@@ -3,30 +3,42 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
-    "@mui/joy": "^5.0.0-alpha.50",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/icons-material": "^5.11.0",
+    "@mui/joy": "^5.0.0-alpha.58",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "react": "^18.2.0",
+    "@testing-library/user-event": "^14.4.3",
+    "prop-types": "^15.8.1",
+    "react-app-rewired": "^2.2.1",
+    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "spotify-web-api-js": "^1.5.2",
-    "web-vitals": "^2.1.4"
+    "react-intl": "^6.2.5",
+    "react-router-dom": "^6.5.0",
+    "react-scripts": "^5.0.1",
+    "react": "^18.2.0",
+    "web-vitals": "^3.1.0"
+  },
+  "devDependencies": {
+    "@formatjs/cli": "^5.1.11",
+    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
+    "colors": "^1.4.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-formatjs": "^4.3.8",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react": "^7.31.11",
+    "prettier": "^2.8.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "eject": "react-scripts eject",
+    "i18n:extract": "formatjs extract 'src/**/*.{js,jsx}' --out-file messages.json && formatjs compile messages.json --out-file src/translations/en.json && rm messages.json",
+    "i18n:check": "node scripts/checkTranslations.js",
     "lint": "eslint --max-warnings=0 --fix --ext .js,.jsx .",
     "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config .prettierrc.js"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -39,13 +51,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "eslint": "^8.26.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-react": "^7.31.10",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^2.7.1"
   }
 }

@@ -1,0 +1,10 @@
+{
+  "components.ConfirmTrackModel.cancel": "Abbrechen",
+  "components.ConfirmTrackModel.confirm": "Bestätigen",
+  "components.ConfirmTrackModel.header": "Position des Songs bestätigen?",
+  "components.ConfirmTrackModel.mainContent": "Möchtest du die Position des aktuellen Songs einloggen?",
+  "components.ConfirmTrackModel.release_year.label": "Du kannst ein Extra-Token verdienen, indem du das exakte Veröffentlichungsjahr des Songs errätst.",
+  "components.ConfirmTrackModel.release_year.placeholder": "Veröffentlichungsjahr",
+  "components.GuessTrackCard.confirm.label": "Bestätigen",
+  "components.GuessTrackCard.header": "Errate den Song!"
+}

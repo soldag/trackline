@@ -1,0 +1,15 @@
+{
+  "StatusBar.label.contesting.active": "It's your turn to contest!",
+  "StatusBar.label.contesting.passive": "Waiting for other players to contest...",
+  "StatusBar.label.guessing.active": "It's your turn to guess!",
+  "StatusBar.label.guessing.passive": "Waiting for {player} to guess...",
+  "StatusBar.label.pendingStart.active": "Waiting for other players...",
+  "StatusBar.label.pendingStart.passive": "Waiting for game to start...",
+  "components.ConfirmTrackModel.cancel": "Cancel",
+  "components.ConfirmTrackModel.confirm": "Confirm",
+  "components.ConfirmTrackModel.header": "Confirm track position?",
+  "components.ConfirmTrackModel.mainContent": "Do you want to confirm the position of the track that is playing?",
+  "components.ConfirmTrackModel.release_year.label": "You can earn an extra token when correctly guessing the exact release year.",
+  "components.GuessTrackCard.confirm.label": "Confirm",
+  "components.GuessTrackCard.header": "Guess the song!"
+}
