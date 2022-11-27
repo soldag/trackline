@@ -1,0 +1,36 @@
+[flake8]
+max-line-length = 88
+extend-ignore = E501
+extend-immutable-calls =
+    Depends,
+    Header,
+    Query
+exclude =
+    .git
+    .venv
+    __pycache__
+    build
+    dist
+
+# flake8-class-attributes-order
+class_attributes_order =
+    constant,
+    field,
+    meta_class
+    nested_class,
+    __new__,
+    __init__,
+    __post_init__,
+    magic_method,
+    property_method,
+    static_method,
+    class_method,
+    methods,
+    private_property_method,
+    private_static_method,
+    private_class_method,
+    private_methods
+
+# flake8-import-order
+import-order-style = google
+application-import-names = trackline
