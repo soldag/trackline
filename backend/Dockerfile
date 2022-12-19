@@ -13,9 +13,11 @@ FROM python:3.10-alpine AS base
 WORKDIR /app
 
 COPY --from=poetry /tmp/requirements.txt /app
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN apk add --update-cache --virtual build-deps build-base git \
+    && pip install --no-cache-dir --upgrade -r requirements.txt \
+    && apk del build-deps
 
-ADD trackline /app/
+ADD . /app
 
 
 FROM base AS dev

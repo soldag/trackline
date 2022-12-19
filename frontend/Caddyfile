@@ -1,0 +1,10 @@
+:80 {
+	root .
+	templates {
+		mime text/plain text/javascript application/javascript
+		between <%% %%>
+	}
+
+	file_server
+	try_files {path} /index.html
+}
