@@ -493,10 +493,7 @@ class ScoreTurn(BaseModel):
             await self._notifier.notify(
                 user_id,
                 game,
-                TurnScored(
-                    scoring=scoring_out,
-                    game_completed=game_completed,
-                ),
+                TurnScored(scoring=scoring_out),
             )
 
             return scoring_out

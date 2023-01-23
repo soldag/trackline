@@ -115,6 +115,7 @@ class GameOut(BaseModel):
 
 class TurnScoringOut(BaseModel):
     tokens: Mapping[str, int]
+    game_completed: bool
 
 
 class PlayerJoined(Notification):
