@@ -22,7 +22,6 @@ from trackline.schema.games import (
     TurnScoringOut,
 )
 from trackline.schema.users import UserOut
-from trackline.services.mapper import Mapper
 from trackline.services.notifier import NotificationChannel, Notifier
 from trackline.services.repositories import GameRepository, UserRepository
 from trackline.services.spotify import SpotifyService
@@ -110,10 +109,6 @@ class CreateGame(BaseModel):
     spotify_market: str
 
     class Handler(BaseHandler):
-        def __init__(self, game_repository: GameRepository, mapper: Mapper) -> None:
-            super().__init__(game_repository)
-            self._mapper = mapper
-
         async def execute(self, user_id: str, use_case: "CreateGame") -> GameOut:
             game = Game(
                 settings=GameSettings(
@@ -126,22 +121,18 @@ class CreateGame(BaseModel):
             )
             await self._game_repository.create(game)
 
-            return self._mapper.map(game, GameOut)
+            return GameOut.from_model(game)
 
 
 class GetGame(BaseModel):
     game_id: str
 
     class Handler(BaseHandler):
-        def __init__(self, game_repository: GameRepository, mapper: Mapper) -> None:
-            super().__init__(game_repository)
-            self._mapper = mapper
-
         async def execute(self, user_id: str, use_case: "GetGame") -> GameOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
 
-            return self._mapper.map(game, GameOut)
+            return GameOut.from_model(game)
 
 
 class GetGameUsers(BaseModel):
@@ -152,11 +143,9 @@ class GetGameUsers(BaseModel):
             self,
             game_repository: GameRepository,
             user_repository: UserRepository,
-            mapper: Mapper,
         ) -> None:
             super().__init__(game_repository)
             self.user_repository = user_repository
-            self._mapper = mapper
 
         async def execute(
             self, user_id: str, use_case: "GetGameUsers"
@@ -167,7 +156,7 @@ class GetGameUsers(BaseModel):
             user_ids = [player.user_id for player in game.players]
             users = await self.user_repository.find_by_ids(user_ids)
 
-            return [self._mapper.map(user, UserOut) for user in users]
+            return [UserOut.from_model(user) for user in users]
 
 
 class JoinGame(BaseModel):
@@ -179,12 +168,10 @@ class JoinGame(BaseModel):
             game_repository: GameRepository,
             user_repository: UserRepository,
             notifier: Notifier,
-            mapper: Mapper,
         ) -> None:
             super().__init__(game_repository)
             self._user_repository = user_repository
             self._notifier = notifier
-            self._mapper = mapper
 
         async def execute(self, user_id: str, use_case: "JoinGame") -> PlayerOut:
             game = await self._get_game(use_case.game_id)
@@ -200,8 +187,8 @@ class JoinGame(BaseModel):
             await self._game_repository.add_player(game.id, player)
 
             user = await self._user_repository.find_by_id(user_id)
-            user_out = self._mapper.map(user, UserOut)
-            player_out = self._mapper.map(player, PlayerOut)
+            user_out = UserOut.from_model(user) if user else None
+            player_out = PlayerOut.from_model(player)
             await self._notifier.notify(
                 user_id,
                 game,
@@ -215,12 +202,9 @@ class LeaveGame(BaseModel):
     game_id: str
 
     class Handler(BaseHandler):
-        def __init__(
-            self, game_repository: GameRepository, notifier: Notifier, mapper: Mapper
-        ) -> None:
+        def __init__(self, game_repository: GameRepository, notifier: Notifier) -> None:
             super().__init__(game_repository)
             self._notifier = notifier
-            self._mapper = mapper
 
         async def execute(self, user_id: str, use_case: "LeaveGame") -> None:
             game = await self._get_game(use_case.game_id)
@@ -252,12 +236,10 @@ class StartGame(BaseModel):
             game_repository: GameRepository,
             spotify_service: SpotifyService,
             notifier: Notifier,
-            mapper: Mapper,
         ) -> None:
             super().__init__(game_repository)
             self._spotify_service = spotify_service
             self._notifier = notifier
-            self._mapper = mapper
 
         async def execute(self, user_id: str, use_case: "StartGame") -> GameOut:
             game = await self._get_game(use_case.game_id)
@@ -295,7 +277,7 @@ class StartGame(BaseModel):
                 }
             )
 
-            return self._mapper.map(game, GameOut)
+            return GameOut.from_model(game)
 
 
 class AbortGame(BaseModel):
@@ -306,11 +288,9 @@ class AbortGame(BaseModel):
             self,
             game_repository: GameRepository,
             notifier: Notifier,
-            mapper: Mapper,
         ) -> None:
             super().__init__(game_repository)
             self._notifier = notifier
-            self._mapper = mapper
 
         async def execute(self, user_id: str, use_case: "AbortGame") -> None:
             game = await self._get_game(use_case.game_id)
@@ -333,12 +313,10 @@ class CreateTurn(BaseModel):
             game_repository: GameRepository,
             spotify_service: SpotifyService,
             notifier: Notifier,
-            mapper: Mapper,
         ) -> None:
             super().__init__(game_repository)
             self._spotify_service = spotify_service
             self._notifier = notifier
-            self._mapper = mapper
 
         async def execute(self, user_id: str, use_case: "CreateTurn") -> TurnOut:
             game = await self._get_game(use_case.game_id)
@@ -372,7 +350,7 @@ class CreateTurn(BaseModel):
                 game.id, {"state": GameState.GUESSING}
             )
 
-            turn_out = self._mapper.map(turn, TurnOut)
+            turn_out = TurnOut.from_model(turn)
             await self._notifier.notify(user_id, game, NewTurn(turn=turn_out))
 
             return turn_out
@@ -389,11 +367,9 @@ class CreateGuess(BaseModel):
             self,
             game_repository: GameRepository,
             notifier: Notifier,
-            mapper: Mapper,
         ) -> None:
             super().__init__(game_repository)
             self._notifier = notifier
-            self._mapper = mapper
 
         async def execute(self, user_id: str, use_case: "CreateGuess") -> GuessOut:
             game = await self._get_game(use_case.game_id)
@@ -429,7 +405,7 @@ class CreateGuess(BaseModel):
                 game.id, use_case.turn_id, user_id, guess
             )
 
-            guess_out = self._mapper.map(guess, GuessOut)
+            guess_out = GuessOut.from_model(guess, user_id)
             await self._notifier.notify(
                 user_id,
                 game,
@@ -448,11 +424,9 @@ class ScoreTurn(BaseModel):
             self,
             game_repository: GameRepository,
             notifier: Notifier,
-            mapper: Mapper,
         ) -> None:
             super().__init__(game_repository)
             self._notifier = notifier
-            self._mapper = mapper
 
         async def execute(self, user_id: str, use_case: "ScoreTurn") -> TurnScoringOut:
             game = await self._get_game(use_case.game_id)
@@ -515,7 +489,7 @@ class ScoreTurn(BaseModel):
                 new_state = GameState.SCORING
             await self._game_repository.update_by_id(game.id, {"state": new_state})
 
-            scoring_out = TurnScoringOut(tokens=tokens)
+            scoring_out = TurnScoringOut(tokens=tokens, game_completed=game_completed)
             await self._notifier.notify(
                 user_id,
                 game,

@@ -8,7 +8,6 @@ from trackline.configuration import (
     SPOTIFY_REDIRECT_URL,
 )
 from trackline.services.database import DatabaseClient
-from trackline.services.mapper import Mapper
 from trackline.services.notifier import Notifier
 from trackline.services.repositories import (
     GameRepository,
@@ -83,8 +82,6 @@ class Container(containers.DeclarativeContainer):
         database=database,
     )
 
-    mapper = providers.Factory(Mapper)
-
     notifier = providers.Singleton(Notifier)
 
     spotify_service = providers.Resource(
@@ -100,7 +97,6 @@ class Container(containers.DeclarativeContainer):
         CreateSession.Handler,
         session_repository=session_repository,
         user_repository=user_repository,
-        mapper=mapper,
     )
 
     delete_session_handler = providers.Factory(
@@ -119,20 +115,17 @@ class Container(containers.DeclarativeContainer):
         AbortGame.Handler,
         game_repository=game_repository,
         notifier=notifier,
-        mapper=mapper,
     )
 
     create_game_handler = providers.Factory(
         CreateGame.Handler,
         game_repository=game_repository,
-        mapper=mapper,
     )
 
     create_guess_handler = providers.Factory(
         CreateGuess.Handler,
         game_repository=game_repository,
         notifier=notifier,
-        mapper=mapper,
     )
 
     create_turn_handler = providers.Factory(
@@ -140,20 +133,17 @@ class Container(containers.DeclarativeContainer):
         game_repository=game_repository,
         spotify_service=spotify_service,
         notifier=notifier,
-        mapper=mapper,
     )
 
     get_game_handler = providers.Factory(
         GetGame.Handler,
         game_repository=game_repository,
-        mapper=mapper,
     )
 
     get_game__users_handler = providers.Factory(
         GetGameUsers.Handler,
         game_repository=game_repository,
         user_repository=user_repository,
-        mapper=mapper,
     )
 
     join_game_handler = providers.Factory(
@@ -161,14 +151,12 @@ class Container(containers.DeclarativeContainer):
         game_repository=game_repository,
         user_repository=user_repository,
         notifier=notifier,
-        mapper=mapper,
     )
 
     leave_game_handler = providers.Factory(
         LeaveGame.Handler,
         game_repository=game_repository,
         notifier=notifier,
-        mapper=mapper,
     )
 
     register_notification_channel_handler = providers.Factory(
@@ -181,7 +169,6 @@ class Container(containers.DeclarativeContainer):
         ScoreTurn.Handler,
         game_repository=game_repository,
         notifier=notifier,
-        mapper=mapper,
     )
 
     start_game_handler = providers.Factory(
@@ -189,7 +176,6 @@ class Container(containers.DeclarativeContainer):
         game_repository=game_repository,
         spotify_service=spotify_service,
         notifier=notifier,
-        mapper=mapper,
     )
 
     unregister_notification_channel_handler = providers.Factory(
@@ -215,11 +201,9 @@ class Container(containers.DeclarativeContainer):
     create_user_handler = providers.Factory(
         CreateUser.Handler,
         user_repository=user_repository,
-        mapper=mapper,
     )
 
     get_current_user_handler = providers.Factory(
         GetCurrentUser.Handler,
         user_repository=user_repository,
-        mapper=mapper,
     )

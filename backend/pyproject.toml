@@ -14,7 +14,6 @@ decorator = "^5.1.1"
 dependency-injector = "^4.40.0"
 fastapi = "^0.88.0"
 motor = "^3.1.1"
-py-automapper = { git = "https://github.com/soldag/py-automapper.git", branch = "main" }
 python-dotenv = "^0.21.0"
 uvicorn = "^0.20.0"
 websockets = "^10.4"
@@ -38,7 +37,6 @@ check_untyped_defs = true
 [[tool.mypy.overrides]]
 module = [
     "async_spotify.*",
-    "automapper.*",
     "motor.*"
 ]
 ignore_missing_imports = true

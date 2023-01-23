@@ -2,7 +2,6 @@ from pydantic import BaseModel
 
 from trackline.models.auth import Session
 from trackline.schema.auth import SessionOut
-from trackline.services.mapper import Mapper
 from trackline.services.repositories import SessionRepository, UserRepository
 from trackline.utils.exceptions import UseCaseException
 from trackline.utils.security import verify_password
@@ -17,11 +16,9 @@ class CreateSession(BaseModel):
             self,
             session_repository: SessionRepository,
             user_repository: UserRepository,
-            mapper: Mapper,
         ) -> None:
             self._session_repository = session_repository
             self._user_repository = user_repository
-            self._mapper = mapper
 
         async def execute(self, use_case: "CreateSession") -> SessionOut:
             user = await self._user_repository.find_one({"username": use_case.username})
@@ -50,7 +47,7 @@ class CreateSession(BaseModel):
             session = Session(user_id=user.id)
             await self._session_repository.create(session)
 
-            return self._mapper.map(session, SessionOut)
+            return SessionOut.from_model(session)
 
 
 class DeleteSession(BaseModel):

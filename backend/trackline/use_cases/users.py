@@ -2,7 +2,6 @@ from pydantic import BaseModel
 
 from trackline.models.users import User
 from trackline.schema.users import UserOut
-from trackline.services.mapper import Mapper
 from trackline.services.repositories import UserRepository
 from trackline.utils.exceptions import UseCaseException
 from trackline.utils.security import hash_password
@@ -13,9 +12,8 @@ class CreateUser(BaseModel):
     password: str
 
     class Handler:
-        def __init__(self, user_repository: UserRepository, mapper: Mapper) -> None:
+        def __init__(self, user_repository: UserRepository) -> None:
             self._user_repository = user_repository
-            self._mapper = mapper
 
         async def execute(self, use_case: "CreateUser") -> UserOut:
             user = User(
@@ -24,14 +22,13 @@ class CreateUser(BaseModel):
             )
             await self._user_repository.create(user)
 
-            return self._mapper.map(user, UserOut)
+            return UserOut.from_model(user)
 
 
 class GetCurrentUser(BaseModel):
     class Handler:
-        def __init__(self, user_repository: UserRepository, mapper: Mapper) -> None:
+        def __init__(self, user_repository: UserRepository) -> None:
             self._user_repository = user_repository
-            self._mapper = mapper
 
         async def execute(self, user_id: str, use_case: "GetCurrentUser") -> UserOut:
             user = await self._user_repository.find_by_id(user_id)
@@ -42,4 +39,4 @@ class GetCurrentUser(BaseModel):
                     status_code=404,
                 )
 
-            return self._mapper.map(user, UserOut)
+            return UserOut.from_model(user)
