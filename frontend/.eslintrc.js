@@ -26,6 +26,7 @@ module.exports = {
     "react-hooks/exhaustive-deps": "warn",
     "comma-dangle": ["error", "always-multiline"],
     "no-empty": ["error", { allowEmptyCatch: true }],
+    "no-duplicate-imports": ["error", { includeExports: true }],
   },
   settings: {
     react: {
