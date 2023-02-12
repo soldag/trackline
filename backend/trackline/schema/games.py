@@ -52,7 +52,7 @@ class PlayerOut(BaseModel):
 
 class GuessOut(BaseModel):
     user_id: str
-    timestamp: datetime
+    creation_time: datetime
     position: int | None
     release_year: int | None
 
@@ -60,13 +60,14 @@ class GuessOut(BaseModel):
     def from_model(model: Guess, user_id: str) -> "GuessOut":
         return GuessOut(
             user_id=user_id,
-            timestamp=model.timestamp,
+            creation_time=model.creation_time,
             position=model.position,
             release_year=model.release_year,
         )
 
 
 class TurnOut(BaseModel):
+    creation_time: datetime
     active_user_id: str
     track: TrackOut
     guesses: List[GuessOut]
@@ -74,6 +75,7 @@ class TurnOut(BaseModel):
     @staticmethod
     def from_model(model: Turn) -> "TurnOut":
         return TurnOut(
+            creation_time=model.creation_time,
             active_user_id=model.active_user_id,
             track=TrackOut.from_model(model.track),
             guesses=[
@@ -103,6 +105,7 @@ class GameSettingsOut(BaseModel):
 
 class GameOut(BaseModel):
     id: str
+    creation_time: datetime
     settings: GameSettingsOut
     state: GameState
     turns: List[TurnOut]
@@ -112,6 +115,7 @@ class GameOut(BaseModel):
     def from_model(model: Game) -> "GameOut":
         return GameOut(
             id=model.id,
+            creation_time=model.creation_time,
             settings=GameSettingsOut.from_model(model.settings),
             state=model.state,
             turns=[TurnOut.from_model(t) for t in model.turns],

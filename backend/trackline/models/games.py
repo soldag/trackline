@@ -33,12 +33,13 @@ class Player(BaseModel):
 
 
 class Guess(BaseModel):
-    timestamp: datetime = Field(default_factory=datetime.now)
+    creation_time: datetime = Field(default_factory=datetime.now)
     position: int | None = None
     release_year: int | None = None
 
 
 class Turn(BaseModel):
+    creation_time: datetime = Field(default_factory=datetime.now)
     active_user_id: StringId
     track: Track
     guesses: Dict[str, Guess] = {}
@@ -53,6 +54,7 @@ class GameSettings(BaseModel):
 
 
 class Game(IdentifiableModel):
+    creation_time: datetime = Field(default_factory=datetime.now)
     settings: GameSettings
     state: GameState = GameState.WAITING_FOR_PLAYERS
     turns: List[Turn] = []

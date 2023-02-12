@@ -483,7 +483,7 @@ class ScoreTurn(BaseModel):
             sorted_guesses = dict(
                 sorted(
                     turn.guesses.items(),
-                    key=lambda kv: (kv[0] != turn.active_user_id, kv[1].timestamp),
+                    key=lambda kv: (kv[0] != turn.active_user_id, kv[1].creation_time),
                 )
             )
             position_scored = year_scored = False
