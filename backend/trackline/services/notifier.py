@@ -1,5 +1,6 @@
 import asyncio
 from collections import defaultdict
+from fastapi.encoders import jsonable_encoder
 from typing import Any, Dict, List, Protocol, runtime_checkable, Sequence, Tuple
 
 from trackline.models.games import Game
@@ -62,4 +63,6 @@ class Notifier:
         if not channels:
             raise ConnectionError(f"User {player_id} is not connected")
 
-        await asyncio.gather(*(channel.send_json(payload) for channel in channels))
+        await asyncio.gather(
+            *(channel.send_json(jsonable_encoder(payload)) for channel in channels)
+        )
