@@ -86,12 +86,18 @@ class TurnOut(BaseModel):
 class GameSettingsOut(BaseModel):
     spotify_market: str
     playlist_ids: List[str]
+    initial_tokens: int
+    timeline_length: int
+    guess_timeout: int
 
     @staticmethod
     def from_model(model: GameSettings) -> "GameSettingsOut":
         return GameSettingsOut(
             spotify_market=model.spotify_market,
             playlist_ids=model.playlist_ids,
+            initial_tokens=model.initial_tokens,
+            timeline_length=model.timeline_length,
+            guess_timeout=model.guess_timeout,
         )
 
 

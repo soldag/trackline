@@ -4,7 +4,9 @@ from typing import Collection, List, Sequence, Tuple
 from pydantic import BaseModel
 
 from trackline.constants import (
-    TARGET_TIMELINE_LENGTH,
+    DEFAULT_GUESS_TIMEOUT,
+    DEFAULT_INITIAL_TOKENS,
+    DEFAULT_TIMELINE_LENGTH,
     TOKEN_COST_POSITION_GUESS,
     TOKEN_COST_YEAR_GUESS,
     TOKEN_GAIN_YEAR_GUESS,
@@ -111,6 +113,9 @@ class BaseHandler:
 class CreateGame(BaseModel):
     playlist_ids: Sequence[str]
     spotify_market: str
+    initial_tokens = DEFAULT_INITIAL_TOKENS
+    timeline_length = DEFAULT_TIMELINE_LENGTH
+    guess_timeout = DEFAULT_GUESS_TIMEOUT
 
     class Handler(BaseHandler):
         async def execute(self, user_id: str, use_case: "CreateGame") -> GameOut:
@@ -118,9 +123,16 @@ class CreateGame(BaseModel):
                 settings=GameSettings(
                     playlist_ids=use_case.playlist_ids,
                     spotify_market=use_case.spotify_market,
+                    initial_tokens=use_case.initial_tokens,
+                    timeline_length=use_case.timeline_length,
+                    guess_timeout=use_case.guess_timeout,
                 ),
                 players=[
-                    Player(user_id=user_id, is_game_master=True),
+                    Player(
+                        user_id=user_id,
+                        is_game_master=True,
+                        tokens=use_case.initial_tokens,
+                    ),
                 ],
             )
             await self._game_repository.create(game)
@@ -187,7 +199,11 @@ class JoinGame(BaseModel):
                     status_code=400,
                 )
 
-            player = Player(user_id=user_id, is_game_master=False)
+            player = Player(
+                user_id=user_id,
+                is_game_master=False,
+                tokens=game.settings.initial_tokens,
+            )
             await self._game_repository.add_player(game.id, player)
 
             user = await self._user_repository.find_by_id(user_id)
@@ -646,7 +662,7 @@ class ScoreTurn(BaseModel):
                 return False
 
             round_complete = list(game.players)[-1] == player
-            target_length_reached = len(player.timeline) > TARGET_TIMELINE_LENGTH
+            target_length_reached = len(player.timeline) > game.settings.timeline_length
             return round_complete and target_length_reached
 
 

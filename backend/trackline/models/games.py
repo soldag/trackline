@@ -47,6 +47,9 @@ class Turn(BaseModel):
 class GameSettings(BaseModel):
     spotify_market: str
     playlist_ids: List[str]
+    initial_tokens: int
+    timeline_length: int
+    guess_timeout: int
 
 
 class Game(IdentifiableModel):
