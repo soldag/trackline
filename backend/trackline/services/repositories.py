@@ -210,6 +210,9 @@ class GameRepository(Repository[Game]):
     async def inc_tokens(self, game_id: str, amounts: Mapping[str, int]) -> int:
         count = 0
         for user_id, amount in amounts.items():
+            if amount == 0:
+                continue
+
             count += await self._update_one(
                 self._id_query(game_id),
                 {"$inc": {"players.$[player].tokens": amount}},

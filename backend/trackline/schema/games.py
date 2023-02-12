@@ -114,6 +114,7 @@ class GameOut(BaseModel):
 
 
 class TurnScoringOut(BaseModel):
+    track_winner: str | None
     tokens: Mapping[str, int]
     game_completed: bool
 
