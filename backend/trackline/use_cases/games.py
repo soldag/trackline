@@ -520,6 +520,8 @@ class ScoreTurn(BaseModel):
             }
             await self._game_repository.inc_tokens(game.id, tokens_diff)
 
+            # Refresh game from database to get state after scoring
+            game = await self._get_game(game.id)
             game_completed = self._check_end_condition(game)
             if game_completed:
                 new_state = GameState.COMPLETED
@@ -656,14 +658,16 @@ class ScoreTurn(BaseModel):
             if not game.turns:
                 return False
 
-            user_id = game.turns[-1].active_user_id
-            player = game.get_player(user_id)
-            if not player:
-                return False
+            active_user_id = game.turns[-1].active_user_id
+            round_complete = game.players[-1].user_id == active_user_id
 
-            round_complete = list(game.players)[-1] == player
-            target_length_reached = len(player.timeline) > game.settings.timeline_length
-            return round_complete and target_length_reached
+            timeline_lengths = [len(p.timeline) for p in game.players]
+            has_single_winner = (
+                max(timeline_lengths) >= game.settings.timeline_length
+                and timeline_lengths.count(max(timeline_lengths)) == 1
+            )
+
+            return round_complete and has_single_winner
 
 
 class RegisterNotificationChannel(BaseModel):
