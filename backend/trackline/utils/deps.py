@@ -1,5 +1,3 @@
-from typing import Optional
-
 from dependency_injector.wiring import inject, Provide
 from fastapi import Depends, Query, Request
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
@@ -12,8 +10,8 @@ from trackline.utils.exceptions import RequestException
 
 class OptionalHTTPBearer(HTTPBearer):
     async def __call__(
-        self, request: Request = None
-    ) -> Optional[HTTPAuthorizationCredentials]:
+        self, request: Request = None  # type: ignore
+    ) -> HTTPAuthorizationCredentials | None:
         if not request:
             return None
 
