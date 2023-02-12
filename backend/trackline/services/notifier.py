@@ -1,7 +1,8 @@
 import asyncio
 from collections import defaultdict
-from fastapi.encoders import jsonable_encoder
 from typing import Any, Dict, List, Protocol, runtime_checkable, Sequence, Tuple
+
+from fastapi.encoders import jsonable_encoder
 
 from trackline.models.games import Game
 from trackline.schema.base import Notification

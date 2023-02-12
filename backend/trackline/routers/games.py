@@ -11,8 +11,8 @@ from fastapi import (
 from trackline.ioc import Container
 from trackline.schema.base import Omit
 from trackline.schema.games import GameOut, GuessOut, TurnOut
-from trackline.schema.users import UserOut
 from trackline.schema.responses import EntityResponse, Response
+from trackline.schema.users import UserOut
 from trackline.use_cases.games import (
     AbortGame,
     CreateGame,

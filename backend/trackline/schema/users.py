@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 
 from trackline.models.base import StringId
-
 from trackline.models.users import User
 
 
