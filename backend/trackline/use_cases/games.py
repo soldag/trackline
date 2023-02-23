@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Collection, List, Sequence, Tuple
+from typing import Collection, Dict, List, Sequence, Tuple
 
 from pydantic import BaseModel
 
@@ -478,45 +478,22 @@ class ScoreTurn(BaseModel):
                     status_code=403,
                 )
 
-            track_winner: str | None = None
-            new_tokens = {str(p.user_id): p.tokens for p in game.players}
             sorted_guesses = dict(
                 sorted(
                     turn.guesses.items(),
                     key=lambda kv: (kv[0] != turn.active_user_id, kv[1].creation_time),
                 )
             )
-            position_scored = year_scored = False
-            for guess_user_id, guess in sorted_guesses.items():
-                player = game.get_player(guess_user_id)
-                if not player:
-                    continue
-
-                if not position_scored:
-                    position_scored, token_change = await self._score_position(
-                        game,
-                        turn,
-                        guess,
-                        player,
-                        new_tokens[guess_user_id],
-                    )
-                    if position_scored:
-                        track_winner = guess_user_id
-                    new_tokens[guess_user_id] += token_change
-
-                if not year_scored:
-                    year_scored, token_change = self._score_year(
-                        turn, guess, player, new_tokens[guess_user_id]
-                    )
-                    new_tokens[guess_user_id] += token_change
-
-                if position_scored and year_scored:
-                    break
+            tokens = {str(p.user_id): p.tokens for p in game.players}
+            track_winner, tokens = await self._score_position(
+                game, turn, sorted_guesses, tokens
+            )
+            _, tokens = self._score_release_year(game, turn, sorted_guesses, tokens)
 
             tokens_diff = {
-                str(p.user_id): new_tokens[p.user_id] - p.tokens
+                str(p.user_id): tokens[p.user_id] - p.tokens
                 for p in game.players
-                if new_tokens[p.user_id] != p.tokens
+                if tokens[p.user_id] != p.tokens
             }
             await self._game_repository.inc_tokens(game.id, tokens_diff)
 
@@ -542,66 +519,46 @@ class ScoreTurn(BaseModel):
 
             return scoring_out
 
-        def _check_guess(
-            self, timeline: List[Track], track: Track, guess: Guess
-        ) -> Tuple[bool, bool]:
-            position_correct: bool = False
-            if guess.position is not None:
-                if guess.position == 0:
-                    min_year = 0
-                else:
-                    min_year = timeline[guess.position - 1].release_year
-                if guess.position == len(timeline):
-                    max_year = datetime.now().year
-                else:
-                    max_year = timeline[guess.position].release_year
-
-                position_correct = min_year <= track.release_year <= max_year
-
-            year_correct: bool = False
-            if guess.release_year is not None:
-                year_correct = guess.release_year == track.release_year
-
-            return position_correct, year_correct
-
         async def _score_position(
             self,
             game: Game,
             turn: Turn,
-            guess: Guess,
-            player: Player,
-            player_tokens: int,
-        ) -> Tuple[bool, int]:
-            if guess.position is None:
-                return False, 0
+            sorted_guesses: Dict[str, Guess],
+            tokens: Dict[str, int],
+        ) -> Tuple[str | None, Dict[str, int]]:
+            seen_positions = set()
+            tokens = tokens.copy()
+            winner: str | None = None
 
-            active_player = game.get_active_player()
-            if not active_player:
-                raise ValueError("Active player was not found")
+            for guess_user_id, guess in sorted_guesses.items():
+                if guess.position is None or guess.position in seen_positions:
+                    continue
 
-            token_diff = 0
-            is_active_user = turn.active_user_id == player.user_id
-            if not is_active_user:
-                if player_tokens < TOKEN_COST_POSITION_GUESS:
-                    return False, 0
+                player = game.get_player(guess_user_id)
+                active_player = game.get_active_player()
+                if not player or not active_player:
+                    continue
 
-                token_diff = -TOKEN_COST_POSITION_GUESS
+                is_active_player = guess_user_id == active_player.user_id
+                if (
+                    not is_active_player
+                    and tokens[guess_user_id] < TOKEN_COST_POSITION_GUESS
+                ):
+                    continue
 
-            if self._check_position(active_player.timeline, turn.track, guess.position):
-                if is_active_user:
-                    insert_position = guess.position or 0
-                else:
-                    insert_position = self._get_insert_position(
-                        player.timeline, turn.track
-                    )
-
-                await self._game_repository.insert_in_timeline(
-                    game.id, player.user_id, turn.track, insert_position
+                position_correct = self._check_position(
+                    active_player.timeline, turn.track, guess.position
                 )
+                if position_correct and not winner:
+                    winner = guess_user_id
+                    await self._insert_in_timeline(game.id, player, turn.track)
 
-                return True, token_diff
+                if not is_active_player:
+                    tokens[guess_user_id] -= TOKEN_COST_POSITION_GUESS
 
-            return False, token_diff
+                seen_positions.add(guess.position)
+
+            return winner, tokens
 
         def _check_position(
             self, timeline: List[Track], track: Track, position: int
@@ -620,39 +577,58 @@ class ScoreTurn(BaseModel):
 
             return min_year <= track.release_year <= max_year
 
-        def _score_year(
-            self,
-            turn: Turn,
-            guess: Guess,
-            player: Player,
-            player_tokens: int,
-        ) -> Tuple[bool, int]:
-            if guess.release_year is None:
-                return False, 0
-
-            token_diff = 0
-            is_active_user = turn.active_user_id == player.user_id
-            if not is_active_user and guess.release_year is not None:
-                if player_tokens < TOKEN_COST_YEAR_GUESS:
-                    return False, 0
-
-                token_diff = -TOKEN_COST_YEAR_GUESS
-
-            correct_year = guess.release_year == turn.track.release_year
-            if guess.release_year == turn.track.release_year:
-                token_diff = TOKEN_GAIN_YEAR_GUESS
-
-            return correct_year, token_diff
-
-        def _get_insert_position(self, timeline: List[Track], track: Track) -> int:
-            return next(
+        async def _insert_in_timeline(self, game_id: str, player: Player, track: Track):
+            position = next(
                 (
                     i
-                    for i, timeline_track in enumerate(timeline)
+                    for i, timeline_track in enumerate(player.timeline)
                     if timeline_track.release_year > track.release_year
                 ),
-                len(timeline),
+                len(player.timeline),
             )
+
+            await self._game_repository.insert_in_timeline(
+                game_id, player.user_id, track, position
+            )
+
+        def _score_release_year(
+            self,
+            game: Game,
+            turn: Turn,
+            sorted_guesses: Dict[str, Guess],
+            tokens: Dict[str, int],
+        ) -> Tuple[str | None, Dict[str, int]]:
+            seen_years = set()
+            tokens = tokens.copy()
+            winner: str | None = None
+
+            for guess_user_id, guess in sorted_guesses.items():
+                if guess.release_year is None or guess.release_year in seen_years:
+                    continue
+
+                player = game.get_player(guess_user_id)
+                active_player = game.get_active_player()
+                if not player or not active_player:
+                    continue
+
+                is_active_player = guess_user_id == active_player.user_id
+                if (
+                    not is_active_player
+                    and tokens[guess_user_id] < TOKEN_COST_YEAR_GUESS
+                ):
+                    continue
+
+                year_correct = guess.release_year == turn.track.release_year
+                if year_correct and not winner:
+                    winner = guess_user_id
+                    tokens[guess_user_id] += TOKEN_GAIN_YEAR_GUESS
+
+                if not is_active_player and guess_user_id != winner:
+                    tokens[guess_user_id] -= TOKEN_COST_POSITION_GUESS
+
+                seen_years.add(guess.release_year)
+
+            return winner, tokens
 
         def _check_end_condition(self, game: Game) -> bool:
             if not game.turns:
