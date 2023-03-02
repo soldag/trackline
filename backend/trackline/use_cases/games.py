@@ -452,14 +452,18 @@ class CreateGuess(BaseModel):
                     status_code=400,
                 )
 
-            if user_id != turn.active_user_id:
-                min_cost = min(TOKEN_COST_POSITION_GUESS, TOKEN_COST_YEAR_GUESS)
-                if current_player.tokens < min_cost:
-                    raise UseCaseException(
-                        code="INSUFFICIENT_TOKENS",
-                        description="You don't have enough tokens to create this guess.",
-                        status_code=400,
-                    )
+            min_cost = min(TOKEN_COST_POSITION_GUESS, TOKEN_COST_YEAR_GUESS)
+            is_rejection = use_case.position is None and use_case.release_year is None
+            if (
+                not is_rejection
+                and user_id != turn.active_user_id
+                and current_player.tokens < min_cost
+            ):
+                raise UseCaseException(
+                    code="INSUFFICIENT_TOKENS",
+                    description="You don't have enough tokens to create this guess.",
+                    status_code=400,
+                )
 
             guess = Guess(
                 position=use_case.position,
