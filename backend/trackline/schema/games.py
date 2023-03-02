@@ -150,8 +150,11 @@ class NewTurn(Notification):
     turn: TurnOut
 
 
+class TrackExchanged(Notification):
+    track: TrackOut
+
+
 class NewGuess(Notification):
-    user_id: str
     guess: GuessOut
 
 

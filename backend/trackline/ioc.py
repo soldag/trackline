@@ -25,6 +25,7 @@ from trackline.use_cases.games import (
     CreateGame,
     CreateGuess,
     CreateTurn,
+    ExchangeTrack,
     GetGame,
     GetGameUsers,
     JoinGame,
@@ -130,6 +131,13 @@ class Container(containers.DeclarativeContainer):
 
     create_turn_handler = providers.Factory(
         CreateTurn.Handler,
+        game_repository=game_repository,
+        spotify_service=spotify_service,
+        notifier=notifier,
+    )
+
+    exchange_track_handler = providers.Factory(
+        ExchangeTrack.Handler,
         game_repository=game_repository,
         spotify_service=spotify_service,
         notifier=notifier,

@@ -7,6 +7,7 @@ from trackline.constants import (
     DEFAULT_GUESS_TIMEOUT,
     DEFAULT_INITIAL_TOKENS,
     DEFAULT_TIMELINE_LENGTH,
+    TOKEN_COST_EXCHANGE_TRACK,
     TOKEN_COST_POSITION_GUESS,
     TOKEN_COST_YEAR_GUESS,
     TOKEN_GAIN_YEAR_GUESS,
@@ -23,6 +24,8 @@ from trackline.schema.games import (
     PlayerJoined,
     PlayerLeft,
     PlayerOut,
+    TrackExchanged,
+    TrackOut,
     TurnOut,
     TurnScored,
     TurnScoringOut,
@@ -45,6 +48,14 @@ class BaseHandler:
                 code="GAME_NOT_FOUND",
                 description="The game does not exist.",
                 status_code=404,
+            )
+
+    def _assert_is_active_player(self, game: Game, turn_id: int, user_id: str) -> None:
+        if user_id != game.turns[turn_id].active_user_id:
+            raise UseCaseException(
+                code="INACTIVE_PLAYER",
+                description="Only the active player can perform this operation.",
+                status_code=403,
             )
 
     def _assert_is_game_master(self, game: Game, user_id: str) -> None:
@@ -108,6 +119,38 @@ class BaseHandler:
             )
 
         return game
+
+
+class SpotifyBaseHandler(BaseHandler):
+    def __init__(
+        self,
+        game_repository: GameRepository,
+        spotify_service: SpotifyService,
+    ) -> None:
+        super().__init__(game_repository)
+        self._spotify_service = spotify_service
+
+    async def _get_new_track(self, game: Game):
+        timeline_track_ids = {t.spotify_id for p in game.players for t in p.timeline}
+        played_track_ids = {t.track.spotify_id for t in game.turns}
+        exclude_track_ids = {
+            *timeline_track_ids,
+            *played_track_ids,
+            *game.discarded_track_ids,
+        }
+
+        track = await self._spotify_service.get_random_track(
+            game.settings.playlist_ids,
+            exclude=exclude_track_ids,
+            market=game.settings.spotify_market,
+        )
+        if not track:
+            raise UseCaseException(
+                "PLAYLISTS_EXHAUSTED",
+                "There are no unplayed tracks left in the selected playlists.",
+            )
+
+        return track
 
 
 class CreateGame(BaseModel):
@@ -327,15 +370,14 @@ class AbortGame(BaseModel):
 class CreateTurn(BaseModel):
     game_id: str
 
-    class Handler(BaseHandler):
+    class Handler(SpotifyBaseHandler):
         def __init__(
             self,
             game_repository: GameRepository,
             spotify_service: SpotifyService,
             notifier: Notifier,
         ) -> None:
-            super().__init__(game_repository)
-            self._spotify_service = spotify_service
+            super().__init__(game_repository, spotify_service)
             self._notifier = notifier
 
         async def execute(self, user_id: str, use_case: "CreateTurn") -> TurnOut:
@@ -350,17 +392,7 @@ class CreateTurn(BaseModel):
                 active_user_index = -1
             next_player_id = player_ids[(active_user_index + 1) % len(player_ids)]
 
-            timeline_track_ids = {
-                t.spotify_id for p in game.players for t in p.timeline
-            }
-            played_track_ids = {t.track.spotify_id for t in game.turns}
-            exclude_track_ids = timeline_track_ids.union(played_track_ids)
-            track = await self._spotify_service.get_random_track(
-                game.settings.playlist_ids,
-                exclude=exclude_track_ids,
-                market=game.settings.spotify_market,
-            )
-
+            track = await self._get_new_track(game)
             turn = Turn(
                 active_user_id=next_player_id,
                 track=track,
@@ -422,7 +454,7 @@ class CreateGuess(BaseModel):
 
             if user_id != turn.active_user_id:
                 min_cost = min(TOKEN_COST_POSITION_GUESS, TOKEN_COST_YEAR_GUESS)
-                if min_cost > current_player.tokens:
+                if current_player.tokens < min_cost:
                     raise UseCaseException(
                         code="INSUFFICIENT_TOKENS",
                         description="You don't have enough tokens to create this guess.",
@@ -441,7 +473,7 @@ class CreateGuess(BaseModel):
             await self._notifier.notify(
                 user_id,
                 game,
-                NewGuess(user_id=user_id, guess=guess_out),
+                NewGuess(guess=guess_out),
             )
 
             return guess_out
@@ -465,19 +497,12 @@ class ScoreTurn(BaseModel):
             self._assert_is_player(game, user_id)
             self._assert_has_state(game, GameState.GUESSING)
             self._assert_is_active_turn(game, use_case.turn_id)
+            self._assert_is_active_player(game, use_case.turn_id, user_id)
 
             current_player = game.get_player(user_id)
             assert current_player
 
             turn = game.turns[use_case.turn_id]
-            active_player = game.get_player(turn.active_user_id)
-            if not active_player:
-                raise UseCaseException(
-                    code="INACTIVE_PLAYER",
-                    description="Only the active player can perform this operation",
-                    status_code=403,
-                )
-
             sorted_guesses = dict(
                 sorted(
                     turn.guesses.items(),
@@ -644,6 +669,55 @@ class ScoreTurn(BaseModel):
             )
 
             return round_complete and has_single_winner
+
+
+class ExchangeTrack(BaseModel):
+    game_id: str
+    turn_id: int
+
+    class Handler(SpotifyBaseHandler):
+        def __init__(
+            self,
+            game_repository: GameRepository,
+            spotify_service: SpotifyService,
+            notifier: Notifier,
+        ) -> None:
+            super().__init__(game_repository, spotify_service)
+            self._notifier = notifier
+
+        async def execute(self, user_id: str, use_case: "ExchangeTrack") -> TrackOut:
+            game = await self._get_game(use_case.game_id)
+            self._assert_is_player(game, user_id)
+            self._assert_has_state(game, GameState.GUESSING)
+            self._assert_is_active_turn(game, use_case.turn_id)
+            self._assert_is_active_player(game, use_case.turn_id, user_id)
+
+            current_player = game.get_player(user_id)
+            assert current_player
+
+            if current_player.tokens < TOKEN_COST_EXCHANGE_TRACK:
+                raise UseCaseException(
+                    code="INSUFFICIENT_TOKENS",
+                    description="You don't have enough tokens to exchange the track.",
+                    status_code=400,
+                )
+
+            old_track = game.turns[use_case.turn_id].track
+            new_track = await self._get_new_track(game)
+            await self._game_repository.exchange_track(
+                game.id, use_case.turn_id, old_track.spotify_id, new_track
+            )
+            await self._game_repository.inc_tokens(
+                game.id,
+                {user_id: -TOKEN_COST_EXCHANGE_TRACK},
+            )
+
+            new_track_out = TrackOut.from_model(new_track)
+            await self._notifier.notify(
+                user_id, game, TrackExchanged(track=new_track_out)
+            )
+
+            return new_track_out
 
 
 class RegisterNotificationChannel(BaseModel):

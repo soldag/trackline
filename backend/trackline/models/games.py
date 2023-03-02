@@ -59,6 +59,7 @@ class Game(IdentifiableModel):
     state: GameState = GameState.WAITING_FOR_PLAYERS
     turns: List[Turn] = []
     players: List[Player] = []
+    discarded_track_ids: List[str] = []
 
     def get_player(self, user_id: str) -> Player | None:
         return next((p for p in self.players if p.user_id == user_id), None)

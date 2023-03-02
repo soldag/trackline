@@ -10,7 +10,7 @@ from fastapi import (
 
 from trackline.ioc import Container
 from trackline.schema.base import Omit
-from trackline.schema.games import GameOut, GuessOut, TurnOut
+from trackline.schema.games import GameOut, GuessOut, TrackOut, TurnOut
 from trackline.schema.responses import EntityResponse, Response
 from trackline.schema.users import UserOut
 from trackline.use_cases.games import (
@@ -18,6 +18,7 @@ from trackline.use_cases.games import (
     CreateGame,
     CreateGuess,
     CreateTurn,
+    ExchangeTrack,
     GetGame,
     GetGameUsers,
     JoinGame,
@@ -171,6 +172,21 @@ async def score_turn(
     use_case = ScoreTurn(game_id=game_id, turn_id=turn_id)
     turn_out = await handler.execute(auth_user_id, use_case)
     return make_ok(turn_out)
+
+
+@router.post(
+    "/{game_id}/turns/{turn_id}/track/exchange", response_model=EntityResponse[TrackOut]
+)
+@inject
+async def exchange_track(
+    game_id: str,
+    turn_id: int,
+    auth_user_id: str = Depends(get_auth_user),
+    handler: ExchangeTrack.Handler = Depends(Provide[Container.exchange_track_handler]),
+):
+    use_case = ExchangeTrack(game_id=game_id, turn_id=turn_id)
+    track_out = await handler.execute(auth_user_id, use_case)
+    return make_ok(track_out)
 
 
 @router.websocket("/{game_id}/notifications")

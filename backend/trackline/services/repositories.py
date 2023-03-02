@@ -177,6 +177,22 @@ class GameRepository(Repository[Game]):
             {"$push": {"turns": self._to_document(turn, root=False)}},
         )
 
+    async def exchange_track(
+        self, game_id: str, turn_id: int, old_track_id: str, track: Track
+    ) -> int:
+        return await self._update_one(
+            self._id_query(game_id),
+            {
+                "$set": {
+                    f"turns.{turn_id}.track": self._to_document(track, root=False),
+                    "guesses": [],
+                },
+                "$push": {
+                    "discarded_track_ids": old_track_id,
+                },
+            },
+        )
+
     async def add_guess(
         self, game_id: str, turn_id: int, user_id: str, guess: Guess
     ) -> int:
