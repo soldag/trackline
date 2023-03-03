@@ -7,6 +7,7 @@ from trackline.constants import (
     DEFAULT_GUESS_TIMEOUT,
     DEFAULT_INITIAL_TOKENS,
     DEFAULT_TIMELINE_LENGTH,
+    TOKEN_COST_BUY_TRACK,
     TOKEN_COST_EXCHANGE_TRACK,
     TOKEN_COST_POSITION_GUESS,
     TOKEN_COST_YEAR_GUESS,
@@ -24,8 +25,10 @@ from trackline.schema.games import (
     PlayerJoined,
     PlayerLeft,
     PlayerOut,
+    TrackBought,
     TrackExchanged,
     TrackOut,
+    TrackPurchaseReceiptOut,
     TurnOut,
     TurnScored,
     TurnScoringOut,
@@ -65,6 +68,15 @@ class BaseHandler:
                 code="NO_GAME_MASTER",
                 description="Only the game master can perform this operation.",
                 status_code=403,
+            )
+
+    def _assert_has_tokens(self, game: Game, user_id: str, tokens: int) -> None:
+        player = game.get_player(user_id)
+        if player and player.tokens < tokens:
+            raise UseCaseException(
+                code="INSUFFICIENT_TOKENS",
+                description="You don't have enough tokens to perform this operation.",
+                status_code=400,
             )
 
     def _assert_has_state(
@@ -119,6 +131,31 @@ class BaseHandler:
             )
 
         return game
+
+    def _get_track_position(self, timeline: Collection[Track], track: Track) -> int:
+        return next(
+            (
+                i
+                for i, timeline_track in enumerate(timeline)
+                if timeline_track.release_year > track.release_year
+            ),
+            len(timeline),
+        )
+
+    def _check_end_condition(self, game: Game) -> bool:
+        if not game.turns:
+            return False
+
+        active_user_id = game.turns[-1].active_user_id
+        round_complete = game.players[-1].user_id == active_user_id
+
+        timeline_lengths = [len(p.timeline) for p in game.players]
+        has_single_winner = (
+            max(timeline_lengths) >= game.settings.timeline_length
+            and timeline_lengths.count(max(timeline_lengths)) == 1
+        )
+
+        return round_complete and has_single_winner
 
 
 class SpotifyBaseHandler(BaseHandler):
@@ -429,9 +466,6 @@ class CreateGuess(BaseModel):
             self._assert_has_state(game, GameState.GUESSING)
             self._assert_is_active_turn(game, use_case.turn_id)
 
-            current_player = game.get_player(user_id)
-            assert current_player
-
             turn = game.turns[use_case.turn_id]
             if user_id in turn.guesses:
                 raise UseCaseException(
@@ -454,16 +488,8 @@ class CreateGuess(BaseModel):
 
             min_cost = min(TOKEN_COST_POSITION_GUESS, TOKEN_COST_YEAR_GUESS)
             is_rejection = use_case.position is None and use_case.release_year is None
-            if (
-                not is_rejection
-                and user_id != turn.active_user_id
-                and current_player.tokens < min_cost
-            ):
-                raise UseCaseException(
-                    code="INSUFFICIENT_TOKENS",
-                    description="You don't have enough tokens to create this guess.",
-                    status_code=400,
-                )
+            if not is_rejection and user_id != turn.active_user_id:
+                self._assert_has_tokens(game, user_id, min_cost)
 
             guess = Guess(
                 position=use_case.position,
@@ -580,7 +606,10 @@ class ScoreTurn(BaseModel):
                 )
                 if position_correct and not winner:
                     winner = guess_user_id
-                    await self._insert_in_timeline(game.id, player, turn.track)
+                    position = self._get_track_position(player.timeline, turn.track)
+                    await self._game_repository.insert_in_timeline(
+                        game.id, player.user_id, turn.track, position
+                    )
 
                 if not is_active_player:
                     tokens[guess_user_id] -= TOKEN_COST_POSITION_GUESS
@@ -605,20 +634,6 @@ class ScoreTurn(BaseModel):
                 max_year = timeline[position].release_year
 
             return min_year <= track.release_year <= max_year
-
-        async def _insert_in_timeline(self, game_id: str, player: Player, track: Track):
-            position = next(
-                (
-                    i
-                    for i, timeline_track in enumerate(player.timeline)
-                    if timeline_track.release_year > track.release_year
-                ),
-                len(player.timeline),
-            )
-
-            await self._game_repository.insert_in_timeline(
-                game_id, player.user_id, track, position
-            )
 
         def _score_release_year(
             self,
@@ -659,20 +674,66 @@ class ScoreTurn(BaseModel):
 
             return winner, tokens
 
-        def _check_end_condition(self, game: Game) -> bool:
-            if not game.turns:
-                return False
 
-            active_user_id = game.turns[-1].active_user_id
-            round_complete = game.players[-1].user_id == active_user_id
+class BuyTrack(BaseModel):
+    game_id: str
 
-            timeline_lengths = [len(p.timeline) for p in game.players]
-            has_single_winner = (
-                max(timeline_lengths) >= game.settings.timeline_length
-                and timeline_lengths.count(max(timeline_lengths)) == 1
+    class Handler(SpotifyBaseHandler):
+        def __init__(
+            self,
+            game_repository: GameRepository,
+            spotify_service: SpotifyService,
+            notifier: Notifier,
+        ) -> None:
+            super().__init__(game_repository, spotify_service)
+            self._notifier = notifier
+
+        async def execute(
+            self, user_id: str, use_case: "BuyTrack"
+        ) -> TrackPurchaseReceiptOut:
+            game = await self._get_game(use_case.game_id)
+            self._assert_is_player(game, user_id)
+            self._assert_has_state(game, GameState.SCORING)
+            self._assert_has_tokens(game, user_id, TOKEN_COST_BUY_TRACK)
+
+            current_player = game.get_player(user_id)
+            assert current_player
+
+            track = await self._get_new_track(game)
+            position = self._get_track_position(current_player.timeline, track)
+            await self._game_repository.insert_in_timeline(
+                game.id, user_id, track, position
             )
 
-            return round_complete and has_single_winner
+            await self._game_repository.inc_tokens(
+                game.id,
+                {user_id: -TOKEN_COST_BUY_TRACK},
+            )
+
+            # Refresh game from database to get state inserting track
+            game = await self._get_game(game.id)
+            game_completed = self._check_end_condition(game)
+            if game_completed:
+                await self._game_repository.update_by_id(
+                    game.id, {"state": GameState.COMPLETED}
+                )
+
+            track_out = TrackOut.from_model(track)
+            await self._notifier.notify(
+                user_id,
+                game,
+                TrackBought(
+                    user_id=user_id,
+                    track=track_out,
+                    game_completed=game_completed,
+                ),
+            )
+
+            return TrackPurchaseReceiptOut(
+                user_id=user_id,
+                track=track_out,
+                game_completed=game_completed,
+            )
 
 
 class ExchangeTrack(BaseModel):
@@ -695,16 +756,7 @@ class ExchangeTrack(BaseModel):
             self._assert_has_state(game, GameState.GUESSING)
             self._assert_is_active_turn(game, use_case.turn_id)
             self._assert_is_active_player(game, use_case.turn_id, user_id)
-
-            current_player = game.get_player(user_id)
-            assert current_player
-
-            if current_player.tokens < TOKEN_COST_EXCHANGE_TRACK:
-                raise UseCaseException(
-                    code="INSUFFICIENT_TOKENS",
-                    description="You don't have enough tokens to exchange the track.",
-                    status_code=400,
-                )
+            self._assert_has_tokens(game, user_id, TOKEN_COST_EXCHANGE_TRACK)
 
             old_track = game.turns[use_case.turn_id].track
             new_track = await self._get_new_track(game)

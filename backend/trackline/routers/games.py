@@ -15,6 +15,7 @@ from trackline.schema.responses import EntityResponse, Response
 from trackline.schema.users import UserOut
 from trackline.use_cases.games import (
     AbortGame,
+    BuyTrack,
     CreateGame,
     CreateGuess,
     CreateTurn,
@@ -26,6 +27,7 @@ from trackline.use_cases.games import (
     RegisterNotificationChannel,
     ScoreTurn,
     StartGame,
+    TrackPurchaseReceiptOut,
     UnregisterNotificationChannel,
 )
 from trackline.utils.deps import get_auth_user
@@ -172,6 +174,25 @@ async def score_turn(
     use_case = ScoreTurn(game_id=game_id, turn_id=turn_id)
     turn_out = await handler.execute(auth_user_id, use_case)
     return make_ok(turn_out)
+
+
+@router.post(
+    "/{game_id}/players/{user_id}/timeline",
+    response_model=EntityResponse[TrackPurchaseReceiptOut],
+)
+@inject
+async def buy_track(
+    game_id: str,
+    user_id: str,
+    auth_user_id: str = Depends(get_auth_user),
+    handler: BuyTrack.Handler = Depends(Provide[Container.buy_track_handler]),
+):
+    if user_id != auth_user_id:
+        return make_error("FORBIDDEN", "You can only buy tracks for yourself", 403)
+
+    use_case = BuyTrack(game_id=game_id)
+    receipt_out = await handler.execute(auth_user_id, use_case)
+    return make_ok(receipt_out)
 
 
 @router.post(

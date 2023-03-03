@@ -208,7 +208,7 @@ class GameRepository(Repository[Game]):
         )
 
     async def insert_in_timeline(
-        self, game_id: str, user_id: str, track: Track, position: int | None = None
+        self, game_id: str, user_id: str, track: Track, position: int
     ) -> int:
         return await self._update_one(
             self._id_query(game_id),

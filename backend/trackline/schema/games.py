@@ -129,6 +129,12 @@ class TurnScoringOut(BaseModel):
     game_completed: bool
 
 
+class TrackPurchaseReceiptOut(BaseModel):
+    user_id: str
+    track: TrackOut
+    game_completed: bool
+
+
 class PlayerJoined(Notification):
     user: UserOut
     player: PlayerOut
@@ -160,3 +166,9 @@ class NewGuess(Notification):
 
 class TurnScored(Notification):
     scoring: TurnScoringOut
+
+
+class TrackBought(Notification):
+    user_id: str
+    track: TrackOut
+    game_completed: bool

@@ -22,6 +22,7 @@ from trackline.use_cases.auth import (
 )
 from trackline.use_cases.games import (
     AbortGame,
+    BuyTrack,
     CreateGame,
     CreateGuess,
     CreateTurn,
@@ -115,6 +116,13 @@ class Container(containers.DeclarativeContainer):
     abort_game_handler = providers.Factory(
         AbortGame.Handler,
         game_repository=game_repository,
+        notifier=notifier,
+    )
+
+    buy_track_handler = providers.Factory(
+        BuyTrack.Handler,
+        game_repository=game_repository,
+        spotify_service=spotify_service,
         notifier=notifier,
     )
 
