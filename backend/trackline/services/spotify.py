@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+import re
 from typing import Collection, List, Sequence, Tuple
 
 from async_spotify import SpotifyApiClient
@@ -30,6 +31,12 @@ class PlaylistNotFoundException(Exception):
 
 
 class SpotifyService:
+    TITLE_CLEANUP_PATTERNS = (
+        r" - \d+ Remaster(ed)?",
+        r" - Remaster(ed)? \d+",
+        r" - [^ ]+ Version",
+    )
+
     def __init__(self, client_id: str, client_secret: str, redirect_url: str) -> None:
         self._client_id = client_id
         self._client_secret = client_secret
@@ -162,10 +169,16 @@ class SpotifyService:
 
             return Track(
                 spotify_id=track["id"],
-                title=track["name"],
+                title=self._cleanup_title(track["name"]),
                 artists=", ".join(a["name"] for a in track["artists"]),
                 release_year=int(release_date[:4]),
                 image_url=images[0]["url"] if images else None,
             )
 
         return None
+
+    def _cleanup_title(self, title: str) -> str:
+        for pattern in self.TITLE_CLEANUP_PATTERNS:
+            title = re.sub(pattern, "", title)
+
+        return title.strip()
