@@ -38,11 +38,23 @@ class Guess(BaseModel):
     release_year: int | None = None
 
 
+class CategoryScoring(BaseModel):
+    winner: str | None
+    tokens_delta: Dict[str, int]
+
+
+class TurnScoring(BaseModel):
+    position: CategoryScoring
+    release_year: CategoryScoring
+
+
 class Turn(BaseModel):
     creation_time: datetime = Field(default_factory=datetime.now)
     active_user_id: StringId
     track: Track
     guesses: Dict[str, Guess] = {}
+    scoring: TurnScoring | None
+    completed_by: List[str] = []
 
 
 class GameSettings(BaseModel):

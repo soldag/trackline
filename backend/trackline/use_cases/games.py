@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Collection, Dict, List, Sequence, Tuple
+from typing import Collection, Dict, List, Sequence
 
 from pydantic import BaseModel
 
@@ -13,7 +13,16 @@ from trackline.constants import (
     TOKEN_COST_YEAR_GUESS,
     TOKEN_GAIN_YEAR_GUESS,
 )
-from trackline.models.games import Game, GameSettings, Guess, Player, Track, Turn
+from trackline.models.games import (
+    CategoryScoring,
+    Game,
+    GameSettings,
+    Guess,
+    Player,
+    Track,
+    Turn,
+    TurnScoring,
+)
 from trackline.schema.games import (
     GameAborted,
     GameOut,
@@ -29,6 +38,8 @@ from trackline.schema.games import (
     TrackExchanged,
     TrackOut,
     TrackPurchaseReceiptOut,
+    TurnCompleted,
+    TurnCompletionOut,
     TurnOut,
     TurnScored,
     TurnScoringOut,
@@ -141,21 +152,6 @@ class BaseHandler:
             ),
             len(timeline),
         )
-
-    def _check_end_condition(self, game: Game) -> bool:
-        if not game.turns:
-            return False
-
-        active_user_id = game.turns[-1].active_user_id
-        round_complete = game.players[-1].user_id == active_user_id
-
-        timeline_lengths = [len(p.timeline) for p in game.players]
-        has_single_winner = (
-            max(timeline_lengths) >= game.settings.timeline_length
-            and timeline_lengths.count(max(timeline_lengths)) == 1
-        )
-
-        return round_complete and has_single_winner
 
 
 class SpotifyBaseHandler(BaseHandler):
@@ -540,32 +536,36 @@ class ScoreTurn(BaseModel):
                 )
             )
             tokens = {str(p.user_id): p.tokens for p in game.players}
-            track_winner, tokens = await self._score_position(
+
+            position_scoring = await self._score_position(
                 game, turn, sorted_guesses, tokens
             )
-            _, tokens = self._score_release_year(game, turn, sorted_guesses, tokens)
+            tokens = self._apply_tokens_delta(tokens, position_scoring.tokens_delta)
 
-            tokens_diff = {
+            release_year_scoring = self._score_release_year(
+                game, turn, sorted_guesses, tokens
+            )
+            tokens = self._apply_tokens_delta(tokens, release_year_scoring.tokens_delta)
+
+            tokens_delta = {
                 str(p.user_id): tokens[p.user_id] - p.tokens
                 for p in game.players
                 if tokens[p.user_id] != p.tokens
             }
-            await self._game_repository.inc_tokens(game.id, tokens_diff)
+            await self._game_repository.inc_tokens(game.id, tokens_delta)
 
-            # Refresh game from database to get state after scoring
-            game = await self._get_game(game.id)
-            game_completed = self._check_end_condition(game)
-            if game_completed:
-                new_state = GameState.COMPLETED
-            else:
-                new_state = GameState.SCORING
-            await self._game_repository.update_by_id(game.id, {"state": new_state})
-
-            scoring_out = TurnScoringOut(
-                track_winner=track_winner,
-                tokens=tokens_diff,
-                game_completed=game_completed,
+            scoring = TurnScoring(
+                position=position_scoring,
+                release_year=release_year_scoring,
             )
+            await self._game_repository.set_turn_scoring(
+                game.id, use_case.turn_id, scoring
+            )
+            await self._game_repository.update_by_id(
+                game.id, {"state": GameState.SCORING}
+            )
+
+            scoring_out = TurnScoringOut.from_model(scoring)
             await self._notifier.notify(
                 user_id,
                 game,
@@ -580,9 +580,9 @@ class ScoreTurn(BaseModel):
             turn: Turn,
             sorted_guesses: Dict[str, Guess],
             tokens: Dict[str, int],
-        ) -> Tuple[str | None, Dict[str, int]]:
+        ) -> CategoryScoring:
             seen_positions = set()
-            tokens = tokens.copy()
+            tokens_delta: Dict[str, int] = {}
             winner: str | None = None
 
             for guess_user_id, guess in sorted_guesses.items():
@@ -615,11 +615,11 @@ class ScoreTurn(BaseModel):
                 # but there's already a winner, the player shouldn't be penalized as this
                 # is the same as if they had guessed the same position.
                 if not is_active_player and (not position_correct or not winner):
-                    tokens[guess_user_id] -= TOKEN_COST_POSITION_GUESS
+                    tokens_delta[guess_user_id] = -TOKEN_COST_POSITION_GUESS
 
                 seen_positions.add(guess.position)
 
-            return winner, tokens
+            return CategoryScoring(winner=winner, tokens_delta=tokens_delta)
 
         def _check_position(
             self, timeline: List[Track], track: Track, position: int
@@ -644,9 +644,9 @@ class ScoreTurn(BaseModel):
             turn: Turn,
             sorted_guesses: Dict[str, Guess],
             tokens: Dict[str, int],
-        ) -> Tuple[str | None, Dict[str, int]]:
+        ) -> CategoryScoring:
             seen_years = set()
-            tokens = tokens.copy()
+            tokens_delta: Dict[str, int] = {}
             winner: str | None = None
 
             for guess_user_id, guess in sorted_guesses.items():
@@ -668,14 +668,89 @@ class ScoreTurn(BaseModel):
                 year_correct = guess.release_year == turn.track.release_year
                 if year_correct and not winner:
                     winner = guess_user_id
-                    tokens[guess_user_id] += TOKEN_GAIN_YEAR_GUESS
+                    tokens_delta[guess_user_id] = TOKEN_GAIN_YEAR_GUESS
 
                 if not is_active_player and guess_user_id != winner:
-                    tokens[guess_user_id] -= TOKEN_COST_POSITION_GUESS
+                    tokens_delta[guess_user_id] = -TOKEN_COST_POSITION_GUESS
 
                 seen_years.add(guess.release_year)
 
-            return winner, tokens
+            return CategoryScoring(winner=winner, tokens_delta=tokens_delta)
+
+        def _apply_tokens_delta(
+            self, tokens: Dict[str, int], delta: Dict[str, int]
+        ) -> Dict[str, int]:
+            return {
+                user_id: curr_tokens + delta.get(user_id, 0)
+                for user_id, curr_tokens in tokens.items()
+            }
+
+
+class CompleteTurn(BaseModel):
+    game_id: str
+    turn_id: int
+
+    class Handler(BaseHandler):
+        def __init__(self, game_repository: GameRepository, notifier: Notifier) -> None:
+            super().__init__(game_repository)
+            self._notifier = notifier
+
+        async def execute(
+            self, user_id: str, use_case: "CompleteTurn"
+        ) -> TurnCompletionOut:
+            game = await self._get_game(use_case.game_id)
+            self._assert_is_player(game, user_id)
+            self._assert_has_state(game, GameState.SCORING)
+            self._assert_is_active_turn(game, use_case.turn_id)
+
+            turn = game.turns[use_case.turn_id]
+            if user_id in turn.completed_by:
+                raise UseCaseException(
+                    code="COMPLETED_ALREADY",
+                    description="You have already completed this turn.",
+                    status_code=400,
+                )
+
+            await self._game_repository.add_turn_completed_by(
+                use_case.game_id, use_case.turn_id, user_id
+            )
+
+            user_ids = {p.user_id for p in game.players}
+            completed_by = {*turn.completed_by, user_id}
+            turn_completed = user_ids == completed_by
+
+            game_completed = turn_completed and self._check_end_condition(game)
+            if game_completed:
+                await self._game_repository.update_by_id(
+                    game.id, {"state": GameState.COMPLETED}
+                )
+
+            completion_out = TurnCompletionOut(
+                turn_completed=turn_completed,
+                game_completed=game_completed,
+            )
+            await self._notifier.notify(
+                user_id,
+                game,
+                TurnCompleted(user_id=user_id, completion=completion_out),
+            )
+
+            return completion_out
+
+        def _check_end_condition(self, game: Game) -> bool:
+            if not game.turns:
+                return False
+
+            active_user_id = game.turns[-1].active_user_id
+            round_complete = game.players[-1].user_id == active_user_id
+
+            timeline_lengths = [len(p.timeline) for p in game.players]
+            has_single_winner = (
+                max(timeline_lengths) >= game.settings.timeline_length
+                and timeline_lengths.count(max(timeline_lengths)) == 1
+            )
+
+            return round_complete and has_single_winner
 
 
 class BuyTrack(BaseModel):
@@ -713,14 +788,6 @@ class BuyTrack(BaseModel):
                 {user_id: -TOKEN_COST_BUY_TRACK},
             )
 
-            # Refresh game from database to get state inserting track
-            game = await self._get_game(game.id)
-            game_completed = self._check_end_condition(game)
-            if game_completed:
-                await self._game_repository.update_by_id(
-                    game.id, {"state": GameState.COMPLETED}
-                )
-
             track_out = TrackOut.from_model(track)
             await self._notifier.notify(
                 user_id,
@@ -728,14 +795,12 @@ class BuyTrack(BaseModel):
                 TrackBought(
                     user_id=user_id,
                     track=track_out,
-                    game_completed=game_completed,
                 ),
             )
 
             return TrackPurchaseReceiptOut(
                 user_id=user_id,
                 track=track_out,
-                game_completed=game_completed,
             )
 
 

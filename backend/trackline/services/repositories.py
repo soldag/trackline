@@ -17,7 +17,7 @@ from pydantic import BaseModel
 
 from trackline.models.auth import Session
 from trackline.models.base import IdentifiableModel
-from trackline.models.games import Game, Guess, Player, Track, Turn
+from trackline.models.games import Game, Guess, Player, Track, Turn, TurnScoring
 from trackline.models.users import User
 from trackline.services.database import DatabaseClient
 from trackline.utils.fields import StringId
@@ -204,6 +204,30 @@ class GameRepository(Repository[Game]):
                         guess, root=False
                     )
                 }
+            },
+        )
+
+    async def set_turn_scoring(
+        self, game_id: str, turn_id: int, scoring: TurnScoring
+    ) -> int:
+        return await self._update_one(
+            self._id_query(game_id),
+            {
+                "$set": {
+                    f"turns.{turn_id}.scoring": self._to_document(scoring, root=False),
+                },
+            },
+        )
+
+    async def add_turn_completed_by(
+        self, game_id: str, turn_id: int, user_id: str
+    ) -> int:
+        return await self._update_one(
+            self._id_query(game_id),
+            {
+                "$addToSet": {
+                    f"turns.{turn_id}.completed_by": user_id,
+                },
             },
         )
 

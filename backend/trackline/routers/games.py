@@ -10,12 +10,19 @@ from fastapi import (
 
 from trackline.ioc import Container
 from trackline.schema.base import Omit
-from trackline.schema.games import GameOut, GuessOut, TrackOut, TurnOut
+from trackline.schema.games import (
+    GameOut,
+    GuessOut,
+    TrackOut,
+    TurnCompletionOut,
+    TurnOut,
+)
 from trackline.schema.responses import EntityResponse, Response
 from trackline.schema.users import UserOut
 from trackline.use_cases.games import (
     AbortGame,
     BuyTrack,
+    CompleteTurn,
     CreateGame,
     CreateGuess,
     CreateTurn,
@@ -172,6 +179,22 @@ async def score_turn(
     handler: ScoreTurn.Handler = Depends(Provide[Container.score_turn_handler]),
 ):
     use_case = ScoreTurn(game_id=game_id, turn_id=turn_id)
+    turn_out = await handler.execute(auth_user_id, use_case)
+    return make_ok(turn_out)
+
+
+@router.post(
+    "/{game_id}/turns/{turn_id}/complete",
+    response_model=EntityResponse[TurnCompletionOut],
+)
+@inject
+async def complete_turn(
+    game_id: str,
+    turn_id: int,
+    auth_user_id: str = Depends(get_auth_user),
+    handler: CompleteTurn.Handler = Depends(Provide[Container.complete_turn_handler]),
+):
+    use_case = CompleteTurn(game_id=game_id, turn_id=turn_id)
     turn_out = await handler.execute(auth_user_id, use_case)
     return make_ok(turn_out)
 

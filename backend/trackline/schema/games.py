@@ -4,6 +4,7 @@ from typing import List, Mapping
 from pydantic import BaseModel
 
 from trackline.models.games import (
+    CategoryScoring,
     Game,
     GameSettings,
     GameState,
@@ -11,6 +12,7 @@ from trackline.models.games import (
     Player,
     Track,
     Turn,
+    TurnScoring,
 )
 from trackline.schema.base import Notification
 from trackline.schema.users import UserOut
@@ -66,11 +68,37 @@ class GuessOut(BaseModel):
         )
 
 
+class CategoryScoringOut(BaseModel):
+    winner: str | None
+    tokens_delta: Mapping[str, int]
+
+    @staticmethod
+    def from_model(model: CategoryScoring) -> "CategoryScoringOut":
+        return CategoryScoringOut(
+            winner=model.winner,
+            tokens_delta=model.tokens_delta,
+        )
+
+
+class TurnScoringOut(BaseModel):
+    position: CategoryScoringOut
+    release_year: CategoryScoringOut
+
+    @staticmethod
+    def from_model(model: TurnScoring) -> "TurnScoringOut":
+        return TurnScoringOut(
+            position=CategoryScoringOut.from_model(model.position),
+            release_year=CategoryScoringOut.from_model(model.release_year),
+        )
+
+
 class TurnOut(BaseModel):
     creation_time: datetime
     active_user_id: str
     track: TrackOut
     guesses: List[GuessOut]
+    scoring: TurnScoringOut | None
+    completed_by: List[str]
 
     @staticmethod
     def from_model(model: Turn) -> "TurnOut":
@@ -82,6 +110,8 @@ class TurnOut(BaseModel):
                 GuessOut.from_model(guess, user_id)
                 for user_id, guess in model.guesses.items()
             ],
+            scoring=TurnScoringOut.from_model(model.scoring) if model.scoring else None,
+            completed_by=model.completed_by,
         )
 
 
@@ -123,16 +153,14 @@ class GameOut(BaseModel):
         )
 
 
-class TurnScoringOut(BaseModel):
-    track_winner: str | None
-    tokens: Mapping[str, int]
+class TurnCompletionOut(BaseModel):
+    turn_completed: bool
     game_completed: bool
 
 
 class TrackPurchaseReceiptOut(BaseModel):
     user_id: str
     track: TrackOut
-    game_completed: bool
 
 
 class PlayerJoined(Notification):
@@ -168,7 +196,11 @@ class TurnScored(Notification):
     scoring: TurnScoringOut
 
 
+class TurnCompleted(Notification):
+    user_id: str
+    completion: TurnCompletionOut
+
+
 class TrackBought(Notification):
     user_id: str
     track: TrackOut
-    game_completed: bool
