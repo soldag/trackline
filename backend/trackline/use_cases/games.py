@@ -611,7 +611,10 @@ class ScoreTurn(BaseModel):
                         game.id, player.user_id, turn.track, position
                     )
 
-                if not is_active_player:
+                # There might be multiple correct positions. If the position is correct,
+                # but there's already a winner, the player shouldn't be penalized as this
+                # is the same as if they had guessed the same position.
+                if not is_active_player and (not position_correct or not winner):
                     tokens[guess_user_id] -= TOKEN_COST_POSITION_GUESS
 
                 seen_positions.add(guess.position)
