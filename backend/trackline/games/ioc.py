@@ -98,6 +98,7 @@ class GamesContainer(containers.DeclarativeContainer):
     leave_game_handler = providers.Factory(
         LeaveGame.Handler,
         game_repository=game_repository,
+        spotify_client=spotify.client,
         notifier=notifier,
     )
 

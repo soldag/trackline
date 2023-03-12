@@ -152,6 +152,7 @@ class PlayerJoined(Notification):
 
 class PlayerLeft(Notification):
     user_id: str
+    new_turn: TurnOut | None
 
 
 class GameStarted(Notification):

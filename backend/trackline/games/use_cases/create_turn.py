@@ -26,14 +26,8 @@ class CreateTurn(BaseModel):
             self._assert_is_player(game, user_id)
             self._assert_has_state(game, (GameState.STARTED, GameState.SCORING))
 
-            player_ids = [p.user_id for p in game.players]
-            try:
-                active_user_index = player_ids.index(game.turns[-1].active_user_id)
-            except (IndexError, ValueError):
-                active_user_index = -1
-            next_player_id = player_ids[(active_user_index + 1) % len(player_ids)]
-
             track = await self._get_new_track(game)
+            next_player_id = self._get_next_player_id(game)
             turn = Turn(
                 active_user_id=next_player_id,
                 track=track,

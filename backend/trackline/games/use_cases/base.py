@@ -110,6 +110,15 @@ class BaseHandler:
             len(timeline),
         )
 
+    def _get_next_player_id(self, game: Game) -> str:
+        player_ids = [p.user_id for p in game.players]
+        try:
+            active_user_index = player_ids.index(game.turns[-1].active_user_id)
+        except (IndexError, ValueError):
+            active_user_index = -1
+
+        return player_ids[(active_user_index + 1) % len(player_ids)]
+
 
 class SpotifyBaseHandler(BaseHandler):
     def __init__(

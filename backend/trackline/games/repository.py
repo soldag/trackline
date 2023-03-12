@@ -28,6 +28,12 @@ class GameRepository(Repository[Game]):
             {"$push": {"turns": self._to_document(turn, root=False)}},
         )
 
+    async def replace_turn(self, game_id: str, turn_id: int, turn: Turn) -> int:
+        return await self._update_one(
+            self._id_query(game_id),
+            {"$set": {f"turns.{turn_id}": self._to_document(turn, root=False)}},
+        )
+
     async def exchange_track(
         self, game_id: str, turn_id: int, old_track_id: str, track: Track
     ) -> int:

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
-
+from trackline.constants import MIN_PLAYER_COUNT
+from trackline.core.exceptions import UseCaseException
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import GameOut, GameStarted, GameState
@@ -26,6 +27,12 @@ class StartGame(BaseModel):
             game = await self._get_game(use_case.game_id)
             self._assert_is_game_master(game, user_id)
             self._assert_has_state(game, GameState.WAITING_FOR_PLAYERS)
+
+            if len(game.players) < MIN_PLAYER_COUNT:
+                raise UseCaseException(
+                    "INSUFFICIENT_PLAYER_COUNT",
+                    f"At least {MIN_PLAYER_COUNT} players are needed to start the game",
+                )
 
             await self._game_repository.update_by_id(
                 game.id, {"state": GameState.STARTED}
