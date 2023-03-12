@@ -2,18 +2,20 @@ from fastapi import FastAPI, Request, WebSocket
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
-from trackline.ioc import Container
-from trackline.middleware import DatabaseTransactionMiddleware
-from trackline.routers import auth, games, spotify, users
-from trackline.schema.responses import Error
-from trackline.utils.exceptions import RequestException
-from trackline.utils.responses import make_error, make_errors
+from trackline.auth.router import router as auth_router
+from trackline.core.exceptions import RequestException
+from trackline.core.ioc import AppContainer
+from trackline.core.middleware import DatabaseTransactionMiddleware
+from trackline.core.utils.response import Error, make_error, make_errors
+from trackline.games.router import router as games_router
+from trackline.spotify.router import router as spotify_router
+from trackline.users.router import router as users_router
 
 
 app = FastAPI(
     title="Trackline",
 )
-app.container = Container()  # type: ignore
+app.container = AppContainer()  # type: ignore
 
 app.add_middleware(DatabaseTransactionMiddleware)
 app.add_middleware(
@@ -24,10 +26,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router)
-app.include_router(games.router)
-app.include_router(spotify.router)
-app.include_router(users.router)
+app.include_router(auth_router)
+app.include_router(games_router)
+app.include_router(spotify_router)
+app.include_router(users_router)
 
 
 @app.exception_handler(Exception)
