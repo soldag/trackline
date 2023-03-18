@@ -1,4 +1,4 @@
-FROM python:3.10-alpine AS poetry
+FROM python:3.11-alpine AS poetry
 
 WORKDIR /tmp
 
@@ -8,7 +8,7 @@ ADD pyproject.toml poetry.lock /tmp/
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 
-FROM python:3.10-alpine AS base
+FROM python:3.11-alpine AS base
 
 WORKDIR /app
 
