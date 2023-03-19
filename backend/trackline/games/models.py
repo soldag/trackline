@@ -5,6 +5,7 @@ from typing import Dict, List
 from pydantic import Field
 
 from trackline.core.db.models import BaseModel, IdentifiableModel, StringId
+from trackline.core.utils.datetime import utcnow
 from trackline.spotify.models import Track
 
 
@@ -25,7 +26,7 @@ class Player(BaseModel):
 
 
 class Guess(BaseModel):
-    creation_time: datetime = Field(default_factory=datetime.now)
+    creation_time: datetime = Field(default_factory=utcnow)
     position: int | None = None
     release_year: int | None = None
 
@@ -41,7 +42,7 @@ class TurnScoring(BaseModel):
 
 
 class Turn(BaseModel):
-    creation_time: datetime = Field(default_factory=datetime.now)
+    creation_time: datetime = Field(default_factory=utcnow)
     active_user_id: StringId
     track: Track
     guesses: Dict[str, Guess] = {}
@@ -58,7 +59,7 @@ class GameSettings(BaseModel):
 
 
 class Game(IdentifiableModel):
-    creation_time: datetime = Field(default_factory=datetime.now)
+    creation_time: datetime = Field(default_factory=utcnow)
     settings: GameSettings
     state: GameState = GameState.WAITING_FOR_PLAYERS
     turns: List[Turn] = []

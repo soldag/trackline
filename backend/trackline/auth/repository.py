@@ -1,8 +1,8 @@
-from datetime import datetime
 from typing import Any, Mapping
 
 from trackline.auth.models import Session
 from trackline.core.db.repository import Repository
+from trackline.core.utils.datetime import utcnow
 
 
 class SessionRepository(Repository[Session]):
@@ -17,7 +17,7 @@ class SessionRepository(Repository[Session]):
             **query,
             "expiration_date": {
                 **query.get("expiration_date", {}),
-                "$gt": datetime.now(),
+                "$gt": utcnow(),
             },
         }
 

@@ -9,7 +9,7 @@ from motor.motor_asyncio import (
 
 class DatabaseClient:
     def __init__(self, db_uri: str, db_name: str) -> None:
-        self._client = AsyncIOMotorClient(db_uri)
+        self._client = AsyncIOMotorClient(db_uri, tz_aware=True)
         self._database: AsyncIOMotorDatabase = self._client[db_name]
 
         self._session: AsyncIOMotorClientSession | None = None

@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Dict, List
 
 from pydantic import BaseModel
@@ -148,12 +147,14 @@ class ScoreTurn(BaseModel):
                 min_year = 0
             else:
                 min_year = timeline[position - 1].release_year
-            if position == len(timeline):
-                max_year = datetime.now().year
-            else:
+
+            max_year = None
+            if position < len(timeline):
                 max_year = timeline[position].release_year
 
-            return min_year <= track.release_year <= max_year
+            return min_year <= track.release_year and (
+                not max_year or track.release_year <= max_year
+            )
 
         def _score_release_year(
             self,
