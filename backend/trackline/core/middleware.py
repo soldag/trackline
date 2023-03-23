@@ -18,6 +18,16 @@ from trackline.core.ioc import AppContainer
 from trackline.core.utils.response import make_error
 
 
+class NoIndexMiddleware(BaseHTTPMiddleware):
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        response = await call_next(request)
+        response.headers["x-robots-tag"] = "noindex, nofollow"
+
+        return response
+
+
 class DatabaseTransactionMiddleware(BaseHTTPMiddleware):
     @inject
     def __init__(
