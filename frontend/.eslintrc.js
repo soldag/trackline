@@ -7,6 +7,8 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
+    "plugin:import/recommended",
+    "plugin:import/react",
     "plugin:prettier/recommended",
   ],
   parserOptions: {
@@ -27,10 +29,17 @@ module.exports = {
     "comma-dangle": ["error", "always-multiline"],
     "no-empty": ["error", { allowEmptyCatch: true }],
     "no-duplicate-imports": ["error", { includeExports: true }],
+    "import/no-relative-packages": "error",
   },
   settings: {
-    react: {
+    "react": {
       version: "detect",
+    },
+    "import/resolver": {
+      node: {
+        extensions: [".js", ".jsx"],
+        moduleDirectory: ["node_modules", "src"],
+      },
     },
   },
   overrides: [
