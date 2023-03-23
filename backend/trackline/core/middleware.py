@@ -15,6 +15,7 @@ from trackline.configuration import (
 )
 from trackline.core.db.client import DatabaseClient
 from trackline.core.ioc import AppContainer
+from trackline.core.utils.datetime import utcnow
 from trackline.core.utils.response import make_error
 
 
@@ -24,6 +25,16 @@ class NoIndexMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         response = await call_next(request)
         response.headers["x-robots-tag"] = "noindex, nofollow"
+
+        return response
+
+
+class ServerTimeMiddleware(BaseHTTPMiddleware):
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        response = await call_next(request)
+        response.headers["x-server-time"] = utcnow().isoformat()
 
         return response
 

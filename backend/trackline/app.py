@@ -5,7 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from trackline.auth.router import router as auth_router
 from trackline.core.exceptions import RequestException
 from trackline.core.ioc import AppContainer
-from trackline.core.middleware import DatabaseTransactionMiddleware, NoIndexMiddleware
+from trackline.core.middleware import (
+    DatabaseTransactionMiddleware,
+    NoIndexMiddleware,
+    ServerTimeMiddleware,
+)
 from trackline.core.utils.response import Error, make_error, make_errors
 from trackline.games.router import router as games_router
 from trackline.spotify.router import router as spotify_router
@@ -18,6 +22,7 @@ app = FastAPI(
 app.container = AppContainer()  # type: ignore
 
 app.add_middleware(NoIndexMiddleware)
+app.add_middleware(ServerTimeMiddleware)
 app.add_middleware(DatabaseTransactionMiddleware)
 app.add_middleware(
     CORSMiddleware,
@@ -25,6 +30,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["x-server-time"],
 )
 
 app.include_router(auth_router)
