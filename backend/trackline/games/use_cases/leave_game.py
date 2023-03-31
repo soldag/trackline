@@ -1,27 +1,26 @@
 from pydantic import BaseModel
 
-
 from trackline.constants import MIN_PLAYER_COUNT
 from trackline.core.exceptions import UseCaseException
 from trackline.games.models import GameState, Turn
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import GameAborted, PlayerLeft, TurnOut
-from trackline.games.use_cases.base import SpotifyBaseHandler
-from trackline.spotify.client import SpotifyClient
+from trackline.games.track_provider import TrackProvider
+from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
 
 class LeaveGame(BaseModel):
     game_id: str
 
-    class Handler(SpotifyBaseHandler):
+    class Handler(TrackProvidingBaseHandler):
         def __init__(
             self,
             game_repository: GameRepository,
-            spotify_client: SpotifyClient,
+            track_provider: TrackProvider,
             notifier: Notifier,
         ) -> None:
-            super().__init__(game_repository, spotify_client)
+            super().__init__(game_repository, track_provider)
             self._notifier = notifier
 
         async def execute(self, user_id: str, use_case: "LeaveGame") -> None:

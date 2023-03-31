@@ -1,9 +1,12 @@
+from typing import List
+
 from pydantic import BaseModel
 
 
-class Track(BaseModel):
-    spotify_id: str
+class SpotifyTrack(BaseModel):
+    id: str
+    artists: List[str]
     title: str
-    artists: str
-    release_year: int
+    release_year: int | None
+    is_playable: bool
     image_url: str | None

@@ -11,21 +11,21 @@ from trackline.games.schemas import (
     TrackOut,
     TrackPurchaseReceiptOut,
 )
-from trackline.games.use_cases.base import SpotifyBaseHandler
-from trackline.spotify.client import SpotifyClient
+from trackline.games.track_provider import TrackProvider
+from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
 
 class BuyTrack(BaseModel):
     game_id: str
 
-    class Handler(SpotifyBaseHandler):
+    class Handler(TrackProvidingBaseHandler):
         def __init__(
             self,
             game_repository: GameRepository,
-            spotify_client: SpotifyClient,
+            track_provider: TrackProvider,
             notifier: Notifier,
         ) -> None:
-            super().__init__(game_repository, spotify_client)
+            super().__init__(game_repository, track_provider)
             self._notifier = notifier
 
         async def execute(

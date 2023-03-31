@@ -6,7 +6,6 @@ from pydantic import Field
 
 from trackline.core.db.models import BaseModel, IdentifiableModel, StringId
 from trackline.core.utils.datetime import utcnow
-from trackline.spotify.models import Track
 
 
 class GameState(str, Enum):
@@ -16,6 +15,14 @@ class GameState(str, Enum):
     SCORING = "scoring"
     COMPLETED = "completed"
     ABORTED = "aborted"
+
+
+class Track(BaseModel):
+    spotify_id: str
+    title: str
+    artists: str
+    release_year: int
+    image_url: str | None
 
 
 class Player(BaseModel):

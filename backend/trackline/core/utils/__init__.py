@@ -1,6 +1,6 @@
 import random
 import re
-from typing import List, Sequence, TypeVar
+from typing import Collection, List, TypeVar
 
 
 def to_snake_case(name):
@@ -13,7 +13,7 @@ def to_snake_case(name):
 T = TypeVar("T")
 
 
-def shuffle(seq: Sequence[T]) -> List[T]:
+def shuffle(seq: Collection[T]) -> List[T]:
     copy = list(seq)
     random.shuffle(copy)
     return copy

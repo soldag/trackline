@@ -1,8 +1,4 @@
-from __future__ import annotations
-
-import random
-import re
-from typing import Collection, List, Sequence, Tuple
+from typing import Tuple
 
 from async_spotify import SpotifyApiClient
 from async_spotify.authentification.authorization_flows import (
@@ -14,8 +10,7 @@ from async_spotify.authentification.spotify_authorization_token import (
 )
 from async_spotify.spotify_errors import SpotifyError
 
-from trackline.core.utils import shuffle
-from trackline.games.models import Track
+from trackline.spotify.models import SpotifyTrack
 
 
 class InvalidTokenException(Exception):
@@ -31,12 +26,6 @@ class PlaylistNotFoundException(Exception):
 
 
 class SpotifyClient:
-    TITLE_CLEANUP_PATTERNS = (
-        r" - \d+ Remaster(ed)?",
-        r" - Remaster(ed)? \d+",
-        r" - [^ ]+ Version",
-    )
-
     def __init__(self, client_id: str, client_secret: str, redirect_url: str) -> None:
         self._client_id = client_id
         self._client_secret = client_secret
@@ -82,103 +71,63 @@ class SpotifyClient:
 
         return token.access_token, token.refresh_token
 
-    async def get_random_track(
-        self,
-        playlist_ids: List[str],
-        market: str | None = None,
-        exclude: Collection[str] | None = None,
-    ) -> Track | None:
+    async def get_playlist_total_tracks(self, playlist_id: str) -> int:
+        await self._get_auth_token_if_needed()
+
+        playlist = await self._client.playlists.get_one(
+            playlist_id,
+            fields="tracks.total",
+        )
+        if not playlist:
+            raise PlaylistNotFoundException(playlist_id)
+
+        return playlist["tracks"]["total"]
+
+    async def get_playlist_track(
+        self, playlist_id: str, index: int, market: str | None = None
+    ) -> SpotifyTrack | None:
+        await self._get_auth_token_if_needed()
+
+        params = {
+            "fields": "items(track(id,is_playable,name,artists(name),album(release_date,images)))",
+            "offset": index,
+            "limit": 1,
+        }
+        if market:
+            params["market"] = market
+        response = await self._client.playlists.get_tracks(playlist_id, **params)
+
+        items = response["items"]
+        if not items:
+            return None
+
+        track = items[0]["track"]
+        release_date = track["album"]["release_date"]
+        is_playable = track.get("is_playable", True)
+
+        try:
+            release_year = int(release_date[:4])
+        except (TypeError, IndexError, ValueError):
+            release_year = None
+
+        images = sorted(
+            track["album"]["images"],
+            key=lambda x: x["height"] * x["width"],
+            reverse=True,
+        )
+
+        return SpotifyTrack(
+            id=track["id"],
+            title=track["name"],
+            artists=[a["name"] for a in track["artists"]],
+            release_year=release_year,
+            is_playable=is_playable,
+            image_url=images[0]["url"] if images else None,
+        )
+
+    async def _get_auth_token_if_needed(self) -> None:
         if (
             not self._client.spotify_authorization_token
             or not not self._client.spotify_authorization_token.valid
         ):
             await self._client.get_auth_token_with_client_credentials()
-
-        # TODO: cache playlists?
-        for playlist_id in shuffle(playlist_ids):
-            playlist_id = random.choice(playlist_ids)
-            playlist = await self._client.playlists.get_one(
-                playlist_id,
-                fields="tracks.total",
-            )
-            if not playlist:
-                raise PlaylistNotFoundException(playlist_id)
-
-            total_tracks = playlist["tracks"]["total"]
-            track = await self._get_random_track_from_playlist(
-                playlist_id, total_tracks, market, exclude
-            )
-            if track:
-                return track
-
-        return None
-
-    async def get_random_tracks(
-        self,
-        playlist_ids: List[str],
-        count: int,
-        market: str | None = None,
-        exclude: Collection[str] | None = None,
-    ) -> Sequence[Track]:
-        tracks: List[Track] = []
-        exclude = list(exclude or [])
-        while len(tracks) < count:
-            track = await self.get_random_track(playlist_ids, market, exclude)
-            if not track:
-                break
-
-            tracks.append(track)
-            exclude.append(track.spotify_id)
-
-        return tracks
-
-    async def _get_random_track_from_playlist(
-        self,
-        playlist_id: str,
-        total_tracks: int,
-        market: str | None = None,
-        exclude: Collection[str] | None = None,
-    ) -> Track | None:
-        for i in shuffle(list(range(total_tracks))):
-            params = {
-                "fields": "items(track(id,is_playable,name,artists(name),album(album_type,release_date,images)))",
-                "offset": i,
-                "limit": 1,
-            }
-            if market:
-                params["market"] = market
-            response = await self._client.playlists.get_tracks(playlist_id, **params)
-
-            track = response["items"][0]["track"]
-            album_type = track["album"]["album_type"]
-            release_date = track["album"]["release_date"]
-            if (
-                (exclude and track["id"] in exclude)
-                or track.get("is_playable") is False
-                or album_type == "compilation"
-                or not release_date
-                or not len(release_date) >= 4
-            ):
-                continue
-
-            images = sorted(
-                track["album"]["images"],
-                key=lambda x: x["height"] * x["width"],
-                reverse=True,
-            )
-
-            return Track(
-                spotify_id=track["id"],
-                title=self._cleanup_title(track["name"]),
-                artists=", ".join(a["name"] for a in track["artists"]),
-                release_year=int(release_date[:4]),
-                image_url=images[0]["url"] if images else None,
-            )
-
-        return None
-
-    def _cleanup_title(self, title: str) -> str:
-        for pattern in self.TITLE_CLEANUP_PATTERNS:
-            title = re.sub(pattern, "", title)
-
-        return title.strip()

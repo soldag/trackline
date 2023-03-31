@@ -13,8 +13,11 @@ async-spotify = "^0.4.4"
 decorator = "^5.1.1"
 dependency-injector = "^4.40.0"
 fastapi = "^0.88.0"
+httpx = "^0.23.3"
+lucene-querybuilder = "^0.2"
 motor = "^3.1.1"
 python-dotenv = "^0.21.0"
+toml = "^0.10.2"
 uvicorn = "^0.20.0"
 websockets = "^10.4"
 
@@ -27,6 +30,7 @@ flake8-import-order = "^0.18.1"
 flake8-warnings = "^0.4.0"
 mypy = "^0.991"
 types-decorator = "^5.1.8.1"
+types-toml = "^0.10.8.6"
 
 [build-system]
 requires = ["poetry-core"]
@@ -37,6 +41,7 @@ check_untyped_defs = true
 [[tool.mypy.overrides]]
 module = [
     "async_spotify.*",
-    "motor.*"
+    "lucenequerybuilder.*",
+    "motor.*",
 ]
 ignore_missing_imports = true

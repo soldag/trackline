@@ -1,11 +1,10 @@
 from typing import Collection, Sequence
 
-
 from trackline.core.exceptions import UseCaseException
 from trackline.games.models import Game, Track
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import GameState
-from trackline.spotify.client import SpotifyClient
+from trackline.games.track_provider import TrackProvider
 
 
 class BaseHandler:
@@ -120,14 +119,14 @@ class BaseHandler:
         return player_ids[(active_user_index + 1) % len(player_ids)]
 
 
-class SpotifyBaseHandler(BaseHandler):
+class TrackProvidingBaseHandler(BaseHandler):
     def __init__(
         self,
         game_repository: GameRepository,
-        spotify_client: SpotifyClient,
+        track_provider: TrackProvider,
     ) -> None:
         super().__init__(game_repository)
-        self._spotify_client = spotify_client
+        self._track_provider = track_provider
 
     async def _get_new_track(self, game: Game):
         timeline_track_ids = {t.spotify_id for p in game.players for t in p.timeline}
@@ -138,7 +137,7 @@ class SpotifyBaseHandler(BaseHandler):
             *game.discarded_track_ids,
         }
 
-        track = await self._spotify_client.get_random_track(
+        track = await self._track_provider.get_random_track(
             game.settings.playlist_ids,
             exclude=exclude_track_ids,
             market=game.settings.spotify_market,

@@ -8,6 +8,7 @@ load_dotenv()
 if env := os.getenv("ENVIRONMENT", "production"):
     load_dotenv(f".env.{env}")
 
+APP_CONTACT_EMAIL = os.getenv("APP_CONTACT_EMAIL")
 
 DB_URI = os.getenv("DB_URI", "mongodb://localhost:27017")
 DB_NAME = os.getenv("DB_NAME", "trackline")

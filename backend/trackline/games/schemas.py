@@ -10,12 +10,30 @@ from trackline.games.models import (
     GameState,
     Guess,
     Player,
+    Track,
     Turn,
     TurnScoring,
 )
 from trackline.games.notifier import Notification
-from trackline.spotify.schemas import TrackOut
 from trackline.users.schemas import UserOut
+
+
+class TrackOut(BaseModel):
+    spotify_id: str
+    title: str
+    artists: str
+    release_year: int
+    image_url: str | None
+
+    @staticmethod
+    def from_model(model: Track) -> "TrackOut":
+        return TrackOut(
+            spotify_id=model.spotify_id,
+            title=model.title,
+            artists=model.artists,
+            release_year=model.release_year,
+            image_url=model.image_url,
+        )
 
 
 class PlayerOut(BaseModel):

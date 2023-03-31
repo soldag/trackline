@@ -1,7 +1,9 @@
 from dependency_injector import containers, providers
 
+from trackline.games.music_brainz import MusicBrainzClient
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
+from trackline.games.track_provider import TrackProvider
 from trackline.games.use_cases import (
     AbortGame,
     BuyTrack,
@@ -33,6 +35,14 @@ class GamesContainer(containers.DeclarativeContainer):
         db=core.database_client,
     )
 
+    music_brainz_client = providers.Singleton(MusicBrainzClient)
+
+    track_provider = providers.Factory(
+        TrackProvider,
+        spotify_client=spotify.client,
+        music_brainz_client=music_brainz_client,
+    )
+
     abort_game_handler = providers.Factory(
         AbortGame.Handler,
         game_repository=game_repository,
@@ -42,7 +52,7 @@ class GamesContainer(containers.DeclarativeContainer):
     buy_track_handler = providers.Factory(
         BuyTrack.Handler,
         game_repository=game_repository,
-        spotify_client=spotify.client,
+        track_provider=track_provider,
         notifier=notifier,
     )
 
@@ -66,14 +76,14 @@ class GamesContainer(containers.DeclarativeContainer):
     create_turn_handler = providers.Factory(
         CreateTurn.Handler,
         game_repository=game_repository,
-        spotify_client=spotify.client,
+        track_provider=track_provider,
         notifier=notifier,
     )
 
     exchange_track_handler = providers.Factory(
         ExchangeTrack.Handler,
         game_repository=game_repository,
-        spotify_client=spotify.client,
+        track_provider=track_provider,
         notifier=notifier,
     )
 
@@ -98,7 +108,7 @@ class GamesContainer(containers.DeclarativeContainer):
     leave_game_handler = providers.Factory(
         LeaveGame.Handler,
         game_repository=game_repository,
-        spotify_client=spotify.client,
+        track_provider=track_provider,
         notifier=notifier,
     )
 
@@ -117,7 +127,7 @@ class GamesContainer(containers.DeclarativeContainer):
     start_game_handler = providers.Factory(
         StartGame.Handler,
         game_repository=game_repository,
-        spotify_client=spotify.client,
+        track_provider=track_provider,
         notifier=notifier,
     )
 

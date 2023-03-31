@@ -5,22 +5,21 @@ from trackline.core.exceptions import UseCaseException
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import GameOut, GameStarted, GameState
-from trackline.games.use_cases.base import BaseHandler
-from trackline.spotify.client import SpotifyClient
+from trackline.games.track_provider import TrackProvider
+from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
 
 class StartGame(BaseModel):
     game_id: str
 
-    class Handler(BaseHandler):
+    class Handler(TrackProvidingBaseHandler):
         def __init__(
             self,
             game_repository: GameRepository,
-            spotify_client: SpotifyClient,
+            track_provider: TrackProvider,
             notifier: Notifier,
         ) -> None:
-            super().__init__(game_repository)
-            self._spotify_client = spotify_client
+            super().__init__(game_repository, track_provider)
             self._notifier = notifier
 
         async def execute(self, user_id: str, use_case: "StartGame") -> GameOut:
@@ -38,7 +37,7 @@ class StartGame(BaseModel):
                 game.id, {"state": GameState.STARTED}
             )
 
-            tracks = await self._spotify_client.get_random_tracks(
+            tracks = await self._track_provider.get_random_tracks(
                 game.settings.playlist_ids,
                 count=len(game.players),
                 market=game.settings.spotify_market,
