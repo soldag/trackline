@@ -18,6 +18,8 @@ import YearRange from "components/common/YearRange";
 import { GuessType, PlayerType, TrackType, TurnType } from "types/games";
 import { UserType } from "types/users";
 
+const isValidGuess = (g) => g?.releaseYear != null || g?.position != null;
+
 const Result = ({
   isCorrect,
   userId,
@@ -156,7 +158,7 @@ ReleaseYearResult.propTypes = {
 };
 
 const TimeToGuess = ({ turn, guess }) => {
-  if (!guess) {
+  if (!isValidGuess(guess)) {
     return "-";
   }
 
@@ -191,9 +193,10 @@ const TurnScoringTable = ({ players, users, turn }) => {
     mergedPlayers,
     [
       (p) => p.userId === activeUserId,
+      (p) => isValidGuess(p.guess),
       (p) => Date.parse(p.guess?.creationTime),
     ],
-    ["desc", "asc"],
+    ["desc", "desc", "asc"],
   );
 
   return (
@@ -244,7 +247,9 @@ const TurnScoringTable = ({ players, users, turn }) => {
             component="tr"
             key={player.userId}
             sx={{
-              "color": player.guess == null && "neutral.plainDisabledColor",
+              ...(!isValidGuess(player.guess) && {
+                color: "neutral.plainDisabledColor",
+              }),
               "&:nth-of-type(odd)": {
                 backgroundColor: "background.level1",
               },
