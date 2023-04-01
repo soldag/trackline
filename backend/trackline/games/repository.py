@@ -42,7 +42,7 @@ class GameRepository(Repository[Game]):
             {
                 "$set": {
                     f"turns.{turn_id}.track": self._to_document(track, root=False),
-                    "guesses": [],
+                    f"turns.{turn_id}.guesses": {},
                 },
                 "$push": {
                     "discarded_track_ids": old_track_id,
