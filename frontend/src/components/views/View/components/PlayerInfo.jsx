@@ -4,8 +4,7 @@ import FlagIcon from "@mui/icons-material/Flag";
 import PersonIcon from "@mui/icons-material/Person";
 import TokenIcon from "@mui/icons-material/Token";
 import WebStoriesIcon from "@mui/icons-material/WebStories";
-import Box from "@mui/joy/Box";
-import Typography from "@mui/joy/Typography";
+import { Box, Typography } from "@mui/joy";
 
 import { PlayerType } from "types/games";
 import { UserType } from "types/users";

@@ -4,10 +4,7 @@ import { FormattedMessage } from "react-intl";
 
 import ClearIcon from "@mui/icons-material/Clear";
 import NumbersIcon from "@mui/icons-material/Numbers";
-import Button from "@mui/joy/Button";
-import Grid from "@mui/joy/Grid";
-import IconButton from "@mui/joy/IconButton";
-import Input from "@mui/joy/Input";
+import { Button, Grid, IconButton, Input } from "@mui/joy";
 
 import { GAME_ID_LENGTH, GAME_ID_REGEX } from "constants";
 

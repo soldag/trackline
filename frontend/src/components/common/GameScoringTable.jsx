@@ -1,11 +1,10 @@
-import orderBy from "lodash/orderBy";
+import _ from "lodash";
 import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
 import TokenIcon from "@mui/icons-material/Token";
 import WebStoriesIcon from "@mui/icons-material/WebStories";
-import Box from "@mui/joy/Box";
-import Typography from "@mui/joy/Typography";
+import { Box, Typography } from "@mui/joy";
 
 import NumericDelta from "components/common/NumericDelta";
 import ShadowTable from "components/common/ShadowTable";
@@ -28,7 +27,7 @@ const GameScoringTable = ({ players, users, turn }) => {
     tracksDelta: getTracksDelta(p.userId, turn),
     tokensDelta: getTokensDelta(p.userId, turn),
   }));
-  const sortedPlayers = orderBy(
+  const sortedPlayers = _.orderBy(
     mergedPlayers,
     [(p) => p.timeline.length, (p) => p.tokens],
     ["desc", "desc"],

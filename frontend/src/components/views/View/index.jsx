@@ -1,9 +1,7 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-import Box from "@mui/joy/Box";
-import CircularProgress from "@mui/joy/CircularProgress";
-import Sheet from "@mui/joy/Sheet";
+import { Box, CircularProgress, Sheet } from "@mui/joy";
 
 import { useEventListener } from "utils/hooks";
 

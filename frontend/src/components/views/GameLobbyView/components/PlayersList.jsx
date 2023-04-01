@@ -3,9 +3,7 @@ import { useMemo } from "react";
 
 import PersonIcon from "@mui/icons-material/Person";
 import StarIcon from "@mui/icons-material/Star";
-import List from "@mui/joy/List";
-import ListItem from "@mui/joy/ListItem";
-import ListItemDecorator from "@mui/joy/ListItemDecorator";
+import { List, ListItem, ListItemDecorator } from "@mui/joy";
 
 import { UserType } from "types/users";
 

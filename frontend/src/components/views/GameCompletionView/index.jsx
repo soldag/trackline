@@ -1,11 +1,9 @@
-import { maxBy } from "lodash";
+import _ from "lodash";
 import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
-import Stack from "@mui/joy/Stack";
+import { Box, Button, Stack } from "@mui/joy";
 
 import GameScoringTable from "components/common/GameScoringTable";
 import View from "components/views/View";
@@ -27,7 +25,7 @@ const GameCompletionView = () => {
   const currentPlayer = game?.players.find((p) => p.userId === user?.id);
   const { isGameMaster = false } = currentPlayer || {};
 
-  const winnerPlayer = maxBy(game?.players, (p) => p.timeline.length);
+  const winnerPlayer = _.maxBy(game?.players, (p) => p.timeline.length);
   const winnerUser = users.find((u) => u.id === winnerPlayer?.userId);
 
   useMountEffect(() => {

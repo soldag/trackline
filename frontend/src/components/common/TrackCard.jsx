@@ -1,9 +1,6 @@
 import PropTypes from "prop-types";
 
-import Card from "@mui/joy/Card";
-import CardContent from "@mui/joy/CardContent";
-import CardCover from "@mui/joy/CardCover";
-import Typography from "@mui/joy/Typography";
+import { Card, CardContent, CardCover, Typography } from "@mui/joy";
 
 import { TrackType } from "types/games";
 import SxType from "types/mui";

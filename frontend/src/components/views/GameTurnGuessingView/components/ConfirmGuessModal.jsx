@@ -2,8 +2,7 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
-import Switch from "@mui/joy/Switch";
-import Typography from "@mui/joy/Typography";
+import { Switch, Typography } from "@mui/joy";
 
 import ConfirmModal from "components/common/ConfirmModal";
 import YearPicker from "components/common/YearPicker";

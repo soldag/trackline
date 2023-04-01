@@ -2,12 +2,14 @@ import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
 import CheckIcon from "@mui/icons-material/Check";
-import Box from "@mui/joy/Box";
-import IconButton from "@mui/joy/IconButton";
-import List from "@mui/joy/List";
-import ListItem from "@mui/joy/ListItem";
-import ListItemContent from "@mui/joy/ListItemContent";
-import Typography from "@mui/joy/Typography";
+import {
+  Box,
+  IconButton,
+  List,
+  ListItem,
+  ListItemContent,
+  Typography,
+} from "@mui/joy";
 
 import PlaylistType from "types/spotify";
 

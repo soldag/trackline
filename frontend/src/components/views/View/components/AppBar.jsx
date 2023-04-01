@@ -8,10 +8,7 @@ import AlbumIcon from "@mui/icons-material/Album";
 import ClearIcon from "@mui/icons-material/Clear";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import LogoutIcon from "@mui/icons-material/Logout";
-import Box from "@mui/joy/Box";
-import IconButton from "@mui/joy/IconButton";
-import Stack from "@mui/joy/Stack";
-import Typography from "@mui/joy/Typography";
+import { Box, IconButton, Stack, Typography } from "@mui/joy";
 
 import FullscreenContext from "components/contexts/FullscreenContext";
 import { TURN_GAME_STATES } from "constants";

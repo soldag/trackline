@@ -3,8 +3,7 @@ import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
-import Box from "@mui/joy/Box";
-import Typography from "@mui/joy/Typography";
+import { Box, Typography } from "@mui/joy";
 
 import View from "components/views/View";
 import { joinGame } from "store/games/actions";

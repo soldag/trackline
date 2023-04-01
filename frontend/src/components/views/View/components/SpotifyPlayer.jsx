@@ -4,10 +4,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import { Typography } from "@mui/joy";
-import IconButton from "@mui/joy/IconButton";
-import LinearProgress from "@mui/joy/LinearProgress";
-import Stack from "@mui/joy/Stack";
+import { IconButton, LinearProgress, Stack, Typography } from "@mui/joy";
 
 import FormattedDuration from "components/common/FormattedDuration";
 

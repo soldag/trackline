@@ -1,8 +1,7 @@
 import PropTypes from "prop-types";
 
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import Stack from "@mui/joy/Stack";
-import Typography from "@mui/joy/Typography";
+import { Stack, Typography } from "@mui/joy";
 
 const WinnerTrophy = ({ username }) => (
   <Stack direction="column" alignItems="center">

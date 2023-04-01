@@ -1,5 +1,4 @@
-import orderBy from "lodash/orderBy";
-import padStart from "lodash/padStart";
+import _ from "lodash";
 import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
@@ -9,8 +8,7 @@ import TimerIcon from "@mui/icons-material/Timer";
 import TimerOffIcon from "@mui/icons-material/TimerOff";
 import TokenIcon from "@mui/icons-material/Token";
 import WebStoriesIcon from "@mui/icons-material/WebStories";
-import Typography from "@mui/joy/Typography";
-import Box from "@mui/material/Box";
+import { Box, Typography } from "@mui/material";
 
 import NumericDelta from "components/common/NumericDelta";
 import ShadowTable from "components/common/ShadowTable";
@@ -172,7 +170,7 @@ const TimeToGuess = ({ turn, guess }) => {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = Math.round(totalSeconds % 60);
 
-  return `${padStart(minutes, 2, 0)}:${padStart(seconds, 2, 0)}`;
+  return `${_.padStart(minutes, 2, 0)}:${_.padStart(seconds, 2, 0)}`;
 };
 
 TimeToGuess.propTypes = {
@@ -189,7 +187,7 @@ const TurnScoringTable = ({ players, users, turn }) => {
     username: users.find((u) => u.id === p.userId)?.username,
     guess: guesses.find((g) => g.userId === p.userId),
   }));
-  const sortedPlayers = orderBy(
+  const sortedPlayers = _.orderBy(
     mergedPlayers,
     [
       (p) => p.userId === activeUserId,

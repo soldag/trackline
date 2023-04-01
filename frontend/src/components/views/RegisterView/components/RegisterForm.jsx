@@ -5,9 +5,7 @@ import { Link } from "react-router-dom";
 
 import KeyIcon from "@mui/icons-material/Key";
 import PersonIcon from "@mui/icons-material/Person";
-import Button from "@mui/joy/Button";
-import Grid from "@mui/joy/Grid";
-import Input from "@mui/joy/Input";
+import { Button, Grid, Input } from "@mui/joy";
 
 import {
   MAX_PASSWORD_LENGTH,

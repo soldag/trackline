@@ -2,9 +2,7 @@ import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 
-import Box from "@mui/joy/Box";
-import Stack from "@mui/joy/Stack";
-import Typography from "@mui/joy/Typography";
+import { Box, Stack, Typography } from "@mui/joy";
 
 import Heading from "components/common/Heading";
 import View from "components/views/View";

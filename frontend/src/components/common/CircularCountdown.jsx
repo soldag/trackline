@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
-import CircularProgress from "@mui/joy/CircularProgress";
+import { CircularProgress } from "@mui/joy";
 
 import { useInterval } from "utils/hooks";
 

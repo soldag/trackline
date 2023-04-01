@@ -1,4 +1,4 @@
-import clamp from "lodash/clamp";
+import _ from "lodash";
 import PropTypes from "prop-types";
 import { useEffect } from "react";
 
@@ -6,10 +6,7 @@ import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
-import Stack from "@mui/joy/Stack";
-import Typography from "@mui/joy/Typography";
+import { Box, Button, Stack, Typography } from "@mui/joy";
 
 import SxType from "types/mui";
 
@@ -24,7 +21,7 @@ const YearPicker = ({
   onChange,
   sx,
 }) => {
-  const clampedValue = clamp(value, min, max);
+  const clampedValue = _.clamp(value, min, max);
   const canGoForward = clampedValue < max && !disabled;
   const canGoBackwards = clampedValue > min && !disabled;
 

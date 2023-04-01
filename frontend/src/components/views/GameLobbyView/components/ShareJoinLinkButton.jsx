@@ -4,7 +4,7 @@ import { FormattedMessage } from "react-intl";
 
 import CopyIcon from "@mui/icons-material/ContentCopy";
 import ShareIcon from "@mui/icons-material/Share";
-import Button from "@mui/joy/Button";
+import { Button } from "@mui/joy";
 
 const COPY_CONFIRMATION_TIMEOUT = 3000;
 

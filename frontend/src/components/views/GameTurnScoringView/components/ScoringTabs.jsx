@@ -1,10 +1,8 @@
 import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
-import Tab, { tabClasses } from "@mui/joy/Tab";
-import TabList from "@mui/joy/TabList";
-import TabPanel from "@mui/joy/TabPanel";
-import Tabs from "@mui/joy/Tabs";
+import { Tab, TabList, TabPanel, Tabs } from "@mui/joy";
+import { tabClasses } from "@mui/joy/Tab";
 
 import GameScoringTable from "components/common/GameScoringTable";
 import { PlayerType, TurnType } from "types/games";

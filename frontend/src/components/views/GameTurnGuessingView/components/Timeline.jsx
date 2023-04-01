@@ -3,7 +3,7 @@ import { useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { FormattedMessage } from "react-intl";
 
-import Stack from "@mui/joy/Stack";
+import { Stack } from "@mui/joy";
 
 import TrackCard from "components/common/TrackCard";
 import YearRange from "components/common/YearRange";

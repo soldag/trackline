@@ -1,16 +1,15 @@
-import countBy from "lodash/countBy";
+import _ from "lodash";
 import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
-import Stack from "@mui/joy/Stack";
-import Typography from "@mui/joy/Typography";
+import { Stack, Typography } from "@mui/joy";
 
 import { GameType } from "types/games";
 import { UserType } from "types/users";
 
 const StatusBar = ({ game, users, currentUserId }) => {
   const round = Math.max(
-    ...Object.values(countBy(game.turns, (t) => t.activeUserId)),
+    ...Object.values(_.countBy(game.turns, (t) => t.activeUserId)),
   );
 
   const turn = game.turns.at(-1);

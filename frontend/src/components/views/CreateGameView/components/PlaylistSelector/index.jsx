@@ -1,13 +1,11 @@
-import debounce from "lodash/debounce";
+import _ from "lodash";
 import PropTypes from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
-import Stack from "@mui/joy/Stack";
+import { Box, Button, Stack } from "@mui/joy";
 
 import { ErrorType } from "types/errors";
 import PlaylistType from "types/spotify";
@@ -35,7 +33,7 @@ const PlaylistSelector = ({
     query.length < MIN_QUERY_LENGTH ? [] : searchResults;
 
   const debouncedSearch = useMemo(
-    () => debounce(onSearch, SEARCH_DEBOUNCE_INTERVAL),
+    () => _.debounce(onSearch, SEARCH_DEBOUNCE_INTERVAL),
     [onSearch],
   );
   useEffect(() => {

@@ -1,12 +1,7 @@
 import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
-import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
-import Divider from "@mui/joy/Divider";
-import Modal from "@mui/joy/Modal";
-import ModalDialog from "@mui/joy/ModalDialog";
-import Typography from "@mui/joy/Typography";
+import { Box, Button, Divider, Modal, ModalDialog, Typography } from "@mui/joy";
 
 const ConfirmModal = ({
   open,

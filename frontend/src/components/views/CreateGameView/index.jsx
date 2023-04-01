@@ -4,9 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 import LinkIcon from "@mui/icons-material/Link";
-import Button from "@mui/joy/Button";
-import Stack from "@mui/joy/Stack";
-import Typography from "@mui/joy/Typography";
+import { Button, Stack, Typography } from "@mui/joy";
 
 import View from "components/views/View";
 import { createGame } from "store/games/actions";

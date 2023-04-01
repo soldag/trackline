@@ -1,8 +1,7 @@
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 
-import Button from "@mui/joy/Button";
-import Stack from "@mui/joy/Stack";
+import { Button, Stack } from "@mui/joy";
 
 import View from "components/views/View";
 

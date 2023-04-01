@@ -2,8 +2,7 @@ import PropTypes from "prop-types";
 import { useRef, useState } from "react";
 import { useZxing } from "react-zxing";
 
-import AspectRatio from "@mui/joy/AspectRatio";
-import CircularProgress from "@mui/joy/CircularProgress";
+import { AspectRatio, CircularProgress } from "@mui/joy";
 
 import { JOIN_URL_REGEX } from "constants";
 

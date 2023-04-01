@@ -2,9 +2,7 @@ import { FormattedMessage } from "react-intl";
 import QRCode from "react-qr-code";
 import { useDispatch, useSelector } from "react-redux";
 
-import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
-import Typography from "@mui/joy/Typography";
+import { Box, Button, Typography } from "@mui/joy";
 
 import View from "components/views/View";
 import { MIN_PLAYER_COUNT } from "constants";

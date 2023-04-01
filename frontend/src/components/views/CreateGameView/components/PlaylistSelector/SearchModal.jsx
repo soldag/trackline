@@ -4,18 +4,20 @@ import { FormattedMessage } from "react-intl";
 
 import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
-import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
-import CircularProgress from "@mui/joy/CircularProgress";
-import IconButton from "@mui/joy/IconButton";
-import Input from "@mui/joy/Input";
-import List from "@mui/joy/List";
-import ListItem from "@mui/joy/ListItem";
-import ListSubheader from "@mui/joy/ListSubheader";
-import Modal from "@mui/joy/Modal";
-import ModalClose from "@mui/joy/ModalClose";
-import ModalDialog from "@mui/joy/ModalDialog";
-import Typography from "@mui/joy/Typography";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Input,
+  List,
+  ListItem,
+  ListSubheader,
+  Modal,
+  ModalClose,
+  ModalDialog,
+  Typography,
+} from "@mui/joy";
 
 import { ErrorType } from "types/errors";
 import PlaylistType from "types/spotify";

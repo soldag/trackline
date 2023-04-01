@@ -4,10 +4,7 @@ import AudiotrackIcon from "@mui/icons-material/Audiotrack";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import LoopIcon from "@mui/icons-material/Loop";
-import Button from "@mui/joy/Button";
-import Card from "@mui/joy/Card";
-import CardContent from "@mui/joy/CardContent";
-import Typography from "@mui/joy/Typography";
+import { Button, Card, CardContent, Typography } from "@mui/joy";
 
 import CircularCountdown from "components/common/CircularCountdown";
 

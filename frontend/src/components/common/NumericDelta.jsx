@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-import Typography from "@mui/joy/Typography";
+import { Typography } from "@mui/joy";
 
 import SxType from "types/mui";
 

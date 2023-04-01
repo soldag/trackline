@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import Box from "@mui/joy/Box";
+import { Box } from "@mui/joy";
 
 import StatusBar from "components/views/GameTurnGuessingView/components/StatusBar";
 import View from "components/views/View";

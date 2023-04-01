@@ -1,5 +1,4 @@
-import Sheet from "@mui/joy/Sheet";
-import Table from "@mui/joy/Table";
+import { Sheet, Table } from "@mui/joy";
 
 const ShadowTable = (props) => (
   <Sheet

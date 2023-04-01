@@ -1,8 +1,7 @@
 import { FormattedMessage } from "react-intl";
 
 import AlbumIcon from "@mui/icons-material/Album";
-import Box from "@mui/joy/Box";
-import Typography from "@mui/joy/Typography";
+import { Box, Typography } from "@mui/joy";
 
 import SxType from "types/mui";
 
