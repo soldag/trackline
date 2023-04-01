@@ -15,8 +15,7 @@ import ShadowTable from "components/common/ShadowTable";
 import YearRange from "components/common/YearRange";
 import { GuessType, PlayerType, TrackType, TurnType } from "types/games";
 import { UserType } from "types/users";
-
-const isValidGuess = (g) => g?.releaseYear != null || g?.position != null;
+import { isValidGuess } from "utils/games";
 
 const Result = ({
   isCorrect,

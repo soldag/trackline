@@ -12,6 +12,7 @@ import {
 } from "constants";
 import { exchangeTrack, guessTrack, scoreTurn } from "store/games/actions";
 import { play } from "store/spotify/actions";
+import { isValidGuess } from "utils/games";
 import { useInterval } from "utils/hooks";
 
 import Timeline from "./components/Timeline";
@@ -71,14 +72,14 @@ const GameTurnGuessingView = () => {
   const { timeoutStart, timeoutEnd } = getTimeout(game, turn, timeDeviation);
 
   useEffect(() => {
-    if (guess) {
+    if (guess == null) {
+      setTracks([turn.track, ...activePlayer.timeline]);
+    } else if (guess.position != null) {
       setTracks([
         ...activePlayer.timeline.slice(0, guess.position),
         turn.track,
         ...activePlayer.timeline.slice(guess.position),
       ]);
-    } else {
-      setTracks([turn.track, ...activePlayer.timeline]);
     }
   }, [guess, turn.track, activePlayer.timeline]);
 
@@ -116,11 +117,12 @@ const GameTurnGuessingView = () => {
   }, [dispatch, turn.track, isGameMaster]);
 
   const handleGuess = ({ year }) => {
+    const index = tracks.findIndex((t) => t.spotifyId === turn.track.spotifyId);
     dispatch(
       guessTrack({
         gameId,
         turnId,
-        position: tracks.indexOf(turn.track),
+        position: index >= 0 ? index : null,
         releaseYear: year,
       }),
     );
@@ -159,7 +161,7 @@ const GameTurnGuessingView = () => {
         <Timeline
           tracks={tracks}
           activeTrackId={turn.track.spotifyId}
-          showRange={guess != null}
+          showRange={isValidGuess(guess)}
           canGuessPosition={canGuessPosition}
           canGuessYear={canGuessYear}
           showExchange={isActivePlayer}
