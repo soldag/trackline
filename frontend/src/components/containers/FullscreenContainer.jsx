@@ -27,7 +27,7 @@ const FullscreenContainer = ({ children }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
   useMountEffect(() => {
-    if (isPreferred && !isEnabled) {
+    if (isPreferred && !isEnabled && process.env.NODE_ENV !== "development") {
       setModalOpen(true);
     }
   });
