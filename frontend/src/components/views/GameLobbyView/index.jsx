@@ -1,14 +1,16 @@
+import { useState } from "react";
 import { FormattedMessage } from "react-intl";
-import QRCode from "react-qr-code";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Box, Button, Typography } from "@mui/joy";
+import { Box, Button, Stack, Typography } from "@mui/joy";
 
+import ResponsiveQrCode from "components/common/ResponsiveQrCode";
 import View from "components/views/View";
 import { MIN_PLAYER_COUNT } from "constants";
 import { abortGame, leaveGame, startGame } from "store/games/actions";
 
 import PlayersList from "./components/PlayersList";
+import QrCodeModal from "./components/QrCodeModal";
 import ShareLinkButton from "./components/ShareJoinLinkButton";
 
 const GameLobbyView = () => {
@@ -17,6 +19,8 @@ const GameLobbyView = () => {
   const game = useSelector((state) => state.games.game);
   const users = useSelector((state) => state.games.users);
 
+  const [qrCodeModalOpen, setQrCoreModalOpen] = useState(false);
+
   const gameId = game.id;
   const userId = user.id;
   const gameMasterId = game.players.find((p) => p.isGameMaster)?.userId;
@@ -24,53 +28,73 @@ const GameLobbyView = () => {
 
   return (
     <View appBar={{ showTitle: true, showLogout: true }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
-      >
-        <Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <QRCode value={joinUrl} />
-            <ShareLinkButton
-              fullWidth
-              variant="soft"
-              color="neutral"
-              sx={{ mt: 1 }}
-              url={joinUrl}
-            />
-          </Box>
+      <QrCodeModal
+        joinUrl={joinUrl}
+        open={qrCodeModalOpen}
+        onClose={() => setQrCoreModalOpen(false)}
+      />
 
-          <Box>
+      <Stack
+        direction="column"
+        justifyContent="space-between"
+        spacing={2}
+        sx={{ overflow: "hidden" }}
+      >
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          sx={{ overflow: "hidden" }}
+        >
+          <Stack direction="column" spacing={1} sx={{ flex: { sm: "1 1 0" } }}>
             <Typography level="h6">
               <FormattedMessage
-                id="GameLobbyView.players.header"
-                defaultMessage="Players"
+                id="GameLobbyView.invitePlayers.header"
+                defaultMessage="Invite players"
               />
             </Typography>
-            <PlayersList
-              users={users}
-              currentUserId={user?.id}
-              gameMasterId={gameMasterId}
-            />
-          </Box>
-        </Box>
+            <Box sx={{ overflow: "hidden" }}>
+              <ResponsiveQrCode
+                sx={{
+                  maxWidth: {
+                    xs: "128px",
+                    sm: "256px",
+                    md: "512px",
+                  },
+                }}
+                data={joinUrl}
+                onClick={() => setQrCoreModalOpen(true)}
+              />
+            </Box>
+            <ShareLinkButton variant="soft" color="neutral" url={joinUrl} />
+          </Stack>
 
-        <Box>
+          <Stack
+            direction="column"
+            spacing={1}
+            sx={{ flex: { sm: "1 1 0" }, overflow: "hidden" }}
+          >
+            <Typography level="h6">
+              <FormattedMessage
+                id="GameLobbyView.joinedPlayers.header"
+                defaultMessage="Joined players"
+              />
+            </Typography>
+            <Box sx={{ overflowY: "auto" }}>
+              <PlayersList
+                users={users}
+                currentUserId={user?.id}
+                gameMasterId={gameMasterId}
+              />
+            </Box>
+          </Stack>
+        </Stack>
+
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           {user?.id === gameMasterId ? (
             <>
               <Button
                 fullWidth
                 color="danger"
-                sx={{ mb: 2 }}
                 onClick={() => dispatch(abortGame({ gameId }))}
               >
                 <FormattedMessage
@@ -101,8 +125,8 @@ const GameLobbyView = () => {
               />
             </Button>
           )}
-        </Box>
-      </Box>
+        </Stack>
+      </Stack>
     </View>
   );
 };
