@@ -12,6 +12,7 @@ class TrackProvider:
     TITLE_CLEANUP_PATTERNS = (
         r" - [^-]*Remaster(ed)?(.*)$",
         r" - [^-]+ Version(.*)$",
+        r" - [^-]+ Anniversary Edition(.*)$",
         r" - From (.*) Soundtrack$",
         r" - The Original$",
     )
