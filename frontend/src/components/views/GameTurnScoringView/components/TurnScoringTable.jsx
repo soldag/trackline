@@ -38,6 +38,7 @@ const Result = ({
 
   return (
     <Typography
+      fontSize="inherit"
       sx={{
         display: "flex",
         alignItems: "center",
@@ -45,10 +46,11 @@ const Result = ({
         flexWrap: "wrap",
       }}
     >
-      <Typography color={isCorrect ? "success" : "danger"}>
+      <Typography fontSize="inherit" color={isCorrect ? "success" : "danger"}>
         {children}
       </Typography>
       <Typography
+        fontSize="inherit"
         sx={{
           display: "flex",
           alignItems: "center",
@@ -244,9 +246,6 @@ const TurnScoringTable = ({ players, users, turn }) => {
             component="tr"
             key={player.userId}
             sx={{
-              ...(!isValidGuess(player.guess) && {
-                color: "neutral.plainDisabledColor",
-              }),
               "&:nth-of-type(odd)": {
                 backgroundColor: "background.level1",
               },
