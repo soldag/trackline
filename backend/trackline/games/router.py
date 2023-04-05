@@ -78,7 +78,7 @@ async def get_game_users(
     game_id: str,
     auth_user_id: str = Depends(get_auth_user),
     handler: GetGameUsers.Handler = Depends(
-        Provide[AppContainer.games.get_game__users_handler]
+        Provide[AppContainer.games.get_game_users_handler]
     ),
 ):
     use_case = GetGameUsers(game_id=game_id)

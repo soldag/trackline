@@ -92,7 +92,7 @@ class GamesContainer(containers.DeclarativeContainer):
         game_repository=game_repository,
     )
 
-    get_game__users_handler = providers.Factory(
+    get_game_users_handler = providers.Factory(
         GetGameUsers.Handler,
         game_repository=game_repository,
         user_repository=users.user_repository,

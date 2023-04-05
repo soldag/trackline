@@ -1,8 +1,7 @@
 from pydantic import BaseModel
 
-
 from trackline.core.exceptions import UseCaseException
-from trackline.games.models import Player
+from trackline.games.models import GameState, Player
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import PlayerJoined, PlayerOut
@@ -27,6 +26,13 @@ class JoinGame(BaseModel):
 
         async def execute(self, user_id: str, use_case: "JoinGame") -> PlayerOut:
             game = await self._get_game(use_case.game_id)
+            if game.state != GameState.WAITING_FOR_PLAYERS:
+                raise UseCaseException(
+                    code="GAME_NOT_FOUND",
+                    description="The game does not exist.",
+                    status_code=404,
+                )
+
             user_ids = [p.user_id for p in game.players]
             if user_id in user_ids:
                 raise UseCaseException(
