@@ -2,8 +2,8 @@ import PropTypes from "prop-types";
 import { useMemo } from "react";
 
 import PersonIcon from "@mui/icons-material/Person";
-import StarIcon from "@mui/icons-material/Star";
-import { List, ListItem, ListItemDecorator } from "@mui/joy";
+import StarsIcon from "@mui/icons-material/Stars";
+import { List, ListItem, ListItemContent, ListItemDecorator } from "@mui/joy";
 
 import { UserType } from "types/users";
 
@@ -35,13 +35,15 @@ const PlayersList = ({ users = [], gameMasterId, currentUserId }) => {
         <ListItem
           key={user.id}
           variant={user.id === currentUserId ? "soft" : "plain"}
-          color={user.id === currentUserId ? "success" : null}
+          color={user.id === currentUserId ? "success" : undefined}
         >
           <ListItemDecorator>
-            <PersonIcon />
+            <PersonIcon
+              color={user.id === currentUserId ? "success" : undefined}
+            />
           </ListItemDecorator>
-          {user.username}
-          {user.id == gameMasterId && <StarIcon sx={{ ml: "3px" }} />}
+          <ListItemContent>{user.username}</ListItemContent>
+          {user.id == gameMasterId && <StarsIcon />}
         </ListItem>
       ))}
     </List>
