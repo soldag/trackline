@@ -3,9 +3,7 @@ import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
 import FlagIcon from "@mui/icons-material/Flag";
-import OutlinedFlagIcon from "@mui/icons-material/OutlinedFlag";
 import TimerIcon from "@mui/icons-material/Timer";
-import TimerOffIcon from "@mui/icons-material/TimerOff";
 import TokenIcon from "@mui/icons-material/Token";
 import WebStoriesIcon from "@mui/icons-material/WebStories";
 import { Box, Typography } from "@mui/material";
@@ -17,63 +15,39 @@ import { GuessType, PlayerType, TrackType, TurnType } from "types/games";
 import { UserType } from "types/users";
 import { isValidGuess } from "utils/games";
 
-const Result = ({
-  isCorrect,
-  userId,
-  winner,
-  activeUserId,
-  tracksDelta,
-  tokensDelta,
-  children,
-}) => {
-  let looseIcon = null;
-  if (isCorrect && winner !== userId) {
-    looseIcon =
-      winner === activeUserId ? (
-        <OutlinedFlagIcon color="warning" />
-      ) : (
-        <TimerOffIcon color="warning" />
-      );
-  }
-
-  return (
+const Result = ({ isCorrect, tracksDelta, tokensDelta, children }) => (
+  <Typography
+    fontSize="inherit"
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      columnGap: 1,
+      flexWrap: "wrap",
+    }}
+  >
+    <Typography fontSize="inherit" color={isCorrect ? "success" : "danger"}>
+      {children}
+    </Typography>
     <Typography
       fontSize="inherit"
       sx={{
         display: "flex",
         alignItems: "center",
         columnGap: 1,
-        flexWrap: "wrap",
       }}
     >
-      <Typography fontSize="inherit" color={isCorrect ? "success" : "danger"}>
-        {children}
-      </Typography>
-      <Typography
-        fontSize="inherit"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          columnGap: 1,
-        }}
-      >
-        {tracksDelta != null && (
-          <NumericDelta value={tracksDelta} icon={<WebStoriesIcon />} />
-        )}
-        {tokensDelta != null && (
-          <NumericDelta value={tokensDelta} icon={<TokenIcon />} />
-        )}
-        {looseIcon}
-      </Typography>
+      {tracksDelta != null && (
+        <NumericDelta value={tracksDelta} icon={<WebStoriesIcon />} />
+      )}
+      {tokensDelta != null && (
+        <NumericDelta value={tokensDelta} icon={<TokenIcon />} />
+      )}
     </Typography>
-  );
-};
+  </Typography>
+);
 
 Result.propTypes = {
   isCorrect: PropTypes.bool,
-  userId: PropTypes.string,
-  winner: PropTypes.string,
-  activeUserId: PropTypes.string,
   tracksDelta: PropTypes.number,
   tokensDelta: PropTypes.number,
   children: PropTypes.node,
@@ -86,7 +60,6 @@ const PositionResult = ({ turn, guess, timeline }) => {
 
   const {
     track,
-    activeUserId,
     scoring: {
       position: { winner, tokensDelta },
     },
@@ -101,14 +74,11 @@ const PositionResult = ({ turn, guess, timeline }) => {
   const isCorrect =
     (minYear == null || track.releaseYear >= minYear) &&
     (maxYear == null || track.releaseYear <= maxYear);
-  const isWinner = turn.scoring.position.winner == guess.userId;
+  const isWinner = winner == guess.userId;
 
   return (
     <Result
       isCorrect={isCorrect}
-      userId={guess.userId}
-      winner={winner}
-      activeUserId={activeUserId}
       tracksDelta={isWinner ? 1 : 0}
       tokensDelta={tokensDelta[guess.userId]}
     >
@@ -130,22 +100,15 @@ const ReleaseYearResult = ({ turn, guess }) => {
 
   const {
     track,
-    activeUserId,
     scoring: {
-      releaseYear: { winner, tokensDelta },
+      releaseYear: { tokensDelta },
     },
   } = turn;
 
   const isCorrect = track.releaseYear === guess.releaseYear;
 
   return (
-    <Result
-      isCorrect={isCorrect}
-      userId={guess.userId}
-      winner={winner}
-      activeUserId={activeUserId}
-      tokensDelta={tokensDelta[guess.userId]}
-    >
+    <Result isCorrect={isCorrect} tokensDelta={tokensDelta[guess.userId]}>
       {guess.releaseYear}
     </Result>
   );
