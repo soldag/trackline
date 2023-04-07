@@ -15,6 +15,7 @@ class TrackProvider:
         r" - [^-]+ Anniversary Edition(.*)$",
         r" - From (.*)$",
         r" - The Original$",
+        r" \(feat\. [^)]+\)",
     )
 
     def __init__(
