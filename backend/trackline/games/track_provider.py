@@ -13,7 +13,7 @@ class TrackProvider:
         r" - [^-]*Remaster(ed)?(.*)$",
         r" - [^-]+ Version(.*)$",
         r" - [^-]+ Anniversary Edition(.*)$",
-        r" - From (.*) Soundtrack$",
+        r" - From (.*)$",
         r" - The Original$",
     )
 
