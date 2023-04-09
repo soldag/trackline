@@ -25,7 +25,11 @@ const ConfirmModal = ({
   return (
     <Modal open={open} onClose={onClose}>
       <ModalDialog
-        sx={{ "maxWidth": "500px", "--ModalDialog-minWidth": "400px" }}
+        sx={{
+          "overflowY": "auto",
+          "maxWidth": "500px",
+          "--ModalDialog-minWidth": "400px",
+        }}
       >
         {header && (
           <>
