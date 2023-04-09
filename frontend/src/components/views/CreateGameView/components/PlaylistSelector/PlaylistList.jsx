@@ -52,8 +52,8 @@ const PlaylistList = ({
     <List
       sx={{
         "padding": "0px",
-        "--List-item-paddingY": "0px",
-        "--List-item-paddingX": "0px",
+        "--ListItem-paddingY": "0px",
+        "--ListItem-paddingX": "0px",
       }}
     >
       {items.map((playlist) => (
