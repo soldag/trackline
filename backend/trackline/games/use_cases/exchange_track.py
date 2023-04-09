@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 from trackline.constants import TOKEN_COST_EXCHANGE_TRACK
+from trackline.core.fields import ResourceId
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import (
@@ -13,7 +14,7 @@ from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
 
 class ExchangeTrack(BaseModel):
-    game_id: str
+    game_id: ResourceId
     turn_id: int
 
     class Handler(TrackProvidingBaseHandler):
@@ -26,7 +27,9 @@ class ExchangeTrack(BaseModel):
             super().__init__(game_repository, track_provider)
             self._notifier = notifier
 
-        async def execute(self, user_id: str, use_case: "ExchangeTrack") -> TrackOut:
+        async def execute(
+            self, user_id: ResourceId, use_case: "ExchangeTrack"
+        ) -> TrackOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
             self._assert_has_state(game, GameState.GUESSING)

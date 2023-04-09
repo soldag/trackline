@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 from trackline.constants import MIN_PLAYER_COUNT
 from trackline.core.exceptions import UseCaseException
+from trackline.core.fields import ResourceId
 from trackline.games.models import GameState, Turn
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
@@ -11,7 +12,7 @@ from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
 
 class LeaveGame(BaseModel):
-    game_id: str
+    game_id: ResourceId
 
     class Handler(TrackProvidingBaseHandler):
         def __init__(
@@ -23,7 +24,7 @@ class LeaveGame(BaseModel):
             super().__init__(game_repository, track_provider)
             self._notifier = notifier
 
-        async def execute(self, user_id: str, use_case: "LeaveGame") -> None:
+        async def execute(self, user_id: ResourceId, use_case: "LeaveGame") -> None:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
 

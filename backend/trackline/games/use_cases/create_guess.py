@@ -5,6 +5,7 @@ from trackline.constants import (
     TOKEN_COST_YEAR_GUESS,
 )
 from trackline.core.exceptions import UseCaseException
+from trackline.core.fields import ResourceId
 from trackline.games.models import Guess
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
@@ -13,7 +14,7 @@ from trackline.games.use_cases.base import BaseHandler
 
 
 class CreateGuess(BaseModel):
-    game_id: str
+    game_id: ResourceId
     turn_id: int
     position: int | None
     release_year: int | None
@@ -27,7 +28,9 @@ class CreateGuess(BaseModel):
             super().__init__(game_repository)
             self._notifier = notifier
 
-        async def execute(self, user_id: str, use_case: "CreateGuess") -> GuessOut:
+        async def execute(
+            self, user_id: ResourceId, use_case: "CreateGuess"
+        ) -> GuessOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
             self._assert_has_state(game, GameState.GUESSING)

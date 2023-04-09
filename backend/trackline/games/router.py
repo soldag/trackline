@@ -9,6 +9,7 @@ from fastapi import (
 )
 
 from trackline.auth.deps import get_auth_user
+from trackline.core.fields import ResourceId
 from trackline.core.ioc import AppContainer
 from trackline.core.schemas import EntityResponse, Response
 from trackline.core.schemas import Omit
@@ -51,7 +52,7 @@ router = APIRouter(
 @inject
 async def create_game(
     use_case: CreateGame,
-    auth_user_id: str = Depends(get_auth_user),
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: CreateGame.Handler = Depends(
         Provide[AppContainer.games.create_game_handler]
     ),
@@ -63,8 +64,8 @@ async def create_game(
 @router.get("/{game_id}", response_model=EntityResponse[GameOut])
 @inject
 async def get_game(
-    game_id: str,
-    auth_user_id: str = Depends(get_auth_user),
+    game_id: ResourceId,
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: GetGame.Handler = Depends(Provide[AppContainer.games.get_game_handler]),
 ):
     use_case = GetGame(game_id=game_id)
@@ -75,8 +76,8 @@ async def get_game(
 @router.get("/{game_id}/users", response_model=EntityResponse[List[UserOut]])
 @inject
 async def get_game_users(
-    game_id: str,
-    auth_user_id: str = Depends(get_auth_user),
+    game_id: ResourceId,
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: GetGameUsers.Handler = Depends(
         Provide[AppContainer.games.get_game_users_handler]
     ),
@@ -89,8 +90,8 @@ async def get_game_users(
 @router.put("/{game_id}/players", response_model=Response, status_code=201)
 @inject
 async def join_game(
-    game_id: str,
-    auth_user_id: str = Depends(get_auth_user),
+    game_id: ResourceId,
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: JoinGame.Handler = Depends(Provide[AppContainer.games.join_game_handler]),
 ):
     use_case = JoinGame(game_id=game_id)
@@ -101,9 +102,9 @@ async def join_game(
 @router.delete("/{game_id}/players/{user_id}", response_model=Response)
 @inject
 async def leave_game(
-    game_id: str,
-    user_id: str,
-    auth_user_id: str = Depends(get_auth_user),
+    game_id: ResourceId,
+    user_id: ResourceId,
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: LeaveGame.Handler = Depends(
         Provide[AppContainer.games.leave_game_handler]
     ),
@@ -119,8 +120,8 @@ async def leave_game(
 @router.post("/{game_id}/start", response_model=EntityResponse[GameOut])
 @inject
 async def start_game(
-    game_id: str,
-    auth_user_id: str = Depends(get_auth_user),
+    game_id: ResourceId,
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: StartGame.Handler = Depends(
         Provide[AppContainer.games.start_game_handler]
     ),
@@ -133,8 +134,8 @@ async def start_game(
 @router.post("/{game_id}/abort", response_model=Response)
 @inject
 async def abort_game(
-    game_id: str,
-    auth_user_id: str = Depends(get_auth_user),
+    game_id: ResourceId,
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: AbortGame.Handler = Depends(
         Provide[AppContainer.games.abort_game_handler]
     ),
@@ -155,8 +156,8 @@ class CreateGuessBody(CreateGuess, metaclass=Omit):
 @router.post("/{game_id}/turns", response_model=EntityResponse[TurnOut])
 @inject
 async def create_turn(
-    game_id: str,
-    auth_user_id: str = Depends(get_auth_user),
+    game_id: ResourceId,
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: CreateTurn.Handler = Depends(
         Provide[AppContainer.games.create_turn_handler]
     ),
@@ -171,10 +172,10 @@ async def create_turn(
 )
 @inject
 async def create_guess(
-    game_id: str,
+    game_id: ResourceId,
     turn_id: int,
     body: CreateGuessBody,
-    auth_user_id: str = Depends(get_auth_user),
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: CreateGuess.Handler = Depends(
         Provide[AppContainer.games.create_guess_handler]
     ),
@@ -187,9 +188,9 @@ async def create_guess(
 @router.post("/{game_id}/turns/{turn_id}/score", response_model=EntityResponse[GameOut])
 @inject
 async def score_turn(
-    game_id: str,
+    game_id: ResourceId,
     turn_id: int,
-    auth_user_id: str = Depends(get_auth_user),
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: ScoreTurn.Handler = Depends(
         Provide[AppContainer.games.score_turn_handler]
     ),
@@ -205,9 +206,9 @@ async def score_turn(
 )
 @inject
 async def complete_turn(
-    game_id: str,
+    game_id: ResourceId,
     turn_id: int,
-    auth_user_id: str = Depends(get_auth_user),
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: CompleteTurn.Handler = Depends(
         Provide[AppContainer.games.complete_turn_handler]
     ),
@@ -223,9 +224,9 @@ async def complete_turn(
 )
 @inject
 async def buy_track(
-    game_id: str,
-    user_id: str,
-    auth_user_id: str = Depends(get_auth_user),
+    game_id: ResourceId,
+    user_id: ResourceId,
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: BuyTrack.Handler = Depends(Provide[AppContainer.games.buy_track_handler]),
 ):
     if user_id != auth_user_id:
@@ -241,9 +242,9 @@ async def buy_track(
 )
 @inject
 async def exchange_track(
-    game_id: str,
+    game_id: ResourceId,
     turn_id: int,
-    auth_user_id: str = Depends(get_auth_user),
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: ExchangeTrack.Handler = Depends(
         Provide[AppContainer.games.exchange_track_handler]
     ),
@@ -256,9 +257,9 @@ async def exchange_track(
 @router.websocket("/{game_id}/notifications")
 @inject
 async def notifications(
-    game_id: str,
+    game_id: ResourceId,
     websocket: WebSocket,
-    user_id: str = Depends(get_auth_user),
+    user_id: ResourceId = Depends(get_auth_user),
     register_handler: RegisterNotificationChannel.Handler = Depends(
         Provide[AppContainer.games.register_notification_channel_handler]
     ),

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 from trackline.core.exceptions import UseCaseException
+from trackline.core.fields import ResourceId
 from trackline.games.models import (
     Game,
 )
@@ -15,7 +16,7 @@ from trackline.games.use_cases.base import BaseHandler
 
 
 class CompleteTurn(BaseModel):
-    game_id: str
+    game_id: ResourceId
     turn_id: int
 
     class Handler(BaseHandler):
@@ -24,7 +25,7 @@ class CompleteTurn(BaseModel):
             self._notifier = notifier
 
         async def execute(
-            self, user_id: str, use_case: "CompleteTurn"
+            self, user_id: ResourceId, use_case: "CompleteTurn"
         ) -> TurnCompletionOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)

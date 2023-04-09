@@ -4,17 +4,24 @@ from pydantic import BaseModel, constr, Field
 from pydantic.generics import GenericModel
 from pydantic.main import ModelMetaclass
 
+from trackline.core.fields import ResourceId
+
 
 DataT = TypeVar("DataT")
 
 
-class Error(BaseModel):
+class BaseSchema(BaseModel):
+    class Config:
+        json_encoders = {ResourceId: str}
+
+
+class Error(BaseSchema):
     code: Annotated[str, constr(to_upper=True)]
     description: str
     location: Sequence[str] | None = None
 
 
-class Response(BaseModel):
+class Response(BaseSchema):
     status: Literal["ok", "error"] = "ok"
 
 

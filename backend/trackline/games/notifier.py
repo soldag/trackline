@@ -5,12 +5,26 @@ from typing import Any, Dict, List, Protocol, runtime_checkable, Sequence, Tuple
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
+from trackline.core.fields import ResourceId
 from trackline.core.utils import to_snake_case
 from trackline.games.models import Game
 
 
 class Notification(BaseModel):
-    pass
+    def get_type(self):
+        return to_snake_case(self.__class__.__name__)
+
+
+class NotificationEnvelope(BaseModel):
+    type: str
+    payload: Notification
+
+    class Config:
+        json_encoders = {ResourceId: str}
+
+    @staticmethod
+    def for_notification(notification: Notification) -> "NotificationEnvelope":
+        return NotificationEnvelope(type=notification.get_type(), payload=notification)
 
 
 @runtime_checkable
@@ -21,12 +35,12 @@ class NotificationChannel(Protocol):
 
 class Notifier:
     def __init__(self):
-        self._channels: Dict[Tuple[str, str], List[NotificationChannel]] = defaultdict(
-            list
-        )
+        self._channels: Dict[
+            Tuple[ResourceId, ResourceId], List[NotificationChannel]
+        ] = defaultdict(list)
 
     def add_channel(
-        self, game_id: str, player_id: str, channel: NotificationChannel
+        self, game_id: ResourceId, player_id: ResourceId, channel: NotificationChannel
     ) -> None:
         self._channels[game_id, player_id].append(channel)
 
@@ -39,7 +53,7 @@ class Notifier:
 
     async def notify(
         self,
-        user_id: str | None,
+        user_id: ResourceId | None,
         game: Game,
         notification: Notification,
     ) -> None:
@@ -49,25 +63,27 @@ class Notifier:
         if not recipient_ids:
             return
 
-        payload = {
-            "type": to_snake_case(notification.__class__.__name__),
-            "payload": notification.dict(),
-        }
-        await self._send_multicast(game.id, recipient_ids, payload)
+        envelope = NotificationEnvelope.for_notification(notification)
+        await self._send_multicast(game.id, recipient_ids, envelope)
 
     async def _send_multicast(
-        self, game_id: str, player_ids: Sequence[str], payload: Any
+        self,
+        game_id: ResourceId,
+        player_ids: Sequence[ResourceId],
+        envelope: NotificationEnvelope,
     ):
         await asyncio.gather(
-            *(self._send(game_id, player_id, payload) for player_id in player_ids),
+            *(self._send(game_id, player_id, envelope) for player_id in player_ids),
             return_exceptions=True,
         )
 
-    async def _send(self, game_id: str, player_id: str, payload: Any):
+    async def _send(
+        self, game_id: ResourceId, player_id: ResourceId, envelope: NotificationEnvelope
+    ):
         channels = self._channels.get((game_id, player_id))
         if not channels:
             raise ConnectionError(f"User {player_id} is not connected")
 
         await asyncio.gather(
-            *(channel.send_json(jsonable_encoder(payload)) for channel in channels)
+            *(channel.send_json(jsonable_encoder(envelope)) for channel in channels)
         )

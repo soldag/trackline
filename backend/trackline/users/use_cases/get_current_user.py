@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 from trackline.core.exceptions import UseCaseException
+from trackline.core.fields import ResourceId
 from trackline.users.repository import UserRepository
 from trackline.users.schemas import UserOut
 
@@ -11,7 +12,9 @@ class GetCurrentUser(BaseModel):
         def __init__(self, user_repository: UserRepository) -> None:
             self._user_repository = user_repository
 
-        async def execute(self, user_id: str, use_case: "GetCurrentUser") -> UserOut:
+        async def execute(
+            self, user_id: ResourceId, use_case: "GetCurrentUser"
+        ) -> UserOut:
             user = await self._user_repository.find_by_id(user_id)
             if not user:
                 raise UseCaseException(

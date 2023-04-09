@@ -4,7 +4,8 @@ from typing import Dict, List
 
 from pydantic import Field
 
-from trackline.core.db.models import BaseModel, IdentifiableModel, StringId
+from trackline.core.db.models import BaseModel, IdentifiableModel
+from trackline.core.fields import ResourceId
 from trackline.core.utils.datetime import utcnow
 
 
@@ -26,7 +27,7 @@ class Track(BaseModel):
 
 
 class Player(BaseModel):
-    user_id: StringId
+    user_id: ResourceId
     is_game_master: bool = False
     tokens: int = 0
     timeline: List[Track] = []
@@ -40,7 +41,7 @@ class Guess(BaseModel):
 
 class CategoryScoring(BaseModel):
     winner: str | None
-    tokens_delta: Dict[str, int]
+    tokens_delta: Dict[ResourceId, int]
 
 
 class TurnScoring(BaseModel):
@@ -50,9 +51,9 @@ class TurnScoring(BaseModel):
 
 class Turn(BaseModel):
     creation_time: datetime = Field(default_factory=utcnow)
-    active_user_id: StringId
+    active_user_id: ResourceId
     track: Track
-    guesses: Dict[str, Guess] = {}
+    guesses: Dict[ResourceId, Guess] = {}
     scoring: TurnScoring | None
     completed_by: List[str] = []
 
@@ -73,7 +74,7 @@ class Game(IdentifiableModel):
     players: List[Player] = []
     discarded_track_ids: List[str] = []
 
-    def get_player(self, user_id: str) -> Player | None:
+    def get_player(self, user_id: ResourceId) -> Player | None:
         return next((p for p in self.players if p.user_id == user_id), None)
 
     def get_active_player(self) -> Player | None:

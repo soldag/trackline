@@ -7,6 +7,7 @@ from trackline.auth.deps import (
 )
 from trackline.auth.schemas import SessionOut
 from trackline.auth.use_cases import CreateSession, DeleteSession
+from trackline.core.fields import ResourceId
 from trackline.core.ioc import AppContainer
 from trackline.core.schemas import EntityResponse, Response
 from trackline.core.utils.response import make_ok
@@ -34,7 +35,7 @@ async def login(
 @inject
 async def logout(
     token: str = Depends(get_auth_token),
-    auth_user_id: str = Depends(get_auth_user),
+    auth_user_id: ResourceId = Depends(get_auth_user),
     handler: DeleteSession.Handler = Depends(
         Provide[AppContainer.auth.delete_session_handler]
     ),

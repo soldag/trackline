@@ -5,6 +5,7 @@ from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 from trackline.auth.repository import SessionRepository
 from trackline.auth.use_cases import GetSessionUser
 from trackline.core.exceptions import RequestException
+from trackline.core.fields import ResourceId
 from trackline.core.ioc import AppContainer
 
 
@@ -43,7 +44,7 @@ async def get_auth_user(
     session_repository: SessionRepository = Depends(
         Provide[AppContainer.auth.session_repository]
     ),
-) -> str:
+) -> ResourceId:
     use_case = GetSessionUser(token=token)
     handler = GetSessionUser.Handler(session_repository)
     user_id = await handler.execute(use_case)

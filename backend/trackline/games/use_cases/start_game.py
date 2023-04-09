@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 from trackline.constants import MIN_PLAYER_COUNT
 from trackline.core.exceptions import UseCaseException
+from trackline.core.fields import ResourceId
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import GameOut, GameStarted, GameState
@@ -10,7 +11,7 @@ from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
 
 class StartGame(BaseModel):
-    game_id: str
+    game_id: ResourceId
 
     class Handler(TrackProvidingBaseHandler):
         def __init__(
@@ -22,7 +23,7 @@ class StartGame(BaseModel):
             super().__init__(game_repository, track_provider)
             self._notifier = notifier
 
-        async def execute(self, user_id: str, use_case: "StartGame") -> GameOut:
+        async def execute(self, user_id: ResourceId, use_case: "StartGame") -> GameOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_game_master(game, user_id)
             self._assert_has_state(game, GameState.WAITING_FOR_PLAYERS)

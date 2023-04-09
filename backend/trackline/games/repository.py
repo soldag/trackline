@@ -1,8 +1,7 @@
 from typing import Mapping
 
-from bson import ObjectId
-
 from trackline.core.db.repository import Repository
+from trackline.core.fields import ResourceId
 from trackline.games.models import Game, Guess, Player, Track, Turn, TurnScoring
 
 
@@ -10,32 +9,32 @@ class GameRepository(Repository[Game]):
     class Meta:
         collection_name = "games"
 
-    async def add_player(self, game_id: str, player: Player) -> int:
+    async def add_player(self, game_id: ResourceId, player: Player) -> int:
         return await self._update_one(
             self._id_query(game_id),
             {"$push": {"players": self._to_document(player, root=False)}},
         )
 
-    async def remove_player(self, game_id: str, user_id: str) -> int:
+    async def remove_player(self, game_id: ResourceId, user_id: ResourceId) -> int:
         return await self._update_one(
             self._id_query(game_id),
-            {"$pull": {"players": {"user_id": ObjectId(user_id)}}},
+            {"$pull": {"players": {"user_id": user_id}}},
         )
 
-    async def add_turn(self, game_id: str, turn: Turn) -> int:
+    async def add_turn(self, game_id: ResourceId, turn: Turn) -> int:
         return await self._update_one(
             self._id_query(game_id),
             {"$push": {"turns": self._to_document(turn, root=False)}},
         )
 
-    async def replace_turn(self, game_id: str, turn_id: int, turn: Turn) -> int:
+    async def replace_turn(self, game_id: ResourceId, turn_id: int, turn: Turn) -> int:
         return await self._update_one(
             self._id_query(game_id),
             {"$set": {f"turns.{turn_id}": self._to_document(turn, root=False)}},
         )
 
     async def exchange_track(
-        self, game_id: str, turn_id: int, old_track_id: str, track: Track
+        self, game_id: ResourceId, turn_id: int, old_track_id: str, track: Track
     ) -> int:
         return await self._update_one(
             self._id_query(game_id),
@@ -51,7 +50,7 @@ class GameRepository(Repository[Game]):
         )
 
     async def add_guess(
-        self, game_id: str, turn_id: int, user_id: str, guess: Guess
+        self, game_id: ResourceId, turn_id: int, user_id: ResourceId, guess: Guess
     ) -> int:
         return await self._update_one(
             self._id_query(game_id),
@@ -65,7 +64,7 @@ class GameRepository(Repository[Game]):
         )
 
     async def set_turn_scoring(
-        self, game_id: str, turn_id: int, scoring: TurnScoring
+        self, game_id: ResourceId, turn_id: int, scoring: TurnScoring
     ) -> int:
         return await self._update_one(
             self._id_query(game_id),
@@ -77,7 +76,7 @@ class GameRepository(Repository[Game]):
         )
 
     async def add_turn_completed_by(
-        self, game_id: str, turn_id: int, user_id: str
+        self, game_id: ResourceId, turn_id: int, user_id: ResourceId
     ) -> int:
         return await self._update_one(
             self._id_query(game_id),
@@ -89,7 +88,7 @@ class GameRepository(Repository[Game]):
         )
 
     async def insert_in_timeline(
-        self, game_id: str, user_id: str, track: Track, position: int
+        self, game_id: ResourceId, user_id: ResourceId, track: Track, position: int
     ) -> int:
         return await self._update_one(
             self._id_query(game_id),
@@ -101,10 +100,12 @@ class GameRepository(Repository[Game]):
                     }
                 }
             },
-            array_filters=[{"player.user_id": ObjectId(user_id)}],
+            array_filters=[{"player.user_id": user_id}],
         )
 
-    async def inc_tokens(self, game_id: str, amounts: Mapping[str, int]) -> int:
+    async def inc_tokens(
+        self, game_id: ResourceId, amounts: Mapping[ResourceId, int]
+    ) -> int:
         count = 0
         for user_id, amount in amounts.items():
             if amount == 0:
@@ -113,7 +114,7 @@ class GameRepository(Repository[Game]):
             count += await self._update_one(
                 self._id_query(game_id),
                 {"$inc": {"players.$[player].tokens": amount}},
-                array_filters=[{"player.user_id": ObjectId(user_id)}],
+                array_filters=[{"player.user_id": user_id}],
             )
 
         return count

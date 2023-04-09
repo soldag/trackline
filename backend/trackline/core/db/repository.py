@@ -1,4 +1,3 @@
-from copy import copy
 from typing import (
     Any,
     Dict,
@@ -7,15 +6,14 @@ from typing import (
     List,
     Mapping,
     Sequence,
-    Type,
     TypeVar,
 )
 
-from bson import ObjectId
 from pydantic import BaseModel
 
 from trackline.core.db.client import DatabaseClient
-from trackline.core.db.models import IdentifiableModel, StringId
+from trackline.core.db.models import IdentifiableModel
+from trackline.core.fields import ResourceId
 
 
 T = TypeVar("T", bound=IdentifiableModel)
@@ -35,22 +33,24 @@ class Repository(Generic[T]):
         document = self._to_document(model)
         await self._collection.insert_one(document, session=self._session)
 
-    async def find_by_id(self, model_id: str) -> T | None:
+    async def find_by_id(self, model_id: ResourceId) -> T | None:
         return await self._find_one(self._id_query(model_id))
 
     async def find_one(self, query: Mapping[str, Any]) -> T | None:
         return await self._find_one(self._transform_query(query))
 
-    async def find_by_ids(self, model_ids: Sequence[str]) -> List[T]:
+    async def find_by_ids(self, model_ids: Sequence[ResourceId]) -> List[T]:
         return await self._find(self._ids_query(model_ids))
 
     async def find(self, query: Mapping[str, Any]) -> Sequence[T]:
         return await self._find(self._transform_query(query))
 
-    async def update_by_id(self, model_id: str, update: Mapping[str, Any]) -> int:
+    async def update_by_id(
+        self, model_id: ResourceId, update: Mapping[str, Any]
+    ) -> int:
         return await self._update_one(self._id_query(model_id), {"$set": update})
 
-    async def delete_by_id(self, model_id: str) -> int:
+    async def delete_by_id(self, model_id: ResourceId) -> int:
         return await self._delete_one(self._id_query(model_id))
 
     async def delete_one(self, query: Mapping[str, Any]) -> int:
@@ -97,35 +97,21 @@ class Repository(Generic[T]):
             query["_id"] = id_filter
         return query
 
-    def _id_query(self, model_id: str) -> Mapping[str, ObjectId]:
-        return {"_id": ObjectId(model_id)}
+    def _id_query(self, model_id: ResourceId) -> Mapping[str, ResourceId]:
+        return {"_id": model_id}
 
     def _ids_query(
-        self, model_ids: Sequence[str]
-    ) -> Mapping[str, Dict[str, List[ObjectId]]]:
-        return {"_id": {"$in": [ObjectId(model_id) for model_id in model_ids]}}
+        self, model_ids: Sequence[ResourceId]
+    ) -> Mapping[str, Dict[str, List[ResourceId]]]:
+        return {"_id": {"$in": list(model_ids)}}
 
     def _to_document(self, model: BaseModel, root: bool = True) -> Dict:
-        result = self._replace_type(model.dict(), StringId, ObjectId)
+        result = model.dict()
         if root and (model_id := result.pop("id", None)):
             result["_id"] = model_id
         return result
 
     def _to_model(self, data: Dict, root: bool = True) -> T:
-        data = self._replace_type(data, ObjectId, StringId)
         if root and (model_id := data.pop("_id", None)):
             data["id"] = str(model_id)
         return self._model_type(**data)
-
-    def _replace_type(self, obj: Any, src_type: Type, dst_type: Type) -> Dict:
-        obj = copy(obj)
-
-        if isinstance(obj, src_type):
-            obj = dst_type(obj)
-        elif isinstance(obj, dict):
-            for key, value in obj.items():
-                obj[key] = self._replace_type(value, src_type, dst_type)
-        elif isinstance(obj, list):
-            obj = [self._replace_type(value, src_type, dst_type) for value in obj]
-
-        return obj

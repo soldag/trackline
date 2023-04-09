@@ -7,6 +7,7 @@ from trackline.constants import (
     TOKEN_COST_YEAR_GUESS,
     TOKEN_GAIN_YEAR_GUESS,
 )
+from trackline.core.fields import ResourceId
 from trackline.games.models import (
     CategoryScoring,
     Game,
@@ -22,7 +23,7 @@ from trackline.games.use_cases.base import BaseHandler
 
 
 class ScoreTurn(BaseModel):
-    game_id: str
+    game_id: ResourceId
     turn_id: int
 
     class Handler(BaseHandler):
@@ -34,7 +35,9 @@ class ScoreTurn(BaseModel):
             super().__init__(game_repository)
             self._notifier = notifier
 
-        async def execute(self, user_id: str, use_case: "ScoreTurn") -> TurnScoringOut:
+        async def execute(
+            self, user_id: ResourceId, use_case: "ScoreTurn"
+        ) -> TurnScoringOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
             self._assert_has_state(game, GameState.GUESSING)
@@ -51,7 +54,7 @@ class ScoreTurn(BaseModel):
                     key=lambda kv: (kv[0] != turn.active_user_id, kv[1].creation_time),
                 )
             )
-            tokens = {str(p.user_id): p.tokens for p in game.players}
+            tokens = {p.user_id: p.tokens for p in game.players}
 
             position_scoring = await self._score_position(
                 game, turn, sorted_guesses, tokens
@@ -64,7 +67,7 @@ class ScoreTurn(BaseModel):
             tokens = self._apply_tokens_delta(tokens, release_year_scoring.tokens_delta)
 
             tokens_delta = {
-                str(p.user_id): tokens[p.user_id] - p.tokens
+                p.user_id: tokens[p.user_id] - p.tokens
                 for p in game.players
                 if tokens[p.user_id] != p.tokens
             }
@@ -94,12 +97,12 @@ class ScoreTurn(BaseModel):
             self,
             game: Game,
             turn: Turn,
-            sorted_guesses: Dict[str, Guess],
-            tokens: Dict[str, int],
+            sorted_guesses: Dict[ResourceId, Guess],
+            tokens: Dict[ResourceId, int],
         ) -> CategoryScoring:
             seen_positions = set()
-            tokens_delta: Dict[str, int] = {}
-            winner: str | None = None
+            tokens_delta: Dict[ResourceId, int] = {}
+            winner: ResourceId | None = None
 
             for guess_user_id, guess in sorted_guesses.items():
                 if guess.position is None or guess.position in seen_positions:
@@ -160,12 +163,12 @@ class ScoreTurn(BaseModel):
             self,
             game: Game,
             turn: Turn,
-            sorted_guesses: Dict[str, Guess],
-            tokens: Dict[str, int],
+            sorted_guesses: Dict[ResourceId, Guess],
+            tokens: Dict[ResourceId, int],
         ) -> CategoryScoring:
             seen_years = set()
-            tokens_delta: Dict[str, int] = {}
-            winner: str | None = None
+            tokens_delta: Dict[ResourceId, int] = {}
+            winner: ResourceId | None = None
 
             for guess_user_id, guess in sorted_guesses.items():
                 if guess.release_year is None or guess.release_year in seen_years:
@@ -196,8 +199,8 @@ class ScoreTurn(BaseModel):
             return CategoryScoring(winner=winner, tokens_delta=tokens_delta)
 
         def _apply_tokens_delta(
-            self, tokens: Dict[str, int], delta: Dict[str, int]
-        ) -> Dict[str, int]:
+            self, tokens: Dict[ResourceId, int], delta: Dict[ResourceId, int]
+        ) -> Dict[ResourceId, int]:
             return {
                 user_id: curr_tokens + delta.get(user_id, 0)
                 for user_id, curr_tokens in tokens.items()

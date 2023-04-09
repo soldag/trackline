@@ -1,6 +1,7 @@
 from typing import Collection, Sequence
 
 from trackline.core.exceptions import UseCaseException
+from trackline.core.fields import ResourceId
 from trackline.games.models import Game, Track
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import GameState
@@ -11,7 +12,7 @@ class BaseHandler:
     def __init__(self, game_repository: GameRepository) -> None:
         self._game_repository = game_repository
 
-    def _assert_is_player(self, game: Game, user_id: str) -> None:
+    def _assert_is_player(self, game: Game, user_id: ResourceId) -> None:
         player_ids = [p.user_id for p in game.players]
         if not user_id or user_id not in player_ids:
             raise UseCaseException(
@@ -20,7 +21,9 @@ class BaseHandler:
                 status_code=404,
             )
 
-    def _assert_is_active_player(self, game: Game, turn_id: int, user_id: str) -> None:
+    def _assert_is_active_player(
+        self, game: Game, turn_id: int, user_id: ResourceId
+    ) -> None:
         if user_id != game.turns[turn_id].active_user_id:
             raise UseCaseException(
                 code="INACTIVE_PLAYER",
@@ -28,7 +31,7 @@ class BaseHandler:
                 status_code=403,
             )
 
-    def _assert_is_game_master(self, game: Game, user_id: str) -> None:
+    def _assert_is_game_master(self, game: Game, user_id: ResourceId) -> None:
         self._assert_is_player(game, user_id)
         if not any(p.user_id == user_id and p.is_game_master for p in game.players):
             raise UseCaseException(
@@ -37,7 +40,7 @@ class BaseHandler:
                 status_code=403,
             )
 
-    def _assert_has_tokens(self, game: Game, user_id: str, tokens: int) -> None:
+    def _assert_has_tokens(self, game: Game, user_id: ResourceId, tokens: int) -> None:
         player = game.get_player(user_id)
         if player and player.tokens < tokens:
             raise UseCaseException(
@@ -88,7 +91,7 @@ class BaseHandler:
                 status_code=400,
             )
 
-    async def _get_game(self, game_id: str) -> Game:
+    async def _get_game(self, game_id: ResourceId) -> Game:
         game = await self._game_repository.find_by_id(game_id)
         if not game:
             raise UseCaseException(
@@ -109,7 +112,7 @@ class BaseHandler:
             len(timeline),
         )
 
-    def _get_next_player_id(self, game: Game) -> str:
+    def _get_next_player_id(self, game: Game) -> ResourceId:
         player_ids = [p.user_id for p in game.players]
         try:
             active_user_index = player_ids.index(game.turns[-1].active_user_id)

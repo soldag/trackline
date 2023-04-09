@@ -7,6 +7,7 @@ from trackline.constants import (
     DEFAULT_INITIAL_TOKENS,
     DEFAULT_TIMELINE_LENGTH,
 )
+from trackline.core.fields import ResourceId
 from trackline.games.models import Game, GameSettings, Player
 from trackline.games.schemas import GameOut
 from trackline.games.use_cases.base import BaseHandler
@@ -20,7 +21,7 @@ class CreateGame(BaseModel):
     guess_timeout = DEFAULT_GUESS_TIMEOUT
 
     class Handler(BaseHandler):
-        async def execute(self, user_id: str, use_case: "CreateGame") -> GameOut:
+        async def execute(self, user_id: ResourceId, use_case: "CreateGame") -> GameOut:
             game = Game(
                 settings=GameSettings(
                     playlist_ids=use_case.playlist_ids,

@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from trackline.constants import (
     TOKEN_COST_BUY_TRACK,
 )
+from trackline.core.fields import ResourceId
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import (
@@ -16,7 +17,7 @@ from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
 
 class BuyTrack(BaseModel):
-    game_id: str
+    game_id: ResourceId
 
     class Handler(TrackProvidingBaseHandler):
         def __init__(
@@ -29,7 +30,7 @@ class BuyTrack(BaseModel):
             self._notifier = notifier
 
         async def execute(
-            self, user_id: str, use_case: "BuyTrack"
+            self, user_id: ResourceId, use_case: "BuyTrack"
         ) -> TrackPurchaseReceiptOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)

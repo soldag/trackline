@@ -1,12 +1,13 @@
 from pydantic import BaseModel
 
+from trackline.core.fields import ResourceId
 from trackline.games.notifier import NotificationChannel, Notifier
 from trackline.games.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
 
 
 class RegisterNotificationChannel(BaseModel):
-    game_id: str
+    game_id: ResourceId
     channel: NotificationChannel
 
     class Config:
@@ -18,7 +19,7 @@ class RegisterNotificationChannel(BaseModel):
             self._notifier = notifier
 
         async def execute(
-            self, user_id: str, use_case: "RegisterNotificationChannel"
+            self, user_id: ResourceId, use_case: "RegisterNotificationChannel"
         ) -> None:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)

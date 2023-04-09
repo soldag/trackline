@@ -2,6 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
+from trackline.core.fields import ResourceId
 from trackline.games.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
 from trackline.users.repository import UserRepository
@@ -9,7 +10,7 @@ from trackline.users.schemas import UserOut
 
 
 class GetGameUsers(BaseModel):
-    game_id: str
+    game_id: ResourceId
 
     class Handler(BaseHandler):
         def __init__(
@@ -21,7 +22,7 @@ class GetGameUsers(BaseModel):
             self.user_repository = user_repository
 
         async def execute(
-            self, user_id: str, use_case: "GetGameUsers"
+            self, user_id: ResourceId, use_case: "GetGameUsers"
         ) -> List[UserOut]:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from trackline.core.fields import ResourceId
 from trackline.games.models import Turn
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
@@ -9,7 +10,7 @@ from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
 
 class CreateTurn(BaseModel):
-    game_id: str
+    game_id: ResourceId
 
     class Handler(TrackProvidingBaseHandler):
         def __init__(
@@ -21,7 +22,7 @@ class CreateTurn(BaseModel):
             super().__init__(game_repository, track_provider)
             self._notifier = notifier
 
-        async def execute(self, user_id: str, use_case: "CreateTurn") -> TurnOut:
+        async def execute(self, user_id: ResourceId, use_case: "CreateTurn") -> TurnOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
             self._assert_has_state(game, (GameState.STARTED, GameState.SCORING))

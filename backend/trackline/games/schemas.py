@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import List, Mapping
 
-from pydantic import BaseModel
-
+from trackline.core.fields import ResourceId
+from trackline.core.schemas import BaseSchema
 from trackline.games.models import (
     CategoryScoring,
     Game,
@@ -18,7 +18,7 @@ from trackline.games.notifier import Notification
 from trackline.users.schemas import UserOut
 
 
-class TrackOut(BaseModel):
+class TrackOut(BaseSchema):
     spotify_id: str
     title: str
     artists: str
@@ -36,8 +36,8 @@ class TrackOut(BaseModel):
         )
 
 
-class PlayerOut(BaseModel):
-    user_id: str
+class PlayerOut(BaseSchema):
+    user_id: ResourceId
     is_game_master: bool
     tokens: int
     timeline: List[TrackOut]
@@ -52,14 +52,14 @@ class PlayerOut(BaseModel):
         )
 
 
-class GuessOut(BaseModel):
-    user_id: str
+class GuessOut(BaseSchema):
+    user_id: ResourceId
     creation_time: datetime
     position: int | None
     release_year: int | None
 
     @staticmethod
-    def from_model(model: Guess, user_id: str) -> "GuessOut":
+    def from_model(model: Guess, user_id: ResourceId) -> "GuessOut":
         return GuessOut(
             user_id=user_id,
             creation_time=model.creation_time,
@@ -68,7 +68,7 @@ class GuessOut(BaseModel):
         )
 
 
-class CategoryScoringOut(BaseModel):
+class CategoryScoringOut(BaseSchema):
     winner: str | None
     tokens_delta: Mapping[str, int]
 
@@ -80,7 +80,7 @@ class CategoryScoringOut(BaseModel):
         )
 
 
-class TurnScoringOut(BaseModel):
+class TurnScoringOut(BaseSchema):
     position: CategoryScoringOut
     release_year: CategoryScoringOut
 
@@ -92,9 +92,9 @@ class TurnScoringOut(BaseModel):
         )
 
 
-class TurnOut(BaseModel):
+class TurnOut(BaseSchema):
     creation_time: datetime
-    active_user_id: str
+    active_user_id: ResourceId
     track: TrackOut
     guesses: List[GuessOut]
     scoring: TurnScoringOut | None
@@ -115,7 +115,7 @@ class TurnOut(BaseModel):
         )
 
 
-class GameSettingsOut(BaseModel):
+class GameSettingsOut(BaseSchema):
     spotify_market: str
     playlist_ids: List[str]
     initial_tokens: int
@@ -133,8 +133,8 @@ class GameSettingsOut(BaseModel):
         )
 
 
-class GameOut(BaseModel):
-    id: str
+class GameOut(BaseSchema):
+    id: ResourceId
     creation_time: datetime
     settings: GameSettingsOut
     state: GameState
@@ -153,13 +153,13 @@ class GameOut(BaseModel):
         )
 
 
-class TurnCompletionOut(BaseModel):
+class TurnCompletionOut(BaseSchema):
     turn_completed: bool
     game_completed: bool
 
 
-class TrackPurchaseReceiptOut(BaseModel):
-    user_id: str
+class TrackPurchaseReceiptOut(BaseSchema):
+    user_id: ResourceId
     track: TrackOut
 
 
@@ -169,12 +169,12 @@ class PlayerJoined(Notification):
 
 
 class PlayerLeft(Notification):
-    user_id: str
+    user_id: ResourceId
     new_turn: TurnOut | None
 
 
 class GameStarted(Notification):
-    initial_tracks: Mapping[str, TrackOut]
+    initial_tracks: Mapping[ResourceId, TrackOut]
 
 
 class GameAborted(Notification):
@@ -198,10 +198,10 @@ class TurnScored(Notification):
 
 
 class TurnCompleted(Notification):
-    user_id: str
+    user_id: ResourceId
     completion: TurnCompletionOut
 
 
 class TrackBought(Notification):
-    user_id: str
+    user_id: ResourceId
     track: TrackOut

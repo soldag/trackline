@@ -1,10 +1,10 @@
-from pydantic import BaseModel
-
+from trackline.core.fields import ResourceId
+from trackline.core.schemas import BaseSchema
 from trackline.users.models import User
 
 
-class UserOut(BaseModel):
-    id: str
+class UserOut(BaseSchema):
+    id: ResourceId
     username: str
 
     @staticmethod
