@@ -1,5 +1,3 @@
-from typing import List
-
 from dependency_injector.wiring import inject, Provide
 from fastapi import (
     APIRouter,
@@ -73,7 +71,7 @@ async def get_game(
     return make_ok(game)
 
 
-@router.get("/{game_id}/users", response_model=EntityResponse[List[UserOut]])
+@router.get("/{game_id}/users", response_model=EntityResponse[list[UserOut]])
 @inject
 async def get_game_users(
     game_id: ResourceId,

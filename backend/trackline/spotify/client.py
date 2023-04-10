@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from async_spotify import SpotifyApiClient
 from async_spotify.authentification.authorization_flows import (
     AuthorizationCodeFlow,
@@ -53,7 +51,7 @@ class SpotifyClient:
     def get_auth_url(self):
         return self._auth_client.build_authorization_url()
 
-    async def get_access_token(self, code: str) -> Tuple[str, str]:
+    async def get_access_token(self, code: str) -> tuple[str, str]:
         try:
             token = await self._auth_client.get_auth_token_with_code(code)
         except SpotifyError as e:
@@ -61,7 +59,7 @@ class SpotifyClient:
 
         return token.access_token, token.refresh_token
 
-    async def refresh_access_token(self, refresh_token: str) -> Tuple[str, str]:
+    async def refresh_access_token(self, refresh_token: str) -> tuple[str, str]:
         try:
             token = await self._auth_client.refresh_token(
                 SpotifyAuthorisationToken(refresh_token=refresh_token)

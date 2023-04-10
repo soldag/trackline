@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import argon2
 
 
@@ -8,7 +6,7 @@ def hash_password(password: str) -> str:
     return hasher.hash(password)
 
 
-def verify_password(password: str, password_hash: str) -> Tuple[bool, str | None]:
+def verify_password(password: str, password_hash: str) -> tuple[bool, str | None]:
     hasher = argon2.PasswordHasher()
 
     new_hash = None

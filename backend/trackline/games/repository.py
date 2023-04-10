@@ -1,4 +1,4 @@
-from typing import Mapping
+from collections.abc import Mapping
 
 from trackline.core.db.repository import Repository
 from trackline.core.fields import ResourceId

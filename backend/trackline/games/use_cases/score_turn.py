@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from pydantic import BaseModel
 
 from trackline.constants import (
@@ -97,11 +95,11 @@ class ScoreTurn(BaseModel):
             self,
             game: Game,
             turn: Turn,
-            sorted_guesses: Dict[ResourceId, Guess],
-            tokens: Dict[ResourceId, int],
+            sorted_guesses: dict[ResourceId, Guess],
+            tokens: dict[ResourceId, int],
         ) -> CategoryScoring:
             seen_positions = set()
-            tokens_delta: Dict[ResourceId, int] = {}
+            tokens_delta: dict[ResourceId, int] = {}
             winner: ResourceId | None = None
 
             for guess_user_id, guess in sorted_guesses.items():
@@ -141,7 +139,7 @@ class ScoreTurn(BaseModel):
             return CategoryScoring(winner=winner, tokens_delta=tokens_delta)
 
         def _check_position(
-            self, timeline: List[Track], track: Track, position: int
+            self, timeline: list[Track], track: Track, position: int
         ) -> bool:
             if position is None:
                 return False
@@ -163,11 +161,11 @@ class ScoreTurn(BaseModel):
             self,
             game: Game,
             turn: Turn,
-            sorted_guesses: Dict[ResourceId, Guess],
-            tokens: Dict[ResourceId, int],
+            sorted_guesses: dict[ResourceId, Guess],
+            tokens: dict[ResourceId, int],
         ) -> CategoryScoring:
             seen_years = set()
-            tokens_delta: Dict[ResourceId, int] = {}
+            tokens_delta: dict[ResourceId, int] = {}
             winner: ResourceId | None = None
 
             for guess_user_id, guess in sorted_guesses.items():
@@ -199,8 +197,8 @@ class ScoreTurn(BaseModel):
             return CategoryScoring(winner=winner, tokens_delta=tokens_delta)
 
         def _apply_tokens_delta(
-            self, tokens: Dict[ResourceId, int], delta: Dict[ResourceId, int]
-        ) -> Dict[ResourceId, int]:
+            self, tokens: dict[ResourceId, int], delta: dict[ResourceId, int]
+        ) -> dict[ResourceId, int]:
             return {
                 user_id: curr_tokens + delta.get(user_id, 0)
                 for user_id, curr_tokens in tokens.items()

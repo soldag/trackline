@@ -1,4 +1,4 @@
-from typing import List, Sequence
+from collections.abc import Collection
 
 from httpx import AsyncClient, HTTPError
 from lucenequerybuilder import Q
@@ -18,7 +18,9 @@ class MusicBrainzClient:
     async def close(self) -> None:
         await self._client.aclose()
 
-    async def get_release_year(self, artists: Sequence[str], title: str) -> int | None:
+    async def get_release_year(
+        self, artists: Collection[str], title: str
+    ) -> int | None:
         query = Q("recording", title)
         for artist in artists:
             query &= Q("artist", artist)
@@ -36,7 +38,7 @@ class MusicBrainzClient:
         if response.status_code != 200:
             return None
 
-        release_years: List[int] = []
+        release_years: list[int] = []
         for recording in response.json().get("recordings", []):
             if recording["score"] < MUSICBRAINZ_MIN_SCORE:
                 continue

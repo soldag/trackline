@@ -1,4 +1,4 @@
-from typing import Annotated, Generic, Literal, Sequence, TypeVar
+from typing import Annotated, Generic, Literal, TypeVar
 
 from pydantic import BaseModel, constr, Field
 from pydantic.generics import GenericModel
@@ -18,7 +18,7 @@ class BaseSchema(BaseModel):
 class Error(BaseSchema):
     code: Annotated[str, constr(to_upper=True)]
     description: str
-    location: Sequence[str] | None = None
+    location: list[str] | None = None
 
 
 class Response(BaseSchema):
@@ -32,7 +32,7 @@ class EntityResponse(Response, GenericModel, Generic[DataT]):
 
 class ErrorResponse(Response):
     status: Literal["error"] = Field("error", const=True)
-    errors: Sequence[Error]
+    errors: list[Error]
 
 
 class Omit(ModelMetaclass):

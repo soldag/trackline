@@ -1,5 +1,5 @@
+from collections.abc import Mapping
 from datetime import datetime
-from typing import List, Mapping
 
 from trackline.core.fields import ResourceId
 from trackline.core.schemas import BaseSchema
@@ -40,7 +40,7 @@ class PlayerOut(BaseSchema):
     user_id: ResourceId
     is_game_master: bool
     tokens: int
-    timeline: List[TrackOut]
+    timeline: list[TrackOut]
 
     @staticmethod
     def from_model(model: Player) -> "PlayerOut":
@@ -96,9 +96,9 @@ class TurnOut(BaseSchema):
     creation_time: datetime
     active_user_id: ResourceId
     track: TrackOut
-    guesses: List[GuessOut]
+    guesses: list[GuessOut]
     scoring: TurnScoringOut | None
-    completed_by: List[str]
+    completed_by: list[str]
 
     @staticmethod
     def from_model(model: Turn) -> "TurnOut":
@@ -117,7 +117,7 @@ class TurnOut(BaseSchema):
 
 class GameSettingsOut(BaseSchema):
     spotify_market: str
-    playlist_ids: List[str]
+    playlist_ids: list[str]
     initial_tokens: int
     timeline_length: int
     guess_timeout: int
@@ -138,8 +138,8 @@ class GameOut(BaseSchema):
     creation_time: datetime
     settings: GameSettingsOut
     state: GameState
-    turns: List[TurnOut]
-    players: List[PlayerOut]
+    turns: list[TurnOut]
+    players: list[PlayerOut]
 
     @staticmethod
     def from_model(model: Game) -> "GameOut":

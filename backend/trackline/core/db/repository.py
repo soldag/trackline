@@ -1,11 +1,8 @@
+from collections.abc import Collection, Mapping
 from typing import (
     Any,
-    Dict,
     Generic,
     get_args,
-    List,
-    Mapping,
-    Sequence,
     TypeVar,
 )
 
@@ -39,10 +36,10 @@ class Repository(Generic[T]):
     async def find_one(self, query: Mapping[str, Any]) -> T | None:
         return await self._find_one(self._transform_query(query))
 
-    async def find_by_ids(self, model_ids: Sequence[ResourceId]) -> List[T]:
+    async def find_by_ids(self, model_ids: Collection[ResourceId]) -> list[T]:
         return await self._find(self._ids_query(model_ids))
 
-    async def find(self, query: Mapping[str, Any]) -> Sequence[T]:
+    async def find(self, query: Mapping[str, Any]) -> list[T]:
         return await self._find(self._transform_query(query))
 
     async def update_by_id(
@@ -63,7 +60,7 @@ class Repository(Generic[T]):
         )
         return self._to_model(document) if document else None
 
-    async def _find(self, query: Mapping[str, Any]) -> List[T]:
+    async def _find(self, query: Mapping[str, Any]) -> list[T]:
         documents = await self._collection.find(
             filter=self._transform_query(query),
             session=self._session,
@@ -74,7 +71,7 @@ class Repository(Generic[T]):
         self,
         query: Mapping[str, Any],
         update: Mapping[str, Any],
-        array_filters: Sequence[Mapping[str, Any]] | None = None,
+        array_filters: Collection[Mapping[str, Any]] | None = None,
     ) -> int:
         result = await self._collection.update_one(
             filter=self._transform_query(query),
@@ -101,17 +98,17 @@ class Repository(Generic[T]):
         return {"_id": model_id}
 
     def _ids_query(
-        self, model_ids: Sequence[ResourceId]
-    ) -> Mapping[str, Dict[str, List[ResourceId]]]:
+        self, model_ids: Collection[ResourceId]
+    ) -> Mapping[str, dict[str, list[ResourceId]]]:
         return {"_id": {"$in": list(model_ids)}}
 
-    def _to_document(self, model: BaseModel, root: bool = True) -> Dict:
+    def _to_document(self, model: BaseModel, root: bool = True) -> dict:
         result = model.dict()
         if root and (model_id := result.pop("id", None)):
             result["_id"] = model_id
         return result
 
-    def _to_model(self, data: Dict, root: bool = True) -> T:
+    def _to_model(self, data: dict, root: bool = True) -> T:
         if root and (model_id := data.pop("_id", None)):
             data["id"] = str(model_id)
         return self._model_type(**data)

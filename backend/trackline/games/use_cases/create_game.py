@@ -1,5 +1,3 @@
-from typing import Sequence
-
 from pydantic import BaseModel
 
 from trackline.constants import (
@@ -14,7 +12,7 @@ from trackline.games.use_cases.base import BaseHandler
 
 
 class CreateGame(BaseModel):
-    playlist_ids: Sequence[str]
+    playlist_ids: list[str]
     spotify_market: str
     initial_tokens = DEFAULT_INITIAL_TOKENS
     timeline_length = DEFAULT_TIMELINE_LENGTH

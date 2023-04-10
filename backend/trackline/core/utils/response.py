@@ -1,4 +1,5 @@
-from typing import Sequence, TypeVar
+from collections.abc import Collection, Sequence
+from typing import TypeVar
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -21,6 +22,6 @@ def make_error(
     return make_errors(errors, status_code)
 
 
-def make_errors(errors: Sequence[Error], status_code: int) -> JSONResponse:
-    content = ErrorResponse(errors=errors)
+def make_errors(errors: Collection[Error], status_code: int) -> JSONResponse:
+    content = ErrorResponse(errors=list(errors))
     return JSONResponse(jsonable_encoder(content, exclude_none=True), status_code)

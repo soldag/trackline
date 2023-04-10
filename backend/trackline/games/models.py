@@ -1,6 +1,5 @@
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List
 
 from pydantic import Field
 
@@ -30,7 +29,7 @@ class Player(BaseModel):
     user_id: ResourceId
     is_game_master: bool = False
     tokens: int = 0
-    timeline: List[Track] = []
+    timeline: list[Track] = []
 
 
 class Guess(BaseModel):
@@ -41,7 +40,7 @@ class Guess(BaseModel):
 
 class CategoryScoring(BaseModel):
     winner: str | None
-    tokens_delta: Dict[ResourceId, int]
+    tokens_delta: dict[ResourceId, int]
 
 
 class TurnScoring(BaseModel):
@@ -53,14 +52,14 @@ class Turn(BaseModel):
     creation_time: datetime = Field(default_factory=utcnow)
     active_user_id: ResourceId
     track: Track
-    guesses: Dict[ResourceId, Guess] = {}
+    guesses: dict[ResourceId, Guess] = {}
     scoring: TurnScoring | None
-    completed_by: List[str] = []
+    completed_by: list[str] = []
 
 
 class GameSettings(BaseModel):
     spotify_market: str
-    playlist_ids: List[str]
+    playlist_ids: list[str]
     initial_tokens: int
     timeline_length: int
     guess_timeout: int
@@ -70,9 +69,9 @@ class Game(IdentifiableModel):
     creation_time: datetime = Field(default_factory=utcnow)
     settings: GameSettings
     state: GameState = GameState.WAITING_FOR_PLAYERS
-    turns: List[Turn] = []
-    players: List[Player] = []
-    discarded_track_ids: List[str] = []
+    turns: list[Turn] = []
+    players: list[Player] = []
+    discarded_track_ids: list[str] = []
 
     def get_player(self, user_id: ResourceId) -> Player | None:
         return next((p for p in self.players if p.user_id == user_id), None)

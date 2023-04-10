@@ -1,6 +1,6 @@
 import asyncio
+from collections.abc import Awaitable, Callable
 import random
-from typing import Awaitable, Callable
 
 from dependency_injector.wiring import inject, Provide
 from pymongo.errors import OperationFailure

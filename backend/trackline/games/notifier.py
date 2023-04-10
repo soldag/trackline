@@ -1,6 +1,7 @@
 import asyncio
 from collections import defaultdict
-from typing import Any, Dict, List, Protocol, runtime_checkable, Sequence, Tuple
+from collections.abc import Collection
+from typing import Any, Protocol, runtime_checkable
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -35,8 +36,8 @@ class NotificationChannel(Protocol):
 
 class Notifier:
     def __init__(self):
-        self._channels: Dict[
-            Tuple[ResourceId, ResourceId], List[NotificationChannel]
+        self._channels: dict[
+            tuple[ResourceId, ResourceId], list[NotificationChannel]
         ] = defaultdict(list)
 
     def add_channel(
@@ -69,7 +70,7 @@ class Notifier:
     async def _send_multicast(
         self,
         game_id: ResourceId,
-        player_ids: Sequence[ResourceId],
+        player_ids: Collection[ResourceId],
         envelope: NotificationEnvelope,
     ):
         await asyncio.gather(

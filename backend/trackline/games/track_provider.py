@@ -1,6 +1,6 @@
+from collections.abc import Collection, Sequence
 import random
 import re
-from typing import Collection, List, Sequence
 
 from trackline.core.utils import shuffle
 from trackline.games.models import Track
@@ -30,8 +30,8 @@ class TrackProvider:
         count: int,
         market: str | None = None,
         exclude: Collection[str] | None = None,
-    ) -> List[Track]:
-        tracks: List[Track] = []
+    ) -> list[Track]:
+        tracks: list[Track] = []
         exclude = list(exclude or [])
         while len(tracks) < count:
             track = await self.get_random_track(playlist_ids, market, exclude)

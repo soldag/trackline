@@ -1,4 +1,5 @@
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from trackline.auth.models import Session
 from trackline.core.db.repository import Repository

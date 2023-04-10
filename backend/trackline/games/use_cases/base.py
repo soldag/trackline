@@ -1,4 +1,4 @@
-from typing import Collection, Sequence
+from collections.abc import Collection, Sequence
 
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
@@ -70,7 +70,7 @@ class BaseHandler:
     def _assert_has_not_state(
         self,
         game: Game,
-        state: GameState | Sequence[GameState],
+        state: GameState | Collection[GameState],
     ) -> None:
         forbidden_states = [state] if isinstance(state, GameState) else state
         allowed_states = set(GameState) - set(forbidden_states)
@@ -102,7 +102,7 @@ class BaseHandler:
 
         return game
 
-    def _get_track_position(self, timeline: Collection[Track], track: Track) -> int:
+    def _get_track_position(self, timeline: Sequence[Track], track: Track) -> int:
         return next(
             (
                 i
