@@ -19,7 +19,7 @@ from trackline.users.router import router as users_router
 app = FastAPI(
     title="Trackline",
 )
-app.container = AppContainer()  # type: ignore
+container = AppContainer()  # type: ignore
 
 app.add_middleware(NoIndexMiddleware)
 app.add_middleware(ServerTimeMiddleware)
@@ -37,6 +37,18 @@ app.include_router(auth_router)
 app.include_router(games_router)
 app.include_router(spotify_router)
 app.include_router(users_router)
+
+
+@app.on_event("startup")
+async def on_startup():
+    if task := container.init_resources():
+        await task
+
+
+@app.on_event("shutdown")
+async def on_shutdown():
+    if task := container.shutdown_resources():
+        await task
 
 
 @app.exception_handler(Exception)
