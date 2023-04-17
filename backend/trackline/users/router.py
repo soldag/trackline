@@ -32,10 +32,10 @@ async def create_user(
 @inject
 async def get_current_user(
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: GetCurrentUser = Depends(),
     handler: GetCurrentUser.Handler = Depends(
         Provide[AppContainer.users.get_current_user_handler]
     ),
 ):
-    use_case = GetCurrentUser()
     user = await handler.execute(auth_user_id, use_case)
     return make_ok(user)

@@ -1,7 +1,11 @@
+from dataclasses import asdict, dataclass
+
 from dependency_injector.wiring import inject, Provide
 from fastapi import (
     APIRouter,
+    Body,
     Depends,
+    Path,
     WebSocket,
     WebSocketDisconnect,
 )
@@ -10,7 +14,6 @@ from trackline.auth.deps import get_auth_user
 from trackline.core.fields import ResourceId
 from trackline.core.ioc import AppContainer
 from trackline.core.schemas import EntityResponse, Response
-from trackline.core.schemas import Omit
 from trackline.core.utils.response import make_error, make_ok
 from trackline.games.schemas import (
     GameOut,
@@ -62,11 +65,10 @@ async def create_game(
 @router.get("/{game_id}", response_model=EntityResponse[GameOut])
 @inject
 async def get_game(
-    game_id: ResourceId,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: GetGame = Depends(),
     handler: GetGame.Handler = Depends(Provide[AppContainer.games.get_game_handler]),
 ):
-    use_case = GetGame(game_id=game_id)
     game = await handler.execute(auth_user_id, use_case)
     return make_ok(game)
 
@@ -74,13 +76,12 @@ async def get_game(
 @router.get("/{game_id}/users", response_model=EntityResponse[list[UserOut]])
 @inject
 async def get_game_users(
-    game_id: ResourceId,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: GetGameUsers = Depends(),
     handler: GetGameUsers.Handler = Depends(
         Provide[AppContainer.games.get_game_users_handler]
     ),
 ):
-    use_case = GetGameUsers(game_id=game_id)
     users = await handler.execute(auth_user_id, use_case)
     return make_ok(users)
 
@@ -88,11 +89,10 @@ async def get_game_users(
 @router.put("/{game_id}/players", response_model=Response, status_code=201)
 @inject
 async def join_game(
-    game_id: ResourceId,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: JoinGame = Depends(),
     handler: JoinGame.Handler = Depends(Provide[AppContainer.games.join_game_handler]),
 ):
-    use_case = JoinGame(game_id=game_id)
     await handler.execute(auth_user_id, use_case)
     return make_ok()
 
@@ -100,9 +100,9 @@ async def join_game(
 @router.delete("/{game_id}/players/{user_id}", response_model=Response)
 @inject
 async def leave_game(
-    game_id: ResourceId,
     user_id: ResourceId,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: LeaveGame = Depends(),
     handler: LeaveGame.Handler = Depends(
         Provide[AppContainer.games.leave_game_handler]
     ),
@@ -110,7 +110,6 @@ async def leave_game(
     if user_id != auth_user_id:
         return make_error("FORBIDDEN", "You can only remove yourself from a game", 403)
 
-    use_case = LeaveGame(game_id=game_id, user_id=user_id)
     await handler.execute(auth_user_id, use_case)
     return make_ok()
 
@@ -118,13 +117,12 @@ async def leave_game(
 @router.post("/{game_id}/start", response_model=EntityResponse[GameOut])
 @inject
 async def start_game(
-    game_id: ResourceId,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: StartGame = Depends(),
     handler: StartGame.Handler = Depends(
         Provide[AppContainer.games.start_game_handler]
     ),
 ):
-    use_case = StartGame(game_id=game_id)
     game = await handler.execute(auth_user_id, use_case)
     return make_ok(game)
 
@@ -132,37 +130,38 @@ async def start_game(
 @router.post("/{game_id}/abort", response_model=Response)
 @inject
 async def abort_game(
-    game_id: ResourceId,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: AbortGame = Depends(),
     handler: AbortGame.Handler = Depends(
         Provide[AppContainer.games.abort_game_handler]
     ),
 ):
-    use_case = AbortGame(game_id=game_id)
     await handler.execute(auth_user_id, use_case)
     return make_ok()
-
-
-class CreateGuessBody(CreateGuess, metaclass=Omit):
-    class Config:
-        omit_fields = {"game_id", "turn_id"}
-
-    def with_params(self, **kwargs) -> CreateGuess:
-        return CreateGuess(**self.dict(), **kwargs)
 
 
 @router.post("/{game_id}/turns", response_model=EntityResponse[TurnOut])
 @inject
 async def create_turn(
-    game_id: ResourceId,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: CreateTurn = Depends(),
     handler: CreateTurn.Handler = Depends(
         Provide[AppContainer.games.create_turn_handler]
     ),
 ):
-    use_case = CreateTurn(game_id=game_id)
     turn_out = await handler.execute(auth_user_id, use_case)
     return make_ok(turn_out)
+
+
+@dataclass
+class CreateGuessParams:
+    game_id: ResourceId = Path()
+    turn_id: int = Path()
+    position: int | None = Body(None)
+    release_year: int | None = Body(None)
+
+    def to_use_case(self) -> CreateGuess:
+        return CreateGuess(**asdict(self))
 
 
 @router.post(
@@ -170,30 +169,25 @@ async def create_turn(
 )
 @inject
 async def create_guess(
-    game_id: ResourceId,
-    turn_id: int,
-    body: CreateGuessBody,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    params: CreateGuessParams = Depends(),
     handler: CreateGuess.Handler = Depends(
         Provide[AppContainer.games.create_guess_handler]
     ),
 ):
-    use_case = body.with_params(game_id=game_id, turn_id=turn_id)
-    turn_out = await handler.execute(auth_user_id, use_case)
+    turn_out = await handler.execute(auth_user_id, params.to_use_case())
     return make_ok(turn_out)
 
 
 @router.post("/{game_id}/turns/{turn_id}/score", response_model=EntityResponse[GameOut])
 @inject
 async def score_turn(
-    game_id: ResourceId,
-    turn_id: int,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: ScoreTurn = Depends(),
     handler: ScoreTurn.Handler = Depends(
         Provide[AppContainer.games.score_turn_handler]
     ),
 ):
-    use_case = ScoreTurn(game_id=game_id, turn_id=turn_id)
     turn_out = await handler.execute(auth_user_id, use_case)
     return make_ok(turn_out)
 
@@ -204,14 +198,12 @@ async def score_turn(
 )
 @inject
 async def complete_turn(
-    game_id: ResourceId,
-    turn_id: int,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: CompleteTurn = Depends(),
     handler: CompleteTurn.Handler = Depends(
         Provide[AppContainer.games.complete_turn_handler]
     ),
 ):
-    use_case = CompleteTurn(game_id=game_id, turn_id=turn_id)
     turn_out = await handler.execute(auth_user_id, use_case)
     return make_ok(turn_out)
 
@@ -222,15 +214,14 @@ async def complete_turn(
 )
 @inject
 async def buy_track(
-    game_id: ResourceId,
     user_id: ResourceId,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: BuyTrack = Depends(),
     handler: BuyTrack.Handler = Depends(Provide[AppContainer.games.buy_track_handler]),
 ):
     if user_id != auth_user_id:
         return make_error("FORBIDDEN", "You can only buy tracks for yourself", 403)
 
-    use_case = BuyTrack(game_id=game_id)
     receipt_out = await handler.execute(auth_user_id, use_case)
     return make_ok(receipt_out)
 
@@ -240,14 +231,12 @@ async def buy_track(
 )
 @inject
 async def exchange_track(
-    game_id: ResourceId,
-    turn_id: int,
     auth_user_id: ResourceId = Depends(get_auth_user),
+    use_case: ExchangeTrack = Depends(),
     handler: ExchangeTrack.Handler = Depends(
         Provide[AppContainer.games.exchange_track_handler]
     ),
 ):
-    use_case = ExchangeTrack(game_id=game_id, turn_id=turn_id)
     track_out = await handler.execute(auth_user_id, use_case)
     return make_ok(track_out)
 
@@ -257,7 +246,7 @@ async def exchange_track(
 async def notifications(
     game_id: ResourceId,
     websocket: WebSocket,
-    user_id: ResourceId = Depends(get_auth_user),
+    auth_user_id: ResourceId = Depends(get_auth_user),
     register_handler: RegisterNotificationChannel.Handler = Depends(
         Provide[AppContainer.games.register_notification_channel_handler]
     ),
@@ -266,7 +255,7 @@ async def notifications(
     ),
 ):
     register_use_case = RegisterNotificationChannel(game_id=game_id, channel=websocket)
-    await register_handler.execute(user_id, register_use_case)
+    await register_handler.execute(auth_user_id, register_use_case)
 
     await websocket.accept()
     try:
