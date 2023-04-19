@@ -5,7 +5,7 @@ from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
-from trackline.games.schemas import GameOut, GameStarted, GameState
+from trackline.games.schemas import GameOut, GameStarted, GameState, TrackOut
 from trackline.games.track_provider import TrackProvider
 from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
@@ -49,10 +49,14 @@ class StartGame(BaseModel):
                     game.id, player_user_id, track, 0
                 )
 
+            player_tracks_out = {
+                user_id: TrackOut.from_model(track)
+                for user_id, track in player_tracks.items()
+            }
             await self._notifier.notify(
                 user_id,
                 game,
-                GameStarted(initial_tracks=player_tracks),
+                GameStarted(initial_tracks=player_tracks_out),
             )
 
             game = game.copy(

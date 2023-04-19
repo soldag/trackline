@@ -48,7 +48,7 @@ class PlayerOut(BaseSchema):
             user_id=model.user_id,
             is_game_master=model.is_game_master,
             tokens=model.tokens,
-            timeline=model.timeline,
+            timeline=[TrackOut.from_model(t) for t in model.timeline],
         )
 
 
@@ -69,8 +69,8 @@ class GuessOut(BaseSchema):
 
 
 class CategoryScoringOut(BaseSchema):
-    winner: str | None
-    tokens_delta: Mapping[str, int]
+    winner: ResourceId | None
+    tokens_delta: Mapping[ResourceId, int]
 
     @staticmethod
     def from_model(model: CategoryScoring) -> "CategoryScoringOut":
@@ -98,7 +98,7 @@ class TurnOut(BaseSchema):
     track: TrackOut
     guesses: list[GuessOut]
     scoring: TurnScoringOut | None
-    completed_by: list[str]
+    completed_by: list[ResourceId]
 
     @staticmethod
     def from_model(model: Turn) -> "TurnOut":

@@ -50,7 +50,9 @@ class JoinGame(BaseModel):
             await self._game_repository.add_player(game.id, player)
 
             user = await self._user_repository.find_by_id(user_id)
-            user_out = UserOut.from_model(user) if user else None
+            assert user
+
+            user_out = UserOut.from_model(user)
             player_out = PlayerOut.from_model(player)
             await self._notifier.notify(
                 user_id,

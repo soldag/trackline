@@ -39,7 +39,7 @@ class Guess(BaseModel):
 
 
 class CategoryScoring(BaseModel):
-    winner: str | None
+    winner: ResourceId | None
     tokens_delta: dict[ResourceId, int]
 
 
@@ -53,8 +53,8 @@ class Turn(BaseModel):
     active_user_id: ResourceId
     track: Track
     guesses: dict[ResourceId, Guess] = {}
-    scoring: TurnScoring | None
-    completed_by: list[str] = []
+    scoring: TurnScoring | None = None
+    completed_by: list[ResourceId] = []
 
 
 class GameSettings(BaseModel):
