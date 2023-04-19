@@ -1,13 +1,9 @@
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends
 
-from trackline.auth.deps import (
-    get_auth_token,
-    get_auth_user,
-)
+from trackline.auth.deps import AuthTokenDep, AuthUserDep
 from trackline.auth.schemas import SessionOut
 from trackline.auth.use_cases import CreateSession, DeleteSession
-from trackline.core.fields import ResourceId
 from trackline.core.ioc import AppContainer
 from trackline.core.schemas import EntityResponse, Response
 from trackline.core.utils.response import make_ok
@@ -34,8 +30,8 @@ async def login(
 @router.post("/logout", response_model=Response)
 @inject
 async def logout(
-    token: str = Depends(get_auth_token),
-    auth_user_id: ResourceId = Depends(get_auth_user),
+    token: AuthTokenDep,
+    auth_user_id: AuthUserDep,
     handler: DeleteSession.Handler = Depends(
         Provide[AppContainer.auth.delete_session_handler]
     ),

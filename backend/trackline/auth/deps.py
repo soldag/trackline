@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from dependency_injector.wiring import inject, Provide
 from fastapi import Depends, Query, Request
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
@@ -38,6 +40,9 @@ def get_auth_token(
     )
 
 
+AuthTokenDep = Annotated[str, Depends(get_auth_token)]
+
+
 @inject
 async def get_auth_user(
     token: str = Depends(get_auth_token),
@@ -55,3 +60,6 @@ async def get_auth_user(
         )
 
     return user_id
+
+
+AuthUserDep = Annotated[ResourceId, Depends(get_auth_user)]
