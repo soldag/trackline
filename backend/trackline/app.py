@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, WebSocket
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import RequestValidationError, WebSocketRequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from trackline.auth.router import router as auth_router
@@ -82,3 +82,10 @@ async def validation_exception_handler(_, exc: RequestValidationError):
         for err in exc.errors()
     ]
     return make_errors(errors=errors, status_code=400)
+
+
+@app.exception_handler(WebSocketRequestValidationError)
+async def ws_validation_exception_handler(
+    ws: WebSocket, exc: WebSocketRequestValidationError
+):
+    pass
