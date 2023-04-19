@@ -25,8 +25,6 @@ class MusicBrainzClient:
         for artist in artists:
             query &= Q("artist", artist)
 
-        print(str(query))
-
         try:
             response = await self._client.get(
                 "recording",
