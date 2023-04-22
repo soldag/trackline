@@ -1,13 +1,22 @@
 import PropTypes from "prop-types";
 
-import { Modal, ModalDialog } from "@mui/joy";
+import { Box, Modal, ModalDialog } from "@mui/joy";
 
 import ResponsiveQrCode from "components/common/ResponsiveQrCode";
 
 const QrCodeModal = ({ joinUrl, open, onClose }) => (
   <Modal open={open} onClose={onClose} onClick={onClose}>
-    <ModalDialog>
-      <ResponsiveQrCode data={joinUrl} sx={{ maxWidth: "512px" }} />
+    <ModalDialog
+      sx={{
+        "display": "flex",
+        "flexDirection": "row",
+        "alignItems": "stretch",
+        "--ModalDialog-minWidth": 0,
+      }}
+    >
+      <Box sx={{ overflow: "hidden" }}>
+        <ResponsiveQrCode data={joinUrl} sx={{ maxWidth: "512px" }} />
+      </Box>
     </ModalDialog>
   </Modal>
 );
