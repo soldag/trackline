@@ -114,7 +114,7 @@ const GameTurnGuessingView = () => {
     if (isGameMaster) {
       dispatch(play({ trackId: turn.track.spotifyId }));
     }
-  }, [dispatch, turn.track, isGameMaster]);
+  }, [dispatch, turn.track.spotifyId, isGameMaster]);
 
   const handleGuess = ({ year }) => {
     const index = tracks.findIndex((t) => t.spotifyId === turn.track.spotifyId);
