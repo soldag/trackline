@@ -3,7 +3,7 @@ import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
-import { Box, Typography } from "@mui/joy";
+import { Box, Stack, Typography } from "@mui/joy";
 
 import View from "components/views/View";
 import { joinGame } from "store/games/actions";
@@ -34,50 +34,38 @@ const JoinGameView = () => {
 
   return (
     <View appBar={{ showTitle: true, showLogout: true }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        alignItems="stretch"
+        spacing={2}
       >
-        <Box>
-          <Typography level="h6" sx={{ mb: 1 }}>
+        <Stack direction="column" spacing={1} sx={{ flex: "1 1 0" }}>
+          <Typography level="h6">
             <FormattedMessage
               id="JoinGameView.scanQrCode.header"
               defaultMessage="Scan QR code"
             />
           </Typography>
-          {!gameId && <QrScanner onResult={handleJoin} />}
-        </Box>
+          <Box sx={{ flex: "1 1 0", overflow: "hidden" }}>
+            {!gameId && (
+              <QrScanner
+                sx={{ margin: { xs: "0 auto", sm: "0" } }}
+                onResult={handleJoin}
+              />
+            )}
+          </Box>
+        </Stack>
 
-        <Typography
-          level="h5"
-          textAlign="center"
-          sx={{
-            ":before, :after": {
-              content: "'–'",
-              mx: "10px",
-            },
-            "textTransform": "uppercase",
-          }}
-        >
-          <FormattedMessage
-            id="JoinGameView.orSeparator.header"
-            defaultMessage="or"
-          />
-        </Typography>
-
-        <Box>
-          <Typography level="h6" sx={{ mb: 1 }}>
+        <Stack direction="column" spacing={1}>
+          <Typography level="h6">
             <FormattedMessage
               id="JoinGameView.enterGameId.header"
               defaultMessage="Enter game ID manually"
             />
           </Typography>
           <JoinGameForm onSubmit={handleJoin} />
-        </Box>
-      </Box>
+        </Stack>
+      </Stack>
     </View>
   );
 };

@@ -66,7 +66,6 @@
   "JoinGameView.enterGameId.header": "Spiel-ID manuell eingeben",
   "JoinGameView.JoinGameForm.gameId.label": "Spiel-ID",
   "JoinGameView.JoinGameForm.joinGame": "Spiel beitreten",
-  "JoinGameView.orSeparator.header": "oder",
   "JoinGameView.scanQrCode.header": "QR-Code scannen",
   "LoginView.header": "Login",
   "LoginView.LoginForm.login": "Login",

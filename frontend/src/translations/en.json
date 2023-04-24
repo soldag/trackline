@@ -66,7 +66,6 @@
   "JoinGameView.JoinGameForm.gameId.label": "Game ID",
   "JoinGameView.JoinGameForm.joinGame": "Join game",
   "JoinGameView.enterGameId.header": "Enter game ID manually",
-  "JoinGameView.orSeparator.header": "or",
   "JoinGameView.scanQrCode.header": "Scan QR code",
   "LoginView.LoginForm.login": "Login",
   "LoginView.LoginForm.password.label": "Password",
