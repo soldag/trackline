@@ -103,7 +103,7 @@ class Repository(Generic[T]):
         return {"_id": {"$in": list(model_ids)}}
 
     def _to_document(self, model: BaseModel, root: bool = True) -> dict:
-        result = model.dict()
+        result = self._enforce_string_keys(model.dict())
         if root and (model_id := result.pop("id", None)):
             result["_id"] = model_id
         return result
@@ -112,3 +112,13 @@ class Repository(Generic[T]):
         if root and (model_id := data.pop("_id", None)):
             data["id"] = str(model_id)
         return self._model_type(**data)
+
+    def _enforce_string_keys(self, obj: Any) -> Any:
+        if isinstance(obj, dict):
+            return {
+                str(key): self._enforce_string_keys(value) for key, value in obj.items()
+            }
+        elif isinstance(obj, list):
+            return [self._enforce_string_keys(value) for value in obj]
+
+        return obj
