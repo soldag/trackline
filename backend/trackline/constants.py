@@ -1,6 +1,10 @@
+from datetime import timedelta
+
+
 APP_NAME = "trackline"
 
 SESSION_TOKEN_LENGTH = 32
+SESSION_EXPIRY_INTERVAL = timedelta(days=7)
 
 MIN_PLAYER_COUNT = 2
 

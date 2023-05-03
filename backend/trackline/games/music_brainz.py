@@ -3,13 +3,15 @@ from collections.abc import Collection
 from httpx import AsyncClient, HTTPError
 from lucenequerybuilder import Q
 
-from trackline.configuration import APP_CONTACT_EMAIL
 from trackline.constants import APP_NAME, MUSICBRAINZ_MIN_SCORE
+from trackline.core.settings import Settings
 from trackline.core.utils.version import get_version
 
 
 class MusicBrainzClient:
-    def __init__(self) -> None:
+    def __init__(self, settings: Settings) -> None:
+        self._settings = settings
+
         self._client = AsyncClient(
             base_url="https://musicbrainz.org/ws/2/",
             headers={"user-agent": self._get_user_agent()},
@@ -57,7 +59,7 @@ class MusicBrainzClient:
         if app_version:
             user_agent += f"/{app_version}"
 
-        if APP_CONTACT_EMAIL:
-            user_agent += f" ({APP_CONTACT_EMAIL})"
+        if contact_email := self._settings.app_contact_email:
+            user_agent += f" ({contact_email})"
 
         return user_agent

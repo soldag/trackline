@@ -6,11 +6,13 @@ from motor.motor_asyncio import (
     AsyncIOMotorDatabase,
 )
 
+from trackline.core.settings import Settings
+
 
 class DatabaseClient:
-    def __init__(self, db_uri: str, db_name: str) -> None:
-        self._client = AsyncIOMotorClient(db_uri, tz_aware=True)
-        self._database: AsyncIOMotorDatabase = self._client[db_name]
+    def __init__(self, settings: Settings) -> None:
+        self._client = AsyncIOMotorClient(settings.db_uri, tz_aware=True)
+        self._database: AsyncIOMotorDatabase = self._client[settings.db_name]
 
         self._session: AsyncIOMotorClientSession | None = None
 

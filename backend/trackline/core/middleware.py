@@ -8,13 +8,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
-from trackline.configuration import (
-    DB_TXN_RETRIES_JITTER,
-    DB_TXN_RETRIES_MAX,
-    DB_TXN_RETRIES_MIN_INTERVAL,
-)
 from trackline.core.db.client import DatabaseClient
 from trackline.core.ioc import AppContainer
+from trackline.core.settings import Settings
 from trackline.core.utils.datetime import utcnow
 from trackline.core.utils.response import make_error
 
@@ -44,9 +40,11 @@ class DatabaseTransactionMiddleware(BaseHTTPMiddleware):
     def __init__(
         self,
         app,
+        settings: Settings = Provide[AppContainer.core.settings],
         db: DatabaseClient = Provide[AppContainer.core.database_client],
     ) -> None:
         super().__init__(app)
+        self._settings = settings
         self._db = db
 
     async def dispatch(
@@ -61,15 +59,17 @@ class DatabaseTransactionMiddleware(BaseHTTPMiddleware):
                 if e.code != 112:
                     raise e
 
-                if retries >= DB_TXN_RETRIES_MAX:
+                if retries >= self._settings.db_txn_retries_max:
                     return make_error(
                         status_code=409,
                         code="CONFLICT",
                         description="The request could not be executed due to a conflict with another request.",
                     )
 
-                base_interval = DB_TXN_RETRIES_MIN_INTERVAL * 2**retries
-                jitter = random.randrange(0, DB_TXN_RETRIES_JITTER)
+                base_interval = (
+                    self._settings.db_txn_retries_min_interval * 2**retries
+                )
+                jitter = random.randrange(0, self._settings.db_txn_retries_jitter)
                 interval = (base_interval + jitter) / 1000
                 await asyncio.sleep(interval)
 

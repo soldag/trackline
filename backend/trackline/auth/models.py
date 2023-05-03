@@ -3,8 +3,7 @@ import secrets
 
 from pydantic import Field
 
-from trackline.configuration import SESSION_EXPIRY_INTERVAL
-from trackline.constants import SESSION_TOKEN_LENGTH
+from trackline.constants import SESSION_EXPIRY_INTERVAL, SESSION_TOKEN_LENGTH
 from trackline.core.db.models import IdentifiableModel
 from trackline.core.fields import ResourceId
 from trackline.core.utils.datetime import utcnow

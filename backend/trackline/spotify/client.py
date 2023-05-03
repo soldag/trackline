@@ -8,6 +8,7 @@ from async_spotify.authentification.spotify_authorization_token import (
 )
 from async_spotify.spotify_errors import SpotifyError
 
+from trackline.core.settings import Settings
 from trackline.spotify.models import SpotifyTrack
 
 
@@ -24,19 +25,20 @@ class PlaylistNotFoundException(Exception):
 
 
 class SpotifyClient:
-    def __init__(self, client_id: str, client_secret: str, redirect_url: str) -> None:
-        self._client_id = client_id
-        self._client_secret = client_secret
+    def __init__(self, settings: Settings) -> None:
+        self._settings = settings
 
         self._client = SpotifyApiClient(
-            ClientCredentialsFlow(self._client_id, self._client_secret),
+            ClientCredentialsFlow(
+                self._settings.spotify_client_id, self._settings.spotify_client_secret
+            ),
             hold_authentication=True,
         )
         self._auth_client = SpotifyApiClient(
             AuthorizationCodeFlow(
-                client_id,
-                client_secret,
-                redirect_url=redirect_url,
+                self._settings.spotify_client_id,
+                self._settings.spotify_client_secret,
+                redirect_url=self._settings.spotify_redirect_url,
             ),
         )
 
