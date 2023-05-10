@@ -1,3 +1,4 @@
+from injector import Inject
 from pydantic import BaseModel
 
 from trackline.core.fields import ResourceId
@@ -14,7 +15,9 @@ class RegisterNotificationChannel(BaseModel):
         arbitrary_types_allowed = True
 
     class Handler(BaseHandler):
-        def __init__(self, game_repository: GameRepository, notifier: Notifier) -> None:
+        def __init__(
+            self, game_repository: Inject[GameRepository], notifier: Inject[Notifier]
+        ) -> None:
             super().__init__(game_repository)
             self._notifier = notifier
 

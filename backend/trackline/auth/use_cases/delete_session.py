@@ -1,3 +1,4 @@
+from injector import Inject
 from pydantic import BaseModel
 
 from trackline.auth.repository import SessionRepository
@@ -8,7 +9,7 @@ class DeleteSession(BaseModel):
     token: str
 
     class Handler:
-        def __init__(self, session_repository: SessionRepository) -> None:
+        def __init__(self, session_repository: Inject[SessionRepository]) -> None:
             self._session_repository = session_repository
 
         async def execute(self, use_case: "DeleteSession") -> None:

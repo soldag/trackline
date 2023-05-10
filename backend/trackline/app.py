@@ -1,17 +1,22 @@
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.exceptions import RequestValidationError, WebSocketRequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_injector import attach_injector, InjectorMiddleware
+from injector import Injector
 
 from trackline.auth.router import router as auth_router
+from trackline.core.di import CoreModule
 from trackline.core.exceptions import RequestException
-from trackline.core.ioc import AppContainer
 from trackline.core.middleware import (
     DatabaseTransactionMiddleware,
     NoIndexMiddleware,
     ServerTimeMiddleware,
 )
 from trackline.core.utils.response import Error, make_error, make_errors
+from trackline.games.di import GamesModule
 from trackline.games.router import router as games_router
+from trackline.spotify.client import SpotifyClient
+from trackline.spotify.di import SpotifyModule
 from trackline.spotify.router import router as spotify_router
 from trackline.users.router import router as users_router
 
@@ -19,11 +24,10 @@ from trackline.users.router import router as users_router
 app = FastAPI(
     title="Trackline",
 )
-container = AppContainer()  # type: ignore
 
-app.add_middleware(NoIndexMiddleware)
-app.add_middleware(ServerTimeMiddleware)
-app.add_middleware(DatabaseTransactionMiddleware)
+injector = Injector([CoreModule(), GamesModule(), SpotifyModule()])
+attach_injector(app, injector)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins="*",
@@ -32,6 +36,10 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["x-server-time"],
 )
+app.add_middleware(ServerTimeMiddleware)
+app.add_middleware(NoIndexMiddleware)
+app.add_middleware(DatabaseTransactionMiddleware, injector=injector)
+app.add_middleware(InjectorMiddleware, injector=injector)
 
 app.include_router(auth_router)
 app.include_router(games_router)
@@ -41,14 +49,14 @@ app.include_router(users_router)
 
 @app.on_event("startup")
 async def on_startup():
-    if task := container.init_resources():
-        await task
+    spotify_client = injector.get(SpotifyClient)
+    await spotify_client.initialize()
 
 
 @app.on_event("shutdown")
 async def on_shutdown():
-    if task := container.shutdown_resources():
-        await task
+    spotify_client = injector.get(SpotifyClient)
+    await spotify_client.close()
 
 
 @app.exception_handler(Exception)

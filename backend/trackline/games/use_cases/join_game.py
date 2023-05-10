@@ -1,3 +1,4 @@
+from injector import Inject
 from pydantic import BaseModel
 
 from trackline.core.exceptions import UseCaseException
@@ -17,9 +18,9 @@ class JoinGame(BaseModel):
     class Handler(BaseHandler):
         def __init__(
             self,
-            game_repository: GameRepository,
-            user_repository: UserRepository,
-            notifier: Notifier,
+            game_repository: Inject[GameRepository],
+            user_repository: Inject[UserRepository],
+            notifier: Inject[Notifier],
         ) -> None:
             super().__init__(game_repository)
             self._user_repository = user_repository

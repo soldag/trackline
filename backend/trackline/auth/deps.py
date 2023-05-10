@@ -1,14 +1,13 @@
 from typing import Annotated
 
-from dependency_injector.wiring import inject, Provide
 from fastapi import Depends, Query, Request
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi_injector import Injected
 
 from trackline.auth.repository import SessionRepository
 from trackline.auth.use_cases import GetSessionUser
 from trackline.core.exceptions import RequestException
 from trackline.core.fields import ResourceId
-from trackline.core.ioc import AppContainer
 
 
 class OptionalHTTPBearer(HTTPBearer):
@@ -43,12 +42,9 @@ def get_auth_token(
 AuthTokenDep = Annotated[str, Depends(get_auth_token)]
 
 
-@inject
 async def get_auth_user(
-    token: str = Depends(get_auth_token),
-    session_repository: SessionRepository = Depends(
-        Provide[AppContainer.auth.session_repository]
-    ),
+    token: Annotated[str, Depends(get_auth_token)],
+    session_repository: Annotated[SessionRepository, Injected(SessionRepository)],
 ) -> ResourceId:
     use_case = GetSessionUser(token=token)
     handler = GetSessionUser.Handler(session_repository)

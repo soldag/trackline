@@ -1,6 +1,7 @@
 from collections.abc import Collection
 
 from httpx import AsyncClient, HTTPError
+from injector import Inject
 from lucenequerybuilder import Q
 
 from trackline.constants import APP_NAME, MUSICBRAINZ_MIN_SCORE
@@ -9,7 +10,7 @@ from trackline.core.utils.version import get_version
 
 
 class MusicBrainzClient:
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Inject[Settings]) -> None:
         self._settings = settings
 
         self._client = AsyncClient(

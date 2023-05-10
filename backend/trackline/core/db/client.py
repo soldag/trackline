@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+from injector import Inject
 from motor.motor_asyncio import (
     AsyncIOMotorClient,
     AsyncIOMotorClientSession,
@@ -10,7 +11,7 @@ from trackline.core.settings import Settings
 
 
 class DatabaseClient:
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Inject[Settings]) -> None:
         self._client = AsyncIOMotorClient(settings.db_uri, tz_aware=True)
         self._database: AsyncIOMotorDatabase = self._client[settings.db_name]
 

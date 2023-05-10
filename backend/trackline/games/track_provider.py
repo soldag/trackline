@@ -2,6 +2,8 @@ from collections.abc import Collection, Sequence
 import random
 import re
 
+from injector import Inject
+
 from trackline.core.utils import shuffle
 from trackline.games.models import Track
 from trackline.games.music_brainz import MusicBrainzClient
@@ -19,7 +21,9 @@ class TrackProvider:
     )
 
     def __init__(
-        self, spotify_client: SpotifyClient, music_brainz_client: MusicBrainzClient
+        self,
+        spotify_client: Inject[SpotifyClient],
+        music_brainz_client: Inject[MusicBrainzClient],
     ) -> None:
         self._spotify_client = spotify_client
         self._music_brainz_client = music_brainz_client

@@ -1,5 +1,5 @@
+from injector import Inject
 from pydantic import BaseModel
-
 
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
@@ -9,7 +9,7 @@ from trackline.users.schemas import UserOut
 
 class GetCurrentUser(BaseModel):
     class Handler:
-        def __init__(self, user_repository: UserRepository) -> None:
+        def __init__(self, user_repository: Inject[UserRepository]) -> None:
             self._user_repository = user_repository
 
         async def execute(

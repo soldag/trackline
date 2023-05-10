@@ -1,3 +1,4 @@
+from injector import Inject
 from pydantic import BaseModel
 
 from trackline.core.fields import ResourceId
@@ -13,8 +14,8 @@ class GetGameUsers(BaseModel):
     class Handler(BaseHandler):
         def __init__(
             self,
-            game_repository: GameRepository,
-            user_repository: UserRepository,
+            game_repository: Inject[GameRepository],
+            user_repository: Inject[UserRepository],
         ) -> None:
             super().__init__(game_repository)
             self.user_repository = user_repository

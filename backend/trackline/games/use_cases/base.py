@@ -1,5 +1,7 @@
 from collections.abc import Collection, Sequence
 
+from injector import Inject
+
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.models import Game, Track
@@ -9,7 +11,7 @@ from trackline.games.track_provider import TrackProvider
 
 
 class BaseHandler:
-    def __init__(self, game_repository: GameRepository) -> None:
+    def __init__(self, game_repository: Inject[GameRepository]) -> None:
         self._game_repository = game_repository
 
     def _assert_is_player(self, game: Game, user_id: ResourceId) -> None:
@@ -125,8 +127,8 @@ class BaseHandler:
 class TrackProvidingBaseHandler(BaseHandler):
     def __init__(
         self,
-        game_repository: GameRepository,
-        track_provider: TrackProvider,
+        game_repository: Inject[GameRepository],
+        track_provider: Inject[TrackProvider],
     ) -> None:
         super().__init__(game_repository)
         self._track_provider = track_provider

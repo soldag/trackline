@@ -7,6 +7,7 @@ from async_spotify.authentification.spotify_authorization_token import (
     SpotifyAuthorisationToken,
 )
 from async_spotify.spotify_errors import SpotifyError
+from injector import Inject
 
 from trackline.core.settings import Settings
 from trackline.spotify.models import SpotifyTrack
@@ -25,7 +26,7 @@ class PlaylistNotFoundException(Exception):
 
 
 class SpotifyClient:
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Inject[Settings]) -> None:
         self._settings = settings
 
         self._client = SpotifyApiClient(

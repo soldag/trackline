@@ -1,3 +1,4 @@
+from injector import Inject
 from pydantic import BaseModel
 
 from trackline.auth.models import Session
@@ -15,8 +16,8 @@ class CreateSession(BaseModel):
     class Handler:
         def __init__(
             self,
-            session_repository: SessionRepository,
-            user_repository: UserRepository,
+            session_repository: Inject[SessionRepository],
+            user_repository: Inject[UserRepository],
         ) -> None:
             self._session_repository = session_repository
             self._user_repository = user_repository

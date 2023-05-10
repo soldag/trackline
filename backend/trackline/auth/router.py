@@ -1,10 +1,11 @@
-from dependency_injector.wiring import inject, Provide
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
+from fastapi import APIRouter
+from fastapi_injector import Injected
 
 from trackline.auth.deps import AuthTokenDep, AuthUserDep
 from trackline.auth.schemas import SessionOut
 from trackline.auth.use_cases import CreateSession, DeleteSession
-from trackline.core.ioc import AppContainer
 from trackline.core.schemas import EntityResponse, Response
 from trackline.core.utils.response import make_ok
 
@@ -16,25 +17,19 @@ router = APIRouter(
 
 
 @router.post("/login", response_model=EntityResponse[SessionOut], status_code=201)
-@inject
 async def login(
     use_case: CreateSession,
-    handler: CreateSession.Handler = Depends(
-        Provide[AppContainer.auth.create_session_handler]
-    ),
+    handler: Annotated[CreateSession.Handler, Injected(CreateSession.Handler)],
 ):
     session = await handler.execute(use_case)
     return make_ok(session)
 
 
 @router.post("/logout", response_model=Response)
-@inject
 async def logout(
     token: AuthTokenDep,
     auth_user_id: AuthUserDep,
-    handler: DeleteSession.Handler = Depends(
-        Provide[AppContainer.auth.delete_session_handler]
-    ),
+    handler: Annotated[DeleteSession.Handler, Injected(DeleteSession.Handler)],
 ):
     use_case = DeleteSession(token=token)
     await handler.execute(use_case)

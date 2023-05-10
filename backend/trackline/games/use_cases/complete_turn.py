@@ -1,3 +1,4 @@
+from injector import Inject
 from pydantic import BaseModel
 
 from trackline.core.exceptions import UseCaseException
@@ -20,7 +21,9 @@ class CompleteTurn(BaseModel):
     turn_id: int
 
     class Handler(BaseHandler):
-        def __init__(self, game_repository: GameRepository, notifier: Notifier) -> None:
+        def __init__(
+            self, game_repository: Inject[GameRepository], notifier: Inject[Notifier]
+        ) -> None:
             super().__init__(game_repository)
             self._notifier = notifier
 

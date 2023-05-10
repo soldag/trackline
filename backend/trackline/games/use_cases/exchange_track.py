@@ -1,3 +1,4 @@
+from injector import Inject
 from pydantic import BaseModel
 
 from trackline.constants import TOKEN_COST_EXCHANGE_TRACK
@@ -20,9 +21,9 @@ class ExchangeTrack(BaseModel):
     class Handler(TrackProvidingBaseHandler):
         def __init__(
             self,
-            game_repository: GameRepository,
-            track_provider: TrackProvider,
-            notifier: Notifier,
+            game_repository: Inject[GameRepository],
+            track_provider: Inject[TrackProvider],
+            notifier: Inject[Notifier],
         ) -> None:
             super().__init__(game_repository, track_provider)
             self._notifier = notifier

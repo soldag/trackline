@@ -1,3 +1,4 @@
+from injector import Inject
 from pydantic import BaseModel
 
 from trackline.core.utils.security import hash_password
@@ -11,7 +12,7 @@ class CreateUser(BaseModel):
     password: str
 
     class Handler:
-        def __init__(self, user_repository: UserRepository) -> None:
+        def __init__(self, user_repository: Inject[UserRepository]) -> None:
             self._user_repository = user_repository
 
         async def execute(self, use_case: "CreateUser") -> UserOut:

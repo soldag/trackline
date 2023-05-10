@@ -6,6 +6,7 @@ from typing import (
     TypeVar,
 )
 
+from injector import Inject
 from pydantic import BaseModel
 
 from trackline.core.db.client import DatabaseClient
@@ -20,7 +21,7 @@ class Repository(Generic[T]):
     class Meta:
         collection_name: str
 
-    def __init__(self, db: DatabaseClient) -> None:
+    def __init__(self, db: Inject[DatabaseClient]) -> None:
         super().__init__()
         self._collection = db.database[self.Meta.collection_name]
         self._session = db.session
