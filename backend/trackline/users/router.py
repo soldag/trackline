@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter
 from fastapi_injector import Injected
 
-from trackline.auth.deps import AuthUserDep
+from trackline.auth.deps import AuthUserId
 from trackline.core.schemas import EntityResponse
 from trackline.core.utils.response import make_ok
 from trackline.users.schemas import UserOut
@@ -26,7 +26,7 @@ async def create_user(
 
 @router.get("/me", response_model=EntityResponse[UserOut])
 async def get_current_user(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[GetCurrentUser, Injected(GetCurrentUser)],
     handler: Annotated[GetCurrentUser.Handler, Injected(GetCurrentUser.Handler)],
 ):

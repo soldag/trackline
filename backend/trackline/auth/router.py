@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter
 from fastapi_injector import Injected
 
-from trackline.auth.deps import AuthTokenDep, AuthUserDep
+from trackline.auth.deps import AuthToken, AuthUserId
 from trackline.auth.schemas import SessionOut
 from trackline.auth.use_cases import CreateSession, DeleteSession
 from trackline.core.schemas import EntityResponse, Response
@@ -27,8 +27,8 @@ async def login(
 
 @router.post("/logout", response_model=Response)
 async def logout(
-    token: AuthTokenDep,
-    auth_user_id: AuthUserDep,
+    token: AuthToken,
+    auth_user_id: AuthUserId,
     handler: Annotated[DeleteSession.Handler, Injected(DeleteSession.Handler)],
 ):
     use_case = DeleteSession(token=token)

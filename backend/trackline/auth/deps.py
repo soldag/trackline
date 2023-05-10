@@ -24,8 +24,8 @@ _auth = OptionalHTTPBearer(auto_error=False)
 
 
 def get_auth_token(
+    auth: Annotated[HTTPAuthorizationCredentials, Depends(_auth)],
     session_token: str | None = Query(default=None, include_in_schema=False),
-    auth: HTTPAuthorizationCredentials = Depends(_auth),
 ) -> str:
     if auth:
         return auth.credentials
@@ -39,10 +39,10 @@ def get_auth_token(
     )
 
 
-AuthTokenDep = Annotated[str, Depends(get_auth_token)]
+AuthToken = Annotated[str, Depends(get_auth_token)]
 
 
-async def get_auth_user(
+async def get_auth_user_id(
     token: Annotated[str, Depends(get_auth_token)],
     session_repository: Annotated[SessionRepository, Injected(SessionRepository)],
 ) -> ResourceId:
@@ -58,4 +58,4 @@ async def get_auth_user(
     return user_id
 
 
-AuthUserDep = Annotated[ResourceId, Depends(get_auth_user)]
+AuthUserId = Annotated[ResourceId, Depends(get_auth_user_id)]

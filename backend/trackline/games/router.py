@@ -11,7 +11,7 @@ from fastapi import (
 )
 from fastapi_injector import Injected
 
-from trackline.auth.deps import AuthUserDep
+from trackline.auth.deps import AuthUserId
 from trackline.core.fields import ResourceId
 from trackline.core.schemas import EntityResponse, Response
 from trackline.core.utils.response import make_error, make_ok
@@ -51,7 +51,7 @@ router = APIRouter(
 
 @router.post("", response_model=EntityResponse[GameOut], status_code=201)
 async def create_game(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: CreateGame,
     handler: Annotated[CreateGame.Handler, Injected(CreateGame.Handler)],
 ):
@@ -61,7 +61,7 @@ async def create_game(
 
 @router.get("/{game_id}", response_model=EntityResponse[GameOut])
 async def get_game(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[GetGame, Depends()],
     handler: Annotated[GetGame.Handler, Injected(GetGame.Handler)],
 ):
@@ -71,7 +71,7 @@ async def get_game(
 
 @router.get("/{game_id}/users", response_model=EntityResponse[list[UserOut]])
 async def get_game_users(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[GetGameUsers, Depends()],
     handler: Annotated[GetGameUsers.Handler, Injected(GetGameUsers.Handler)],
 ):
@@ -81,7 +81,7 @@ async def get_game_users(
 
 @router.put("/{game_id}/players", response_model=Response, status_code=201)
 async def join_game(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[JoinGame, Depends()],
     handler: Annotated[JoinGame.Handler, Injected(JoinGame.Handler)],
 ):
@@ -92,7 +92,7 @@ async def join_game(
 @router.delete("/{game_id}/players/{user_id}", response_model=Response)
 async def leave_game(
     user_id: ResourceId,
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[LeaveGame, Depends()],
     handler: Annotated[LeaveGame.Handler, Injected(LeaveGame.Handler)],
 ):
@@ -105,7 +105,7 @@ async def leave_game(
 
 @router.post("/{game_id}/start", response_model=EntityResponse[GameOut])
 async def start_game(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[StartGame, Depends()],
     handler: Annotated[StartGame.Handler, Injected(StartGame.Handler)],
 ):
@@ -115,7 +115,7 @@ async def start_game(
 
 @router.post("/{game_id}/abort", response_model=Response)
 async def abort_game(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[AbortGame, Depends()],
     handler: Annotated[AbortGame.Handler, Injected(AbortGame.Handler)],
 ):
@@ -125,7 +125,7 @@ async def abort_game(
 
 @router.post("/{game_id}/turns", response_model=EntityResponse[TurnOut])
 async def create_turn(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[CreateTurn, Depends()],
     handler: Annotated[CreateTurn.Handler, Injected(CreateTurn.Handler)],
 ):
@@ -148,7 +148,7 @@ class CreateGuessParams:
     "/{game_id}/turns/{turn_id}/guess", response_model=EntityResponse[GuessOut]
 )
 async def create_guess(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     params: Annotated[CreateGuessParams, Depends()],
     handler: Annotated[CreateGuess.Handler, Injected(CreateGuess.Handler)],
 ):
@@ -158,7 +158,7 @@ async def create_guess(
 
 @router.post("/{game_id}/turns/{turn_id}/score", response_model=EntityResponse[GameOut])
 async def score_turn(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[ScoreTurn, Depends()],
     handler: Annotated[ScoreTurn.Handler, Injected(ScoreTurn.Handler)],
 ):
@@ -171,7 +171,7 @@ async def score_turn(
     response_model=EntityResponse[TurnCompletionOut],
 )
 async def complete_turn(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[CompleteTurn, Depends()],
     handler: Annotated[CompleteTurn.Handler, Injected(CompleteTurn.Handler)],
 ):
@@ -185,7 +185,7 @@ async def complete_turn(
 )
 async def buy_track(
     user_id: ResourceId,
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[BuyTrack, Depends()],
     handler: Annotated[BuyTrack.Handler, Injected(BuyTrack.Handler)],
 ):
@@ -200,7 +200,7 @@ async def buy_track(
     "/{game_id}/turns/{turn_id}/track/exchange", response_model=EntityResponse[TrackOut]
 )
 async def exchange_track(
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     use_case: Annotated[ExchangeTrack, Depends()],
     handler: Annotated[ExchangeTrack.Handler, Injected(ExchangeTrack.Handler)],
 ):
@@ -212,7 +212,7 @@ async def exchange_track(
 async def notifications(
     game_id: ResourceId,
     websocket: WebSocket,
-    auth_user_id: AuthUserDep,
+    auth_user_id: AuthUserId,
     register_handler: Annotated[
         RegisterNotificationChannel.Handler,
         Injected(RegisterNotificationChannel.Handler),
