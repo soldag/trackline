@@ -5,7 +5,7 @@ import {
   TOKEN_COST_BUY_TRACK,
   TOKEN_COST_EXCHANGE_TRACK,
 } from "constants";
-import { resetState } from "store/common/actions";
+import { dismissError, resetState } from "store/common/actions";
 import {
   isFailure,
   isFulfill,
@@ -57,6 +57,9 @@ const getTrackPosition = (timeline, track) => {
 const reducer = createReducer(initialState, (builder) => {
   builder
     .addCase(resetState, () => initialState)
+    .addCase(dismissError, (state) => {
+      state.error = null;
+    })
 
     .addCase(clearGame, (state) => {
       state.game = null;

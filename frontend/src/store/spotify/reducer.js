@@ -2,7 +2,7 @@ import { createReducer } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-import { resetState } from "store/common/actions";
+import { dismissError, resetState } from "store/common/actions";
 import {
   isFailure,
   isFulfill,
@@ -56,6 +56,9 @@ const reducer = createReducer(initialState, (builder) => {
       ...initialState,
       isLoggedIn: false,
     }))
+    .addCase(dismissError, (state) => {
+      state.error = null;
+    })
 
     .addCase(setAccessToken, (state, { payload: { token } }) => {
       if (token) {
