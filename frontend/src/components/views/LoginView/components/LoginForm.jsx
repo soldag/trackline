@@ -7,9 +7,11 @@ import KeyIcon from "@mui/icons-material/Key";
 import PersonIcon from "@mui/icons-material/Person";
 import { Button, Grid, Input } from "@mui/joy";
 
+import ErrorAlert from "components/common/ErrorAlert";
 import { MAX_PASSWORD_LENGTH, MAX_USERNAME_LENGTH } from "constants";
+import { ErrorType } from "types/errors";
 
-const LoginForm = ({ onSubmit }) => {
+const LoginForm = ({ loading, error, onSubmit, onDismissError }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -27,6 +29,20 @@ const LoginForm = ({ onSubmit }) => {
   return (
     <form onSubmit={handleSubmit}>
       <Grid container spacing={2}>
+        {error && (
+          <Grid xs={12}>
+            <ErrorAlert
+              header={
+                <FormattedMessage
+                  id="LoginView.LoginForm.error.header"
+                  defaultMessage="Login failed"
+                />
+              }
+              error={error}
+              onDismiss={onDismissError}
+            />
+          </Grid>
+        )}
         <Grid xs={12}>
           <FormattedMessage
             id="LoginView.LoginForm.username.placeholder"
@@ -91,7 +107,7 @@ const LoginForm = ({ onSubmit }) => {
           <Button
             fullWidth
             type="submit"
-            disabled={!isValid}
+            disabled={loading || !isValid}
             onClick={handleSubmit}
           >
             <FormattedMessage
@@ -106,7 +122,10 @@ const LoginForm = ({ onSubmit }) => {
 };
 
 LoginForm.propTypes = {
+  loading: PropTypes.bool,
+  error: ErrorType,
   onSubmit: PropTypes.func,
+  onDismissError: PropTypes.func,
 };
 
 export default LoginForm;

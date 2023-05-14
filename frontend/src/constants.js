@@ -25,6 +25,11 @@ export const TOKEN_COST_YEAR_GUESS = 1;
 export const TOKEN_COST_EXCHANGE_TRACK = 1;
 export const TOKEN_COST_BUY_TRACK = 3;
 
+export const ERROR_CODES = {
+  API: "API_ERROR",
+  SPOTIFY: "SPOTIFY_ERROR",
+};
+
 export const GAME_STATES = {
   WAITING_FOR_PLAYERS: "waiting_for_players",
   STARTED: "started",

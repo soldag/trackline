@@ -1,10 +1,12 @@
-class ApiError extends Error {
-  code = "API_ERROR";
+import { ERROR_CODES } from "constants";
 
-  constructor(message, statusCode = null, errors = null) {
+class ApiError extends Error {
+  code = ERROR_CODES.API;
+
+  constructor(message, statusCode = null, apiError = null) {
     super(message);
     this.statusCode = statusCode;
-    this.errors = errors || [];
+    this.apiError = apiError;
   }
 }
 

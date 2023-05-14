@@ -1,5 +1,7 @@
+import { ERROR_CODES } from "constants";
+
 class SpotifyError extends Error {
-  code = "SPOTIFY_ERROR";
+  code = ERROR_CODES.SPOTIFY;
 
   constructor(message, statusCode = null) {
     super(message);

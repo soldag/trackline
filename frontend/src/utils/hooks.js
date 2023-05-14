@@ -1,8 +1,13 @@
 import { camelizeKeys } from "humps";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useIntl } from "react-intl";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 
 import api from "api/trackline";
 import SpotifyContext from "components/contexts/SpotifyContext";
+import { dismissError } from "store/common/actions";
+import { getErrorMessage } from "utils/errors";
 
 export const useMountEffect = (effect) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,4 +95,20 @@ export const useSpotify = ({ requireAuth = false }) => {
 
   useMountEffect(() => () => setIsRequired(false));
   useEffect(() => setIsRequired(requireAuth), [requireAuth, setIsRequired]);
+};
+
+export const useErrorToast = ({ error }) => {
+  const intl = useIntl();
+  const dispatch = useDispatch();
+
+  const prevError = usePrevious(error);
+  useEffect(() => {
+    if (!error || error === prevError) return;
+
+    const message = getErrorMessage(intl, error);
+    toast.error(message, {
+      onDismiss: () => dispatch(dismissError()),
+      onAutoClose: () => dispatch(dismissError()),
+    });
+  }, [prevError, error, intl, dispatch]);
 };

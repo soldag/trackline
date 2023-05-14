@@ -6,6 +6,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { CssBaseline } from "@mui/joy";
 import { CssVarsProvider } from "@mui/joy/styles";
 
+import JoyToaster from "components/common/JoyToaster";
 import RootContainer from "components/containers/RootContainer";
 import LoadingView from "components/views/LoadingView";
 import { persistor, store } from "store";
@@ -20,6 +21,7 @@ const App = () => (
         <PersistGate persistor={persistor} loading={<LoadingView />}>
           <CssVarsProvider>
             <CssBaseline />
+            <JoyToaster />
             <RootContainer />
           </CssVarsProvider>
         </PersistGate>

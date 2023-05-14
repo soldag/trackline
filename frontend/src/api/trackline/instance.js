@@ -50,15 +50,15 @@ instance.interceptors.response.use(
       message,
       response: {
         status,
-        data: { errors },
+        data: { error: apiError },
       },
     } = error;
 
-    if (status === 401 || errors.some(({ code }) => code === "INVALID_TOKEN")) {
+    if (status === 401 || apiError.code === "INVALID_TOKEN") {
       setSessionToken(null);
     }
 
-    throw new ApiError(message, status, errors);
+    throw new ApiError(message, status, apiError);
   },
 );
 
