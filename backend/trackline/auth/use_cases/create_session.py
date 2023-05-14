@@ -27,7 +27,7 @@ class CreateSession(BaseModel):
             if not user:
                 raise UseCaseException(
                     code="WRONG_CREDENTIALS",
-                    description="The credentials are incorrect.",
+                    message="The credentials are incorrect.",
                     status_code=400,
                 )
 
@@ -42,7 +42,7 @@ class CreateSession(BaseModel):
             if not password_correct:
                 raise UseCaseException(
                     code="WRONG_CREDENTIALS",
-                    description="The credentials are incorrect.",
+                    message="The credentials are incorrect.",
                     status_code=400,
                 )
 

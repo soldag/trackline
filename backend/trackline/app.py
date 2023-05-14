@@ -12,7 +12,8 @@ from trackline.core.middleware import (
     NoIndexMiddleware,
     ServerTimeMiddleware,
 )
-from trackline.core.utils.response import Error, make_error, make_errors
+from trackline.core.schemas import ErrorDetail
+from trackline.core.utils.response import make_error
 from trackline.games.di import GamesModule
 from trackline.games.router import router as games_router
 from trackline.spotify.client import SpotifyClient
@@ -63,7 +64,7 @@ async def on_shutdown():
 async def global_exception_handler(_, exc: Exception):
     return make_error(
         code="UNEXPECTED_ERROR",
-        description="An unexpected error occurred.",
+        message="An unexpected error occurred.",
         status_code=500,
     )
 
@@ -77,19 +78,22 @@ async def request_exception_handler(
     else:
         return make_error(
             code=exc.code,
-            description=exc.description,
-            location=exc.location,
+            message=exc.message,
             status_code=exc.status_code,
         )
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(_, exc: RequestValidationError):
-    errors = [
-        Error(code="VALIDATION_ERROR", description=err["msg"], location=err.get("loc"))
-        for err in exc.errors()
-    ]
-    return make_errors(errors=errors, status_code=400)
+    return make_error(
+        code="VALIDATION_ERROR",
+        message="The request is invalid.",
+        details=[
+            ErrorDetail(message=err["msg"], location=err.get("loc"))
+            for err in exc.errors()
+        ],
+        status_code=400,
+    )
 
 
 @app.exception_handler(WebSocketRequestValidationError)

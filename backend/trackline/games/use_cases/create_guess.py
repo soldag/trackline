@@ -40,8 +40,8 @@ class CreateGuess(BaseModel):
             turn = game.turns[use_case.turn_id]
             if user_id in turn.guesses:
                 raise UseCaseException(
-                    code="GUESSED_ALREADY",
-                    description="You can only guess once per turn.",
+                    code="TURN_GUESSED",
+                    message="You can only guess once per turn.",
                     status_code=400,
                 )
 
@@ -53,7 +53,7 @@ class CreateGuess(BaseModel):
             ):
                 raise UseCaseException(
                     code="INVALID_POSITION",
-                    description="This position exceeds the boundaries of the timeline.",
+                    message="This position exceeds the boundaries of the timeline.",
                     status_code=400,
                 )
 

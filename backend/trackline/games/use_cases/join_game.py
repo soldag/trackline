@@ -31,7 +31,7 @@ class JoinGame(BaseModel):
             if game.state != GameState.WAITING_FOR_PLAYERS:
                 raise UseCaseException(
                     code="GAME_NOT_FOUND",
-                    description="The game does not exist.",
+                    message="The game does not exist.",
                     status_code=404,
                 )
 
@@ -39,7 +39,7 @@ class JoinGame(BaseModel):
             if user_id in user_ids:
                 raise UseCaseException(
                     code="ALREADY_JOINED",
-                    description="You have joined this game already.",
+                    message="You have joined this game already.",
                     status_code=400,
                 )
 

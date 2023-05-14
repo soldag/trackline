@@ -19,7 +19,7 @@ class GetCurrentUser(BaseModel):
             if not user:
                 raise UseCaseException(
                     code="USER_NOT_FOUND",
-                    description="The user does not exist.",
+                    message="The user does not exist.",
                     status_code=404,
                 )
 

@@ -57,8 +57,8 @@ class DatabaseTransactionMiddleware(BaseHTTPMiddleware):
                 if retries >= settings.db_txn_retries_max:
                     return make_error(
                         status_code=409,
-                        code="CONFLICT",
-                        description="The request could not be executed due to a conflict with another request.",
+                        code="REQUEST_CONFLICT",
+                        message="The request could not be executed due to a conflict with another request.",
                     )
 
                 base_interval = settings.db_txn_retries_min_interval * 2**retries

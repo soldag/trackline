@@ -21,8 +21,8 @@ class GetAccessToken(BaseModel):
                 ) = await self._spotify_client.get_access_token(use_case.code)
             except InvalidTokenException:
                 raise UseCaseException(
-                    code="INVALID_AUTH_TOKEN",
-                    description="The authorization code is invalid.",
+                    code="INVALID_SPOTIFY_AUTH_CODE",
+                    message="The authorization code is invalid.",
                     status_code=400,
                 )
 

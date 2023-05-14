@@ -38,8 +38,8 @@ class CompleteTurn(BaseModel):
             turn = game.turns[use_case.turn_id]
             if user_id in turn.completed_by:
                 raise UseCaseException(
-                    code="COMPLETED_ALREADY",
-                    description="You have already completed this turn.",
+                    code="TURN_COMPLETED",
+                    message="You have already completed this turn.",
                     status_code=400,
                 )
 

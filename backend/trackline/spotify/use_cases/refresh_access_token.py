@@ -23,8 +23,8 @@ class RefreshAccessToken(BaseModel):
                 )
             except InvalidTokenException:
                 raise UseCaseException(
-                    code="INVALID_AUTH_TOKEN",
-                    description="The refresh token is invalid.",
+                    code="INVALID_SPOTIFY_REFRESH_TOKEN",
+                    message="The refresh token is invalid.",
                     status_code=400,
                 )
 

@@ -19,7 +19,7 @@ class BaseHandler:
         if not user_id or user_id not in player_ids:
             raise UseCaseException(
                 code="GAME_NOT_FOUND",
-                description="The game does not exist.",
+                message="The game does not exist.",
                 status_code=404,
             )
 
@@ -29,7 +29,7 @@ class BaseHandler:
         if user_id != game.turns[turn_id].active_user_id:
             raise UseCaseException(
                 code="INACTIVE_PLAYER",
-                description="Only the active player can perform this operation.",
+                message="Only the active player can perform this operation.",
                 status_code=403,
             )
 
@@ -38,7 +38,7 @@ class BaseHandler:
         if not any(p.user_id == user_id and p.is_game_master for p in game.players):
             raise UseCaseException(
                 code="NO_GAME_MASTER",
-                description="Only the game master can perform this operation.",
+                message="Only the game master can perform this operation.",
                 status_code=403,
             )
 
@@ -47,7 +47,7 @@ class BaseHandler:
         if player and player.tokens < tokens:
             raise UseCaseException(
                 code="INSUFFICIENT_TOKENS",
-                description="You don't have enough tokens to perform this operation.",
+                message="You don't have enough tokens to perform this operation.",
                 status_code=400,
             )
 
@@ -65,7 +65,7 @@ class BaseHandler:
 
             raise UseCaseException(
                 code="UNEXPECTED_STATE",
-                description=description,
+                message=description,
                 status_code=400,
             )
 
@@ -82,14 +82,14 @@ class BaseHandler:
         if not game.turns:
             raise UseCaseException(
                 code="TURN_NOT_FOUND",
-                description="The turn does not exist.",
+                message="The turn does not exist.",
                 status_code=404,
             )
 
         if turn_id != len(game.turns) - 1:
             raise UseCaseException(
                 code="INACTIVE_TURN",
-                description="The turn is not active.",
+                message="The turn is not active.",
                 status_code=400,
             )
 
@@ -98,7 +98,7 @@ class BaseHandler:
         if not game:
             raise UseCaseException(
                 code="GAME_NOT_FOUND",
-                description="The game does not exist.",
+                message="The game does not exist.",
                 status_code=404,
             )
 

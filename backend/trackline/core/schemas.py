@@ -16,10 +16,15 @@ class BaseSchema(BaseModel):
         json_encoders = {ResourceId: str}
 
 
+class ErrorDetail(BaseSchema):
+    message: str
+    location: Sequence[int | str] | None = None
+
+
 class Error(BaseSchema):
     code: Annotated[str, constr(to_upper=True)]
-    description: str
-    location: Sequence[int | str] | None = None
+    message: str
+    details: Sequence[ErrorDetail] | None = None
 
 
 class Response(BaseSchema):
@@ -33,11 +38,11 @@ class EntityResponse(Response, GenericModel, Generic[DataT]):
 
 class ErrorResponse(Response):
     status: Literal["error"] = Field("error", const=True)
-    errors: Sequence[Error]
+    error: Error
 
 
 class Omit(ModelMetaclass):
-    def __new__(self, name, bases, namespaces, **kwargs):
+    def __new__(cls, name, bases, namespaces, **kwargs):
         omit_fields = getattr(namespaces.get("Config", {}), "omit_fields", {})
         fields = namespaces.get("__fields__", {})
         annotations = namespaces.get("__annotations__", {})
@@ -54,4 +59,4 @@ class Omit(ModelMetaclass):
                 new_fields[field] = fields[field]
         namespaces["__annotations__"] = new_annotations
         namespaces["__fields__"] = new_fields
-        return super().__new__(self, name, bases, namespaces, **kwargs)
+        return super().__new__(cls, name, bases, namespaces, **kwargs)

@@ -33,7 +33,7 @@ class LeaveGame(BaseModel):
             if game_master and game_master.user_id == user_id:
                 raise UseCaseException(
                     code="GAME_MASTER_CANNOT_LEAVE",
-                    description="The game master cannot leave the game",
+                    message="The game master cannot leave the game.",
                     status_code=400,
                 )
 
