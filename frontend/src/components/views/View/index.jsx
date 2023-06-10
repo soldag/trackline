@@ -1,9 +1,6 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
 
 import { Box, CircularProgress, Sheet } from "@mui/joy";
-
-import { useEventListener } from "utils/hooks";
 
 import AppBar from "./components/AppBar";
 
@@ -13,63 +10,53 @@ const View = ({
   disableScrolling = false,
   loading = false,
   children,
-}) => {
-  const [height, setHeight] = useState("100vh");
+}) => (
+  <Sheet
+    sx={{
+      height: "100dvh",
+      width: "100dvw",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
+      overscrollBehavior: "none",
+      boxSizing: "border-box",
+    }}
+  >
+    {appBar && <AppBar {...appBar} />}
 
-  useEventListener(window, "resize", () => {
-    if (!window.visualViewport) return;
-
-    setHeight(`${window.visualViewport.height}px`);
-  });
-
-  return (
-    <Sheet
+    <Box
       sx={{
-        height,
-        width: "100vw",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        overscrollBehavior: "none",
-        boxSizing: "border-box",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexGrow": 1,
+        ...(!disablePadding && { padding: 2 }),
+        ...(!disableScrolling && { overflowY: "auto" }),
+        "& > *": {
+          flexGrow: 1,
+        },
       }}
     >
-      {appBar && <AppBar {...appBar} />}
+      {children}
+    </Box>
 
+    {loading && (
       <Box
         sx={{
-          "display": "flex",
-          "flexDirection": "column",
-          "flexGrow": 1,
-          ...(!disablePadding && { padding: 2 }),
-          ...(!disableScrolling && { overflowY: "auto" }),
-          "& > *": {
-            flexGrow: 1,
-          },
+          position: "absolute",
+          width: "100%",
+          height: "calc(100% - 66px)",
+          top: "66px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#ffffffb0",
         }}
       >
-        {children}
+        <CircularProgress size="lg" thickness={6} />
       </Box>
-
-      {loading && (
-        <Box
-          sx={{
-            position: "absolute",
-            width: "100%",
-            height: "calc(100% - 66px)",
-            top: "66px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#ffffffb0",
-          }}
-        >
-          <CircularProgress size="lg" thickness={6} />
-        </Box>
-      )}
-    </Sheet>
-  );
-};
+    )}
+  </Sheet>
+);
 
 View.propTypes = {
   appBar: PropTypes.shape({

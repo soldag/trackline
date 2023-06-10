@@ -26,7 +26,7 @@ const RegisterView = () => {
       <Stack direction="column" spacing={2}>
         <Box sx={{ flexGrow: 4 }} />
 
-        <Heading sx={{ mb: "8vh" }} />
+        <Heading sx={{ mb: "8dvh" }} />
 
         <Box sx={{ flexGrow: 1 }} />
 
