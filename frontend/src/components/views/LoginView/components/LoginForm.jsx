@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Link } from "react-router-dom";
 
 import KeyIcon from "@mui/icons-material/Key";
@@ -8,26 +9,39 @@ import PersonIcon from "@mui/icons-material/Person";
 import { Button, Grid, Input } from "@mui/joy";
 
 import ErrorAlert from "components/common/ErrorAlert";
-import { MAX_PASSWORD_LENGTH, MAX_USERNAME_LENGTH } from "constants";
+import FormError from "components/common/FormError";
+import {
+  MAX_PASSWORD_LENGTH,
+  MAX_USERNAME_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  MIN_USERNAME_LENGTH,
+} from "constants";
 import { ErrorType } from "types/errors";
+import { buildRules } from "utils/forms";
 
 const LoginForm = ({ loading, error, onSubmit, onDismissError }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const intl = useIntl();
+  const {
+    control,
+    formState: { isValid, errors },
+    resetField,
+    handleSubmit,
+  } = useForm({
+    mode: "onTouched",
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
 
-  const isValid = username.length > 0 && password.length > 0;
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    if (isValid && onSubmit) {
-      setPassword("");
-      onSubmit({ username, password });
+  useEffect(() => {
+    if (error) {
+      resetField("password");
     }
-  };
+  }, [resetField, error]);
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={2}>
         {error && (
           <Grid xs={12}>
@@ -44,49 +58,77 @@ const LoginForm = ({ loading, error, onSubmit, onDismissError }) => {
           </Grid>
         )}
         <Grid xs={12}>
-          <FormattedMessage
-            id="LoginView.LoginForm.username.placeholder"
-            defaultMessage="Username"
-          >
-            {([label]) => (
-              <Input
-                variant="soft"
-                startDecorator={<PersonIcon />}
-                label={label}
-                placeholder={label}
-                value={username}
-                slotProps={{
-                  input: {
-                    autoCapitalize: "none",
-                    maxLength: MAX_USERNAME_LENGTH,
-                  },
-                }}
-                onChange={({ target: { value } }) => setUsername(value)}
-              />
+          <Controller
+            name="username"
+            control={control}
+            rules={buildRules(intl, {
+              required: true,
+              minLength: MIN_USERNAME_LENGTH,
+              maxLength: MAX_USERNAME_LENGTH,
+            })}
+            render={({ field }) => (
+              <FormattedMessage
+                id="LoginView.LoginForm.username.placeholder"
+                defaultMessage="Username"
+              >
+                {([label]) => (
+                  <Input
+                    {...field}
+                    autoComplete="username"
+                    variant="soft"
+                    startDecorator={<PersonIcon />}
+                    label={label}
+                    placeholder={label}
+                    error={!!errors.username}
+                    slotProps={{
+                      input: {
+                        autoCapitalize: "none",
+                        maxLength: MAX_USERNAME_LENGTH,
+                      },
+                    }}
+                  />
+                )}
+              </FormattedMessage>
             )}
-          </FormattedMessage>
+          />
+          {errors.username && <FormError>{errors.username.message}</FormError>}
         </Grid>
 
         <Grid xs={12}>
-          <FormattedMessage
-            id="LoginView.LoginForm.password.label"
-            defaultMessage="Password"
-          >
-            {([label]) => (
-              <Input
-                type="password"
-                variant="soft"
-                startDecorator={<KeyIcon />}
-                label={label}
-                placeholder={label}
-                value={password}
-                slotProps={{
-                  input: { maxLength: MAX_PASSWORD_LENGTH },
-                }}
-                onChange={({ target: { value } }) => setPassword(value)}
-              />
+          <Controller
+            name="password"
+            control={control}
+            rules={buildRules(intl, {
+              required: true,
+              minLength: MIN_PASSWORD_LENGTH,
+              maxLength: MAX_PASSWORD_LENGTH,
+            })}
+            render={({ field }) => (
+              <FormattedMessage
+                id="LoginView.LoginForm.password.label"
+                defaultMessage="Password"
+              >
+                {([label]) => (
+                  <Input
+                    {...field}
+                    type="password"
+                    autoComplete="current-password"
+                    variant="soft"
+                    startDecorator={<KeyIcon />}
+                    label={label}
+                    placeholder={label}
+                    error={!!errors.password}
+                    slotProps={{
+                      input: {
+                        maxLength: MAX_PASSWORD_LENGTH,
+                      },
+                    }}
+                  />
+                )}
+              </FormattedMessage>
             )}
-          </FormattedMessage>
+          />
+          {errors.password && <FormError>{errors.password.message}</FormError>}
         </Grid>
 
         <Grid xs={6}>
@@ -96,6 +138,7 @@ const LoginForm = ({ loading, error, onSubmit, onDismissError }) => {
             variant="soft"
             component={Link}
             to="/register"
+            onClick={onDismissError}
           >
             <FormattedMessage
               id="LoginView.LoginForm.register"
@@ -104,12 +147,7 @@ const LoginForm = ({ loading, error, onSubmit, onDismissError }) => {
           </Button>
         </Grid>
         <Grid xs={6}>
-          <Button
-            fullWidth
-            type="submit"
-            disabled={loading || !isValid}
-            onClick={handleSubmit}
-          >
+          <Button fullWidth type="submit" disabled={loading || !isValid}>
             <FormattedMessage
               id="LoginView.LoginForm.login"
               defaultMessage="Login"
