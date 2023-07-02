@@ -19,7 +19,7 @@ const GameLobbyView = () => {
   const game = useSelector((state) => state.games.game);
   const users = useSelector((state) => state.games.users);
 
-  const [qrCodeModalOpen, setQrCoreModalOpen] = useState(false);
+  const [qrCodeModalOpen, setQrCodeModalOpen] = useState(false);
 
   const gameId = game.id;
   const userId = user.id;
@@ -31,7 +31,7 @@ const GameLobbyView = () => {
       <QrCodeModal
         joinUrl={joinUrl}
         open={qrCodeModalOpen}
-        onClose={() => setQrCoreModalOpen(false)}
+        onClose={() => setQrCodeModalOpen(false)}
       />
 
       <Stack
@@ -62,7 +62,7 @@ const GameLobbyView = () => {
                   },
                 }}
                 data={joinUrl}
-                onClick={() => setQrCoreModalOpen(true)}
+                onClick={() => setQrCodeModalOpen(true)}
               />
             </Box>
             <ShareLinkButton variant="soft" color="neutral" url={joinUrl} />
