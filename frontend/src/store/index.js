@@ -5,16 +5,20 @@ import { all } from "redux-saga/effects";
 
 import spotifyApi from "api/spotify";
 import tracklineApi from "api/trackline";
-import auth from "store/auth";
-import games from "store/games";
-import spotify from "store/spotify";
-import timing from "store/timing";
+import * as auth from "store/auth";
+import * as errors from "store/errors";
+import * as games from "store/games";
+import * as loading from "store/loading";
+import * as spotify from "store/spotify";
+import * as timing from "store/timing";
 
 const sagaMiddleware = createSagaMiddleware();
 
 const store = configureStore({
   reducer: combineReducers({
     auth: auth.reducer,
+    errors: errors.reducer,
+    loading: loading.reducer,
     games: games.reducer,
     spotify: spotify.reducer,
     timing: timing.reducer,

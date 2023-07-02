@@ -147,7 +147,7 @@ const LoginForm = ({ loading, error, onSubmit, onDismissError }) => {
           </Button>
         </Grid>
         <Grid xs={6}>
-          <Button fullWidth type="submit" disabled={loading || !isValid}>
+          <Button fullWidth type="submit" loading={loading} disabled={!isValid}>
             <FormattedMessage
               id="LoginView.LoginForm.login"
               defaultMessage="Login"

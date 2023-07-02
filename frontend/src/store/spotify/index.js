@@ -1,5 +1,3 @@
-import * as actions from "./actions";
-import reducer from "./reducer";
-import sagas from "./sagas";
-
-export default { actions, reducer, sagas };
+export * as actions from "./actions";
+export { default as reducer } from "./reducer";
+export { default as sagas } from "./sagas";

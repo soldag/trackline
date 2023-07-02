@@ -139,7 +139,7 @@ const RegisterForm = ({ loading, error, onSubmit, onDismissError }) => {
           </Button>
         </Grid>
         <Grid xs={6}>
-          <Button fullWidth type="submit" disabled={loading || !isValid}>
+          <Button fullWidth type="submit" loading={loading} disabled={!isValid}>
             <FormattedMessage
               id="RegisterView.RegisterForm.login"
               defaultMessage="Register"

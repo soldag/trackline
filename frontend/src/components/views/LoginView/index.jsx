@@ -7,7 +7,8 @@ import { Box, Stack, Typography } from "@mui/joy";
 import Heading from "components/common/Heading";
 import View from "components/views/View";
 import { login } from "store/auth/actions";
-import { dismissError } from "store/common/actions";
+import { dismissAllErrors } from "store/errors/actions";
+import { useErrorSelector, useLoadingSelector } from "utils/hooks";
 
 import LoginForm from "./components/LoginForm";
 
@@ -15,14 +16,14 @@ const LoginView = () => {
   const location = useLocation();
 
   const dispatch = useDispatch();
-  const loading = useSelector((state) => state.auth.loading);
-  const error = useSelector((state) => state.auth.error);
+  const loading = useLoadingSelector(login);
+  const error = useErrorSelector(login);
   const user = useSelector((state) => state.auth.user);
 
   const handleLogin = ({ username, password }) =>
     dispatch(login({ username, password }));
 
-  const handleDismissError = () => dispatch(dismissError());
+  const handleDismissError = () => dispatch(dismissAllErrors());
 
   if (user) {
     const path = location.state?.redirect || "/";

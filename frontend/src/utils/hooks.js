@@ -1,13 +1,14 @@
 import { camelizeKeys } from "humps";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 import api from "api/trackline";
 import SpotifyContext from "components/contexts/SpotifyContext";
-import { dismissError } from "store/common/actions";
+import { dismissError } from "store/errors/actions";
 import { getErrorMessage } from "utils/errors";
+import { getRoutinePrefix } from "utils/routines";
 
 export const useMountEffect = (effect) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -54,6 +55,38 @@ export const useInterval = (callback, delay) => {
   }, [delay]);
 };
 
+export const useErrorSelector = (...actions) => {
+  const prefixes = actions.map(getRoutinePrefix);
+  return useSelector((state) =>
+    prefixes.find((prefix) => state.errors.byRoutine[prefix]),
+  );
+};
+
+export const useLoadingSelector = (...actions) => {
+  const prefixes = actions.map(getRoutinePrefix);
+  return useSelector((state) =>
+    prefixes.some((prefix) => state.loading.byRoutine[prefix]),
+  );
+};
+
+export const useErrorToast = (...actions) => {
+  const intl = useIntl();
+  const dispatch = useDispatch();
+
+  const error = useErrorSelector(...actions);
+
+  const prevError = usePrevious(error);
+  useEffect(() => {
+    if (!error || error === prevError) return;
+
+    const message = getErrorMessage(intl, error);
+    toast.error(message, {
+      onDismiss: () => dispatch(dismissError(error.trigger)),
+      onAutoClose: () => dispatch(dismissError(error.trigger)),
+    });
+  }, [prevError, error, intl, dispatch]);
+};
+
 export const useNotifications = ({ gameId, onMessage }) => {
   const [webSocket, setWebSocket] = useState();
 
@@ -95,20 +128,4 @@ export const useSpotify = ({ requireAuth = false }) => {
 
   useMountEffect(() => () => setIsRequired(false));
   useEffect(() => setIsRequired(requireAuth), [requireAuth, setIsRequired]);
-};
-
-export const useErrorToast = ({ error }) => {
-  const intl = useIntl();
-  const dispatch = useDispatch();
-
-  const prevError = usePrevious(error);
-  useEffect(() => {
-    if (!error || error === prevError) return;
-
-    const message = getErrorMessage(intl, error);
-    toast.error(message, {
-      onDismiss: () => dispatch(dismissError()),
-      onAutoClose: () => dispatch(dismissError()),
-    });
-  }, [prevError, error, intl, dispatch]);
 };

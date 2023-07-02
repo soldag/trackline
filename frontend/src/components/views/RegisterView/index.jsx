@@ -7,15 +7,21 @@ import { Box, Stack, Typography } from "@mui/joy";
 import Heading from "components/common/Heading";
 import View from "components/views/View";
 import { createUser } from "store/auth/actions";
+import { dismissAllErrors } from "store/errors/actions";
+import { useErrorSelector, useLoadingSelector } from "utils/hooks";
 
-import LoginForm from "./components/RegisterForm";
+import RegisterForm from "./components/RegisterForm";
 
 const RegisterView = () => {
   const dispatch = useDispatch();
+  const loading = useLoadingSelector(createUser);
+  const error = useErrorSelector(createUser);
   const user = useSelector((state) => state.auth.user);
 
   const handleLogin = ({ username, password }) =>
     dispatch(createUser({ username, password }));
+
+  const handleDismissError = () => dispatch(dismissAllErrors());
 
   if (user) {
     return <Navigate replace to="/" />;
@@ -38,7 +44,12 @@ const RegisterView = () => {
             />
           </Typography>
 
-          <LoginForm onSubmit={handleLogin} />
+          <RegisterForm
+            loading={loading}
+            error={error}
+            onSubmit={handleLogin}
+            onDismissError={handleDismissError}
+          />
         </Stack>
 
         <Box sx={{ flexGrow: 4 }} />

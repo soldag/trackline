@@ -2,17 +2,10 @@ import { createReducer } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-import { dismissError, resetState } from "store/common/actions";
+import { resetState } from "store/common/actions";
+import { isSuccess } from "store/utils/matchers";
+
 import {
-  isFailure,
-  isFulfill,
-  isSuccess,
-  isTrigger,
-} from "store/utils/matchers";
-
-import * as actions from "./actions";
-
-const {
   completeAuth,
   fetchCurrentUser,
   fetchRecommendedPlaylists,
@@ -23,7 +16,8 @@ const {
   searchPlaylists,
   setAccessToken,
   setPlaybackState,
-} = actions;
+  setVolume,
+} from "./actions";
 
 const persistConfig = {
   key: "spotify",
@@ -32,8 +26,6 @@ const persistConfig = {
 };
 
 const initialState = {
-  loading: false,
-  error: null,
   isLoggedIn: null,
   user: null,
   accessToken: null,
@@ -56,9 +48,6 @@ const reducer = createReducer(initialState, (builder) => {
       ...initialState,
       isLoggedIn: false,
     }))
-    .addCase(dismissError, (state) => {
-      state.error = null;
-    })
 
     .addCase(setAccessToken, (state, { payload: { token } }) => {
       if (token) {
@@ -89,11 +78,6 @@ const reducer = createReducer(initialState, (builder) => {
         state.playback.progress + value,
         state.playback.duration,
       );
-    })
-
-    .addMatcher(isTrigger(...Object.values(actions)), (state) => {
-      state.loading = true;
-      state.error = null;
     })
 
     .addMatcher(
@@ -131,22 +115,8 @@ const reducer = createReducer(initialState, (builder) => {
       }
     })
 
-    .addMatcher(
-      isSuccess(actions.setVolume),
-      (state, { payload: { volume } }) => {
-        state.playback.volume = volume;
-      },
-    )
-
-    .addMatcher(
-      isFailure(...Object.values(actions)),
-      (state, { payload: { error } }) => {
-        state.error = error;
-      },
-    )
-
-    .addMatcher(isFulfill(...Object.values(actions)), (state) => {
-      state.loading = false;
+    .addMatcher(isSuccess(setVolume), (state, { payload: { volume } }) => {
+      state.playback.volume = volume;
     });
 });
 

@@ -5,17 +5,10 @@ import {
   TOKEN_COST_BUY_TRACK,
   TOKEN_COST_EXCHANGE_TRACK,
 } from "constants";
-import { dismissError, resetState } from "store/common/actions";
+import { resetState } from "store/common/actions";
+import { isSuccess } from "store/utils/matchers";
+
 import {
-  isFailure,
-  isFulfill,
-  isSuccess,
-  isTrigger,
-} from "store/utils/matchers";
-
-import * as actions from "./actions";
-
-const {
   abortGame,
   buyTrack,
   clearGame,
@@ -40,11 +33,9 @@ const {
   turnCompleted,
   turnCreated,
   turnScored,
-} = actions;
+} from "./actions";
 
 const initialState = {
-  loading: false,
-  error: null,
   game: null,
   users: [],
 };
@@ -57,9 +48,6 @@ const getTrackPosition = (timeline, track) => {
 const reducer = createReducer(initialState, (builder) => {
   builder
     .addCase(resetState, () => initialState)
-    .addCase(dismissError, (state) => {
-      state.error = null;
-    })
 
     .addCase(clearGame, (state) => {
       state.game = null;
@@ -95,11 +83,6 @@ const reducer = createReducer(initialState, (builder) => {
 
     .addCase(gameAborted, (state) => {
       state.game.state = GAME_STATES.ABORTED;
-    })
-
-    .addMatcher(isTrigger(...Object.values(actions)), (state) => {
-      state.loading = true;
-      state.error = null;
     })
 
     .addMatcher(
@@ -222,18 +205,7 @@ const reducer = createReducer(initialState, (builder) => {
           activePlayer.tokens -= TOKEN_COST_EXCHANGE_TRACK;
         }
       },
-    )
-
-    .addMatcher(
-      isFailure(...Object.values(actions)),
-      (state, { payload: { error } }) => {
-        state.error = error;
-      },
-    )
-
-    .addMatcher(isFulfill(...Object.values(actions)), (state) => {
-      state.loading = false;
-    });
+    );
 });
 
 export default reducer;
