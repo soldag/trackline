@@ -13,6 +13,7 @@ from trackline.spotify.client import PlaylistNotFoundException, SpotifyClient
 class TrackProvider:
     TITLE_CLEANUP_PATTERNS = (
         r" - [^-]*Remaster(ed)?(.*)$",
+        r" - [^-]+ Edit(.*)$",
         r" - [^-]+ Version(.*)$",
         r" - [^-]+ Anniversary Edition(.*)$",
         r" - From (.*)$",
