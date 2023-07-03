@@ -6,6 +6,7 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Box, Stack, Typography } from "@mui/joy";
 
 import View from "components/views/View";
+import { dismissError } from "store/errors/actions";
 import { joinGame } from "store/games/actions";
 
 import JoinGameForm from "./components/JoinGameForm";
@@ -20,6 +21,10 @@ const JoinGameView = () => {
 
   const handleJoin = ({ gameId }) => {
     navigate(`/games/join/${gameId}`, { replace: true });
+  };
+
+  const handleDismissError = () => {
+    dispatch(dismissError(joinGame));
   };
 
   useEffect(() => {
@@ -63,7 +68,10 @@ const JoinGameView = () => {
               defaultMessage="Enter game ID manually"
             />
           </Typography>
-          <JoinGameForm onSubmit={handleJoin} />
+          <JoinGameForm
+            onSubmit={handleJoin}
+            onDismissError={handleDismissError}
+          />
         </Stack>
       </Stack>
     </View>

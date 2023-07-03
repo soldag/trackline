@@ -2,16 +2,17 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Link } from "react-router-dom";
 
 import ClearIcon from "@mui/icons-material/Clear";
 import NumbersIcon from "@mui/icons-material/Numbers";
-import { Button, Grid, IconButton, Input } from "@mui/joy";
+import { Button, Grid, IconButton, Input, Stack } from "@mui/joy";
 
 import FormError from "components/common/FormError";
 import { GAME_ID_LENGTH, GAME_ID_REGEX } from "constants";
 import { buildRules } from "utils/forms";
 
-const JoinGameForm = ({ onSubmit }) => {
+const JoinGameForm = ({ onSubmit, onDismissError }) => {
   const intl = useIntl();
   const {
     control,
@@ -74,17 +75,27 @@ const JoinGameForm = ({ onSubmit }) => {
           {errors.gameId && <FormError>{errors.gameId.message}</FormError>}
         </Grid>
         <Grid xs={12}>
-          <Button
-            fullWidth
-            type="submit"
-            disabled={!isValid}
-            onClick={handleSubmit}
-          >
-            <FormattedMessage
-              id="JoinGameView.JoinGameForm.joinGame"
-              defaultMessage="Join game"
-            />
-          </Button>
+          <Stack direction="row" spacing={2}>
+            <Button
+              fullWidth
+              color="neutral"
+              variant="soft"
+              component={Link}
+              to="/"
+              onClick={onDismissError}
+            >
+              <FormattedMessage
+                id="JoinGameView.JoinGameForm.back"
+                defaultMessage="Back"
+              />
+            </Button>
+            <Button fullWidth disabled={!isValid} onClick={handleSubmit}>
+              <FormattedMessage
+                id="JoinGameView.JoinGameForm.joinGame"
+                defaultMessage="Join game"
+              />
+            </Button>
+          </Stack>
         </Grid>
       </Grid>
     </form>
@@ -93,6 +104,7 @@ const JoinGameForm = ({ onSubmit }) => {
 
 JoinGameForm.propTypes = {
   onSubmit: PropTypes.func,
+  onDismissError: PropTypes.func,
 };
 
 export default JoinGameForm;

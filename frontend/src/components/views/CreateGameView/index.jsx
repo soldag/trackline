@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 import LinkIcon from "@mui/icons-material/Link";
 import { Button, Stack, Typography } from "@mui/joy";
@@ -101,12 +101,27 @@ const CreateGameView = () => {
           )}
         </Stack>
 
-        <Button disabled={playlists.length === 0} onClick={handleCreate}>
-          <FormattedMessage
-            id="CreateGameView.createGame"
-            defaultMessage="Create game"
-          />
-        </Button>
+        <Stack direction="row" spacing={2}>
+          <Button
+            fullWidth
+            color="neutral"
+            variant="soft"
+            component={Link}
+            to="/"
+          >
+            <FormattedMessage id="CreateGameView.back" defaultMessage="Back" />
+          </Button>
+          <Button
+            fullWidth
+            disabled={playlists.length === 0}
+            onClick={handleCreate}
+          >
+            <FormattedMessage
+              id="CreateGameView.createGame"
+              defaultMessage="Create game"
+            />
+          </Button>
+        </Stack>
       </Stack>
     </View>
   );
