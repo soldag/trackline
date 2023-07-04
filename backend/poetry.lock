@@ -588,15 +588,19 @@ name = "fastapi-injector"
 version = "0.5.0"
 description = "python-injector integration for FastAPI"
 optional = false
-python-versions = ">=3.8,<3.12"
-files = [
-    {file = "fastapi_injector-0.5.0-py3-none-any.whl", hash = "sha256:7ddf7e901fc03d28682220f27f21b26259d18f4755091cec12df2f91dd02abb1"},
-    {file = "fastapi_injector-0.5.0.tar.gz", hash = "sha256:7230dc51339e47b2c28e3255b09d2e39491b31f86cc8585c5094df2cdc8b657e"},
-]
+python-versions = ">=3.8 <3.12"
+files = []
+develop = false
 
 [package.dependencies]
 fastapi = ">=0.70.0"
 injector = ">=0.19.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/soldag/fastapi-injector.git"
+reference = "ws-support"
+resolved_reference = "c0ac9e31816cd40afd8aa43ea1f4769e4a1f3f46"
 
 [[package]]
 name = "flake8"
@@ -1739,4 +1743,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "d36fa19a67cde95a7eef5f81d8501779e5e9b09297f67d4c58a416bdfa5c4963"
+content-hash = "a1143cdff80b66a59ceaca03891c1c4d735e4dd35789a0ecb7b5c93d512cc3a8"

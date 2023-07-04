@@ -12,7 +12,7 @@ argon2-cffi = "^21.3.0"
 async-spotify = "^0.4.4"
 decorator = "^5.1.1"
 fastapi = "^0.99.1"
-fastapi-injector = "^0.5.0"
+fastapi-injector = { git = "https://github.com/soldag/fastapi-injector.git", branch = "ws-support" }
 httpx = "^0.24.0"
 injector = "^0.20.1"
 lucene-querybuilder = "^0.2"
