@@ -25,7 +25,7 @@ const JoyToaster = () => {
           }
         `}
       />
-      <Toaster richColors className="sonner-toast" />
+      <Toaster richColors closeButton className="sonner-toast" />
     </>
   );
 };
