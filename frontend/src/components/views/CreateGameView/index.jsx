@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
@@ -37,22 +37,29 @@ const CreateGameView = () => {
     }
   }, [spotifyUser, playlistRecommendations, dispatch]);
 
-  const handleStartSpotifyAuth = () => {
-    dispatch(startAuth());
-  };
+  const handleStartSpotifyAuth = useCallback(
+    () => dispatch(startAuth()),
+    [dispatch],
+  );
 
-  const handleSearchPlaylists = ({ query, limit }) => {
-    dispatch(searchPlaylists({ query, limit }));
-  };
+  const handleSearchPlaylists = useCallback(
+    ({ query, limit }) => dispatch(searchPlaylists({ query, limit })),
+    [dispatch],
+  );
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     dispatch(
       createGame({
         playlistIds: playlists.map(({ id }) => id),
         spotifyMarket: spotifyUser.country,
       }),
     );
-  };
+  }, [dispatch, playlists, spotifyUser]);
+
+  const handleDismissErrors = useCallback(
+    () => dispatch(dismissAllErrors()),
+    [dispatch],
+  );
 
   const prevGame = usePrevious(game);
   if (game && game !== prevGame) {
