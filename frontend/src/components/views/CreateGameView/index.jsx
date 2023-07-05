@@ -7,13 +7,19 @@ import LinkIcon from "@mui/icons-material/Link";
 import { Button, Stack, Typography } from "@mui/joy";
 
 import View from "components/views/View";
+import { dismissAllErrors } from "store/errors/actions";
 import { createGame } from "store/games/actions";
 import {
   fetchRecommendedPlaylists,
   searchPlaylists,
   startAuth,
 } from "store/spotify/actions";
-import { usePrevious } from "utils/hooks";
+import {
+  useErrorSelector,
+  useErrorToast,
+  useLoadingSelector,
+  usePrevious,
+} from "utils/hooks";
 
 import PlaylistSelector from "./components/PlaylistSelector";
 
@@ -21,6 +27,15 @@ const CreateGameView = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const game = useSelector((state) => state.games.game);
+  const createGameLoading = useLoadingSelector(createGame);
+  const spotifyError = useErrorSelector(
+    fetchRecommendedPlaylists,
+    searchPlaylists,
+  );
+  const spotifyLoading = useLoadingSelector(
+    fetchRecommendedPlaylists,
+    searchPlaylists,
+  );
   const spotifyUser = useSelector((state) => state.spotify.user);
   const playlistRecommendations = useSelector(
     (state) => state.spotify.playlists.recommendations,
@@ -30,6 +45,8 @@ const CreateGameView = () => {
   );
 
   const [playlists, setPlaylists] = useState([]);
+
+  useErrorToast(createGame);
 
   useEffect(() => {
     if (spotifyUser && playlistRecommendations.length === 0) {
@@ -89,6 +106,8 @@ const CreateGameView = () => {
             <PlaylistSelector
               value={playlists}
               onChange={setPlaylists}
+              error={spotifyError}
+              loading={spotifyLoading}
               recommendations={playlistRecommendations}
               searchResults={playlistSearchResults}
               onSearch={handleSearchPlaylists}
@@ -115,11 +134,13 @@ const CreateGameView = () => {
             variant="soft"
             component={Link}
             to="/"
+            onClick={handleDismissErrors}
           >
             <FormattedMessage id="CreateGameView.back" defaultMessage="Back" />
           </Button>
           <Button
             fullWidth
+            loading={createGameLoading}
             disabled={playlists.length === 0}
             onClick={handleCreate}
           >
