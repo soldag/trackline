@@ -19,6 +19,7 @@ import {
   useErrorToast,
   useLoadingSelector,
   usePrevious,
+  useSpotify,
 } from "utils/hooks";
 
 import PlaylistSelector from "./components/PlaylistSelector";
@@ -47,6 +48,8 @@ const CreateGameView = () => {
   const [playlists, setPlaylists] = useState([]);
 
   useErrorToast(createGame);
+
+  useSpotify({ requireAuth: true });
 
   useEffect(() => {
     if (spotifyUser && playlistRecommendations.length === 0) {
