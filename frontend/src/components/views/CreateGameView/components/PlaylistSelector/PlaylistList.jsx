@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
 import CheckIcon from "@mui/icons-material/Check";
+import PhotoIcon from "@mui/icons-material/Photo";
 import {
   Box,
   IconButton,
@@ -80,10 +81,16 @@ const PlaylistList = ({
             }}
             onClick={() => toggleSelection(playlist)}
           >
-            <img
-              src={playlist.images[0].url}
-              style={{ width: "70px", marginRight: "0.5rem" }}
-            />
+            {playlist.images.length > 0 ? (
+              <img
+                src={playlist.images[0].url}
+                style={{ width: "70px", marginRight: "0.5rem" }}
+              />
+            ) : (
+              <PhotoIcon
+                sx={{ width: "70px", height: "70px", marginRight: "0.5rem" }}
+              />
+            )}
 
             <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
               <ItemTypography level="body1" sx={{ fontWeight: "bold" }}>
