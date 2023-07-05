@@ -57,8 +57,11 @@ export const useInterval = (callback, delay) => {
 
 export const useErrorSelector = (...actions) => {
   const prefixes = actions.map(getRoutinePrefix);
-  return useSelector((state) =>
-    prefixes.find((prefix) => state.errors.byRoutine[prefix]),
+  return useSelector(
+    (state) =>
+      prefixes
+        .map((prefix) => state.errors.byRoutine[prefix])
+        .filter((error) => error)[0],
   );
 };
 
