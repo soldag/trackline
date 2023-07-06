@@ -97,10 +97,13 @@ export const useErrorToast = (...actions) => {
   useEffect(() => {
     if (!error || error === prevError) return;
 
+    const {
+      trigger: { type: actionType },
+    } = error;
     const message = getErrorMessage(intl, error);
     toast.error(message, {
-      onDismiss: () => dispatch(dismissError(error.trigger)),
-      onAutoClose: () => dispatch(dismissError(error.trigger)),
+      onDismiss: () => dispatch(dismissError({ actionType })),
+      onAutoClose: () => dispatch(dismissError({ actionType })),
     });
   }, [prevError, error, intl, dispatch]);
 };

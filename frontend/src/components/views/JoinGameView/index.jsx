@@ -24,7 +24,7 @@ const JoinGameView = () => {
   };
 
   const handleDismissError = () => {
-    dispatch(dismissError(joinGame));
+    dispatch(dismissError({ actionType: joinGame.toString() }));
   };
 
   useEffect(() => {

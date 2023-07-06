@@ -16,7 +16,11 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(resetState, () => initialState)
 
     .addCase(dismissError, (state, action) => {
-      const prefix = getRoutinePrefix(action);
+      const {
+        payload: { actionType },
+      } = action;
+
+      const prefix = getRoutinePrefix(actionType);
       state.byRoutine[prefix] = null;
     })
 
