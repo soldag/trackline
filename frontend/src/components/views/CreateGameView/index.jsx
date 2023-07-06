@@ -28,12 +28,12 @@ const CreateGameView = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const game = useSelector((state) => state.games.game);
-  const createGameLoading = useLoadingSelector(createGame);
-  const spotifyError = useErrorSelector(
+  const loadingCreateGame = useLoadingSelector(createGame);
+  const errorSpotify = useErrorSelector(
     fetchRecommendedPlaylists,
     searchPlaylists,
   );
-  const spotifyLoading = useLoadingSelector(
+  const loadingSpotify = useLoadingSelector(
     fetchRecommendedPlaylists,
     searchPlaylists,
   );
@@ -109,8 +109,8 @@ const CreateGameView = () => {
             <PlaylistSelector
               value={playlists}
               onChange={setPlaylists}
-              error={spotifyError}
-              loading={spotifyLoading}
+              error={errorSpotify}
+              loading={loadingSpotify}
               recommendations={playlistRecommendations}
               searchResults={playlistSearchResults}
               onSearch={handleSearchPlaylists}
@@ -143,8 +143,8 @@ const CreateGameView = () => {
           </Button>
           <Button
             fullWidth
-            loading={createGameLoading}
-            disabled={playlists.length === 0}
+            loading={loadingCreateGame}
+            disabled={loadingCreateGame || playlists.length === 0}
             onClick={handleCreate}
           >
             <FormattedMessage
