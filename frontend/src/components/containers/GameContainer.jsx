@@ -16,7 +16,8 @@ import {
   listenNotifications,
   unlistenNotifications,
 } from "store/games/actions";
-import { usePrevious, useSpotify } from "utils/hooks";
+import { pause } from "store/spotify/actions";
+import { usePrevious, useSpotify, useUnmountEffect } from "utils/hooks";
 
 const GAME_STATE_VIEWS = {
   [GAME_STATES.WAITING_FOR_PLAYERS]: GameLobbyView,
@@ -59,6 +60,12 @@ const GameContainer = () => {
       navigate("/");
     }
   }, [prevGame, game, navigate]);
+
+  useUnmountEffect(() => {
+    if (isGameMaster) {
+      return () => dispatch(pause());
+    }
+  }, [isGameMaster]);
 
   if (!gameId) {
     return <Navigate to="/" />;

@@ -15,6 +15,21 @@ export const useMountEffect = (effect) => {
   return useEffect(effect, []);
 };
 
+export const useUnmountEffect = (effect) => {
+  const ref = useRef();
+  ref.current = effect;
+
+  useEffect(
+    () => () => {
+      const currentEffect = ref.current;
+      if (currentEffect) {
+        currentEffect();
+      }
+    },
+    [],
+  );
+};
+
 export const usePrevious = (value) => {
   const ref = useRef();
   useEffect(() => {
