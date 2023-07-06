@@ -15,6 +15,7 @@ export const leaveGame = createRoutine("GAMES/LEAVE");
 
 export const createTurn = createRoutine("GAMES/CREATE_TURN");
 export const guessTrack = createRoutine("GAMES/GUESS_TRACK");
+export const rejectGuess = createRoutine("GAMES/REJECT_GUESS");
 export const scoreTurn = createRoutine("GAMES/SCORE_TURN");
 export const completeTurn = createRoutine("GAMES/COMPLETE_TURN");
 

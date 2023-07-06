@@ -15,6 +15,9 @@ const GuessTrackCard = ({
   canExchange = false,
   showReject = false,
   canReject = false,
+  loadingConfirm = false,
+  loadingReject = false,
+  loadingExchange = false,
   timeoutStart = null,
   timeoutEnd = null,
   onConfirm = () => {},
@@ -85,7 +88,8 @@ const GuessTrackCard = ({
         <Button
           variant="soft"
           color="neutral"
-          disabled={!canExchange}
+          loading={loadingExchange}
+          disabled={loadingExchange || !canExchange}
           onClick={onExchange}
         >
           <LoopIcon />
@@ -95,7 +99,8 @@ const GuessTrackCard = ({
         <Button
           variant="soft"
           color="danger"
-          disabled={!canReject}
+          loading={loadingReject}
+          disabled={loadingReject || !canReject}
           onClick={onReject}
         >
           <CloseIcon />
@@ -104,7 +109,8 @@ const GuessTrackCard = ({
       <Button
         variant="soft"
         color="success"
-        disabled={!canConfirm}
+        loading={loadingConfirm}
+        disabled={loadingConfirm || !canConfirm}
         onClick={onConfirm}
       >
         <CheckIcon />
@@ -120,6 +126,9 @@ GuessTrackCard.propTypes = {
   canReject: PropTypes.bool,
   showExchange: PropTypes.bool,
   canExchange: PropTypes.bool,
+  loadingConfirm: PropTypes.bool,
+  loadingReject: PropTypes.bool,
+  loadingExchange: PropTypes.bool,
   timeoutStart: PropTypes.number,
   timeoutEnd: PropTypes.number,
   onConfirm: PropTypes.func,

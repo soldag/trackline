@@ -10,10 +10,15 @@ import {
   TOKEN_COST_POSITION_GUESS,
   TOKEN_COST_YEAR_GUESS,
 } from "constants";
-import { exchangeTrack, guessTrack, scoreTurn } from "store/games/actions";
+import {
+  exchangeTrack,
+  guessTrack,
+  rejectGuess,
+  scoreTurn,
+} from "store/games/actions";
 import { play } from "store/spotify/actions";
 import { isValidGuess } from "utils/games";
-import { useInterval } from "utils/hooks";
+import { useErrorToast, useInterval, useLoadingSelector } from "utils/hooks";
 
 import Timeline from "./components/Timeline";
 
@@ -50,6 +55,11 @@ const GameTurnGuessingView = () => {
   const timeDeviation = useSelector(
     (state) => state.timing.timeDeviation.trackline,
   );
+
+  const loadingExchangeTrack = useLoadingSelector(exchangeTrack);
+  const loadingGuessTrack = useLoadingSelector(guessTrack);
+  const loadingRejectGuess = useLoadingSelector(rejectGuess);
+  useErrorToast(exchangeTrack, guessTrack, rejectGuess, scoreTurn);
 
   const gameId = game?.id;
   const turnId = game.turns.length - 1;
@@ -129,7 +139,7 @@ const GameTurnGuessingView = () => {
   };
 
   const handleReject = () => {
-    dispatch(guessTrack({ gameId, turnId }));
+    dispatch(rejectGuess({ gameId, turnId }));
   };
 
   const handleExchange = () => {
@@ -170,6 +180,9 @@ const GameTurnGuessingView = () => {
           canReject={canGuessPosition || canGuessYear}
           timeoutStart={timeoutStart}
           timeoutEnd={timeoutEnd}
+          loadingGuess={loadingGuessTrack}
+          loadingReject={loadingRejectGuess}
+          loadingExchange={loadingExchangeTrack}
           onTracksChange={setTracks}
           onGuess={handleGuess}
           onReject={handleReject}

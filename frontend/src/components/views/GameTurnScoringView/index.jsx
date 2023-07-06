@@ -11,6 +11,7 @@ import View from "components/views/View";
 import { TOKEN_COST_BUY_TRACK } from "constants";
 import { buyTrack, completeTurn } from "store/games/actions";
 import { useConfetti, useStars } from "utils/confetti";
+import { useErrorToast, useLoadingSelector } from "utils/hooks";
 
 import ScoringTabs from "./components/ScoringTabs";
 
@@ -21,6 +22,10 @@ const GameTurnScoringView = () => {
   const user = useSelector((state) => state.auth.user);
   const game = useSelector((state) => state.games.game);
   const users = useSelector((state) => state.games.users);
+
+  const loadingBuyTrack = useLoadingSelector(buyTrack);
+  const loadingCompleteTurn = useLoadingSelector(completeTurn);
+  useErrorToast(buyTrack, completeTurn);
 
   const userId = user.id;
   const gameId = game.id;
@@ -77,7 +82,8 @@ const GameTurnScoringView = () => {
             <Button
               variant="soft"
               color="neutral"
-              disabled={!canBuyTrack}
+              loading={loadingBuyTrack}
+              disabled={loadingBuyTrack || !canBuyTrack}
               onClick={() => setBuyTrackModelOpen(true)}
             >
               <AddShoppingCartIcon />
@@ -86,7 +92,8 @@ const GameTurnScoringView = () => {
             <Button
               variant="soft"
               sx={{ flexGrow: 1 }}
-              disabled={hasCompletedTurn}
+              loading={loadingCompleteTurn}
+              disabled={loadingCompleteTurn || hasCompletedTurn}
               onClick={() => dispatch(completeTurn({ gameId, turnId }))}
             >
               {hasCompletedTurn ? (

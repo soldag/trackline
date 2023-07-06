@@ -32,6 +32,9 @@ const Timeline = ({
   canExchange = false,
   showReject = false,
   canReject = false,
+  loadingGuess = false,
+  loadingReject = false,
+  loadingExchange = false,
   timeoutStart,
   timeoutEnd,
   onTracksChange,
@@ -136,6 +139,9 @@ const Timeline = ({
                         canExchange={canExchange}
                         timeoutStart={timeoutStart}
                         timeoutEnd={timeoutEnd}
+                        loadingConfirm={loadingGuess}
+                        loadingReject={loadingReject}
+                        loadingExchange={loadingExchange}
                         onConfirm={() => setConfirmModalOpen(true)}
                         onReject={() => setRejectModalOpen(true)}
                         onExchange={() => setExchangeModalOpen(true)}
@@ -166,6 +172,9 @@ Timeline.propTypes = {
   canGuessYear: PropTypes.bool,
   showReject: PropTypes.bool,
   canReject: PropTypes.bool,
+  loadingGuess: PropTypes.bool,
+  loadingReject: PropTypes.bool,
+  loadingExchange: PropTypes.bool,
   showExchange: PropTypes.bool,
   canExchange: PropTypes.bool,
   timeoutStart: PropTypes.number,

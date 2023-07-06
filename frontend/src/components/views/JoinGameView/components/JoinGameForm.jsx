@@ -12,7 +12,7 @@ import FormError from "components/common/FormError";
 import { GAME_ID_LENGTH, GAME_ID_REGEX } from "constants";
 import { buildRules } from "utils/forms";
 
-const JoinGameForm = ({ onSubmit, onDismissError }) => {
+const JoinGameForm = ({ loading = false, onSubmit }) => {
   const intl = useIntl();
   const {
     control,
@@ -82,14 +82,18 @@ const JoinGameForm = ({ onSubmit, onDismissError }) => {
               variant="soft"
               component={Link}
               to="/"
-              onClick={onDismissError}
             >
               <FormattedMessage
                 id="JoinGameView.JoinGameForm.back"
                 defaultMessage="Back"
               />
             </Button>
-            <Button fullWidth disabled={!isValid} onClick={handleSubmit}>
+            <Button
+              fullWidth
+              loading={loading}
+              disabled={loading || !isValid}
+              onClick={handleSubmit}
+            >
               <FormattedMessage
                 id="JoinGameView.JoinGameForm.joinGame"
                 defaultMessage="Join game"
@@ -103,8 +107,8 @@ const JoinGameForm = ({ onSubmit, onDismissError }) => {
 };
 
 JoinGameForm.propTypes = {
+  loading: PropTypes.bool,
   onSubmit: PropTypes.func,
-  onDismissError: PropTypes.func,
 };
 
 export default JoinGameForm;

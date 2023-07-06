@@ -8,6 +8,7 @@ import ResponsiveQrCode from "components/common/ResponsiveQrCode";
 import View from "components/views/View";
 import { MIN_PLAYER_COUNT } from "constants";
 import { abortGame, leaveGame, startGame } from "store/games/actions";
+import { useErrorToast, useLoadingSelector } from "utils/hooks";
 
 import PlayersList from "./components/PlayersList";
 import QrCodeModal from "./components/QrCodeModal";
@@ -18,6 +19,11 @@ const GameLobbyView = () => {
   const user = useSelector((state) => state.auth.user);
   const game = useSelector((state) => state.games.game);
   const users = useSelector((state) => state.games.users);
+
+  const loadingStartGame = useLoadingSelector(startGame);
+  const loadingAbortGame = useLoadingSelector(abortGame);
+  const loadingLeaveGame = useLoadingSelector(leaveGame);
+  useErrorToast(startGame, abortGame, leaveGame);
 
   const [qrCodeModalOpen, setQrCodeModalOpen] = useState(false);
 
@@ -95,6 +101,7 @@ const GameLobbyView = () => {
               <Button
                 fullWidth
                 color="danger"
+                loading={loadingAbortGame}
                 onClick={() => dispatch(abortGame({ gameId }))}
               >
                 <FormattedMessage
@@ -104,7 +111,10 @@ const GameLobbyView = () => {
               </Button>
               <Button
                 fullWidth
-                disabled={game.players.length < MIN_PLAYER_COUNT}
+                loading={loadingStartGame}
+                disabled={
+                  loadingStartGame || game.players.length < MIN_PLAYER_COUNT
+                }
                 onClick={() => dispatch(startGame({ gameId }))}
               >
                 <FormattedMessage
@@ -117,6 +127,7 @@ const GameLobbyView = () => {
             <Button
               fullWidth
               color="danger"
+              loading={loadingLeaveGame}
               onClick={() => dispatch(leaveGame({ gameId, userId }))}
             >
               <FormattedMessage

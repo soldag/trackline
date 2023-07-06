@@ -6,8 +6,8 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Box, Stack, Typography } from "@mui/joy";
 
 import View from "components/views/View";
-import { dismissError } from "store/errors/actions";
 import { joinGame } from "store/games/actions";
+import { useErrorToast, useLoadingSelector } from "utils/hooks";
 
 import JoinGameForm from "./components/JoinGameForm";
 import QrScanner from "./components/QrScanner";
@@ -19,12 +19,12 @@ const JoinGameView = () => {
   const dispatch = useDispatch();
   const game = useSelector((state) => state.games.game);
 
-  const handleJoin = ({ gameId }) => {
-    navigate(`/games/join/${gameId}`, { replace: true });
-  };
+  const loadingJoinGame = useLoadingSelector(joinGame);
+  useErrorToast(joinGame);
 
-  const handleDismissError = () => {
-    dispatch(dismissError({ actionType: joinGame.toString() }));
+  const handleJoin = ({ gameId }) => {
+    console.log({ gameId });
+    navigate(`/games/join/${gameId}`, { replace: true });
   };
 
   useEffect(() => {
@@ -68,10 +68,7 @@ const JoinGameView = () => {
               defaultMessage="Enter game ID manually"
             />
           </Typography>
-          <JoinGameForm
-            onSubmit={handleJoin}
-            onDismissError={handleDismissError}
-          />
+          <JoinGameForm loading={loadingJoinGame} onSubmit={handleJoin} />
         </Stack>
       </Stack>
     </View>

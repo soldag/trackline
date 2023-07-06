@@ -25,6 +25,7 @@ import {
   leaveGame,
   playerJoined,
   playerLeft,
+  rejectGuess,
   scoreTurn,
   startGame,
   trackBought,
@@ -118,7 +119,7 @@ const reducer = createReducer(initialState, (builder) => {
     )
 
     .addMatcher(
-      isAnyOf(isSuccess(guessTrack), trackGuessed),
+      isAnyOf(isSuccess(guessTrack, rejectGuess), trackGuessed),
       (state, { payload: { guess } }) => {
         const turn = state.game.turns.at(-1);
         turn.guesses = [

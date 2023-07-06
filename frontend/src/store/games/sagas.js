@@ -35,6 +35,7 @@ import {
   listenNotifications,
   playerJoined,
   playerLeft,
+  rejectGuess,
   scoreTurn,
   startGame,
   trackBought,
@@ -123,6 +124,11 @@ function* handleGuessTrack({
     position,
     releaseYear,
   });
+  return { guess };
+}
+
+function* handleRejectGuess({ gameId, turnId }) {
+  const guess = yield call(tracklineApi.games.createGuess, { gameId, turnId });
   return { guess };
 }
 
@@ -238,6 +244,7 @@ export default registerSagaHandlers([
   [createTurn, handleCreateTurn],
   [exchangeTrack, handleExchangeTrack],
   [guessTrack, handleGuessTrack],
+  [rejectGuess, handleRejectGuess],
   [scoreTurn, handleScoreTurn],
   [completeTurn, handleCompleteTurn],
   [buyTrack, handleBuyTrack],
