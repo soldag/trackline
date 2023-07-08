@@ -14,6 +14,7 @@
   "ApiErrors.turnNotFound": "The turn does not exist.",
   "ApiErrors.unexpectedError": "An unexpected error occurred.",
   "ApiErrors.unexpectedState": "The game is not in the correct state to perform this operation.",
+  "ApiErrors.unsupportedSpotifyProduct": "Spotify Premium is required to create a game.",
   "ApiErrors.userNotFound": "The user does not exist",
   "ApiErrors.validationError": "The entered data is invalid. Please check and try again.",
   "ApiErrors.wrongCredentials": "The entered username or password is wrong. Please try again.",

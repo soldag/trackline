@@ -84,6 +84,11 @@ export default defineMessages({
     defaultMessage: "The Spotify refresh token is invalid.",
   },
 
+  UNSUPPORTED_SPOTIFY_PRODUCT: {
+    id: "ApiErrors.unsupportedSpotifyProduct",
+    defaultMessage: "Spotify Premium is required to create a game.",
+  },
+
   // Users
 
   USER_NOT_FOUND: {
