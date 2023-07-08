@@ -16,10 +16,10 @@ import { useMountEffect } from "utils/hooks";
 
 const RootContainer = () => {
   const dispatch = useDispatch();
+  const apiIsLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const apiSessionToken = useSelector((state) => state.auth.sessionToken);
-  const apiUser = useSelector((state) => state.auth.user);
+  const spotifyIsLoggedIn = useSelector((state) => state.spotify.isLoggedIn);
   const spotifyAccessToken = useSelector((state) => state.spotify.accessToken);
-  const spotifyUser = useSelector((state) => state.spotify.user);
 
   useMountEffect(() => {
     if (apiSessionToken) {
@@ -35,7 +35,7 @@ const RootContainer = () => {
     }
   });
 
-  if ((apiSessionToken && !apiUser) || (spotifyAccessToken && !spotifyUser)) {
+  if (apiIsLoggedIn == null || spotifyIsLoggedIn == null) {
     return <LoadingView />;
   }
 
