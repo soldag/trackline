@@ -1,6 +1,8 @@
 import asyncio
 from collections.abc import Awaitable, Callable
+import logging
 import random
+import time
 
 from injector import Injector
 from pymongo.errors import OperationFailure
@@ -12,6 +14,9 @@ from trackline.core.db.client import DatabaseClient
 from trackline.core.settings import Settings
 from trackline.core.utils.datetime import utcnow
 from trackline.core.utils.response import make_error
+
+
+log = logging.getLogger(__name__)
 
 
 class NoIndexMiddleware(BaseHTTPMiddleware):
@@ -30,6 +35,22 @@ class ServerTimeMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         response = await call_next(request)
         response.headers["x-server-time"] = utcnow().isoformat()
+
+        return response
+
+
+class LoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        start_time = time.perf_counter()
+        response = await call_next(request)
+        end_time = time.perf_counter()
+        duration = (end_time - start_time) * 1000
+
+        log.info(
+            f"{request.method} {request.url.path} - HTTP {response.status_code} ({duration:.2f} ms)"
+        )
 
         return response
 

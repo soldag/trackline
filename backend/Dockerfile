@@ -8,7 +8,7 @@ ADD pyproject.toml poetry.lock /tmp/
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 
-FROM python:3.11-alpine AS base
+FROM python:3.11-alpine
 
 WORKDIR /app
 
@@ -19,12 +19,4 @@ RUN apk add --update-cache --virtual build-deps build-base git \
 
 ADD . /app
 
-
-FROM base AS dev
-
-CMD ["uvicorn", "trackline.app:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
-
-
-FROM base
-
-CMD ["uvicorn", "trackline.app:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["python3", "main.py"]

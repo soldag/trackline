@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.exceptions import RequestValidationError, WebSocketRequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +11,7 @@ from trackline.core.di import CoreModule
 from trackline.core.exceptions import RequestException
 from trackline.core.middleware import (
     DatabaseTransactionMiddleware,
+    LoggingMiddleware,
     NoIndexMiddleware,
     ServerTimeMiddleware,
 )
@@ -20,6 +23,9 @@ from trackline.spotify.client import SpotifyClient
 from trackline.spotify.di import SpotifyModule
 from trackline.spotify.router import router as spotify_router
 from trackline.users.router import router as users_router
+
+
+log = logging.getLogger(__name__)
 
 
 app = FastAPI(
@@ -37,6 +43,7 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["x-server-time"],
 )
+app.add_middleware(LoggingMiddleware)
 app.add_middleware(ServerTimeMiddleware)
 app.add_middleware(NoIndexMiddleware)
 app.add_middleware(DatabaseTransactionMiddleware, injector=injector)
@@ -50,14 +57,22 @@ app.include_router(users_router)
 
 @app.on_event("startup")
 async def on_startup():
+    log.info("Waiting for application startup.")
+
     spotify_client = injector.get(SpotifyClient)
     await spotify_client.initialize()
+
+    log.info("Application startup complete.")
 
 
 @app.on_event("shutdown")
 async def on_shutdown():
+    log.info("Waiting for application shutdown.")
+
     spotify_client = injector.get(SpotifyClient)
     await spotify_client.close()
+
+    log.info("Application shutdown complete.")
 
 
 @app.exception_handler(Exception)
