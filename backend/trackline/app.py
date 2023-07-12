@@ -1,11 +1,12 @@
 import logging
 
-from fastapi import FastAPI, Request, WebSocket
+from fastapi import Depends, FastAPI, Request, WebSocket
 from fastapi.exceptions import RequestValidationError, WebSocketRequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_injector import attach_injector, InjectorMiddleware
 from injector import Injector
 
+from trackline.auth.deps import websocket_logger
 from trackline.auth.router import router as auth_router
 from trackline.core.di import CoreModule
 from trackline.core.exceptions import RequestException
@@ -30,6 +31,7 @@ log = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Trackline",
+    dependencies=[Depends(websocket_logger)],
 )
 
 injector = Injector([CoreModule(), GamesModule(), SpotifyModule()])
