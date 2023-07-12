@@ -20,18 +20,22 @@ const getTokensDelta = (userId, turn) =>
     .map((s) => s.tokensDelta[userId] || 0)
     .reduce((acc, curr) => acc + curr, 0);
 
+const getPosition = (player, players) =>
+  players.filter(
+    (p) =>
+      p.timeline.length > player.timeline.length ||
+      (p.timeline.length == player.timeline.length && p.tokens > player.tokens),
+  ).length + 1;
+
 const GameScoringTable = ({ players, users, turn }) => {
   const mergedPlayers = players.map((p) => ({
     ...p,
     username: users.find((u) => u.id === p.userId)?.username,
+    position: getPosition(p, players),
     tracksDelta: getTracksDelta(p.userId, turn),
     tokensDelta: getTokensDelta(p.userId, turn),
   }));
-  const sortedPlayers = _.orderBy(
-    mergedPlayers,
-    [(p) => p.timeline.length, (p) => p.tokens],
-    ["desc", "desc"],
-  );
+  const sortedPlayers = _.sortBy(mergedPlayers, ["position"]);
 
   return (
     <ShadowTable
@@ -66,7 +70,7 @@ const GameScoringTable = ({ players, users, turn }) => {
         </tr>
       </thead>
       <tbody>
-        {sortedPlayers.map((player, i) => (
+        {sortedPlayers.map((player) => (
           <Box
             component="tr"
             key={player.userId}
@@ -76,7 +80,7 @@ const GameScoringTable = ({ players, users, turn }) => {
               },
             }}
           >
-            <td>{i + 1}</td>
+            <td>{player.position}.</td>
             <td>{player.username}</td>
             <td>
               <Typography
