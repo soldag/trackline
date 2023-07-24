@@ -585,22 +585,18 @@ all = ["email-validator (>=1.1.1)", "httpx (>=0.23.0)", "itsdangerous (>=1.1.0)"
 
 [[package]]
 name = "fastapi-injector"
-version = "0.5.0"
+version = "0.5.1"
 description = "python-injector integration for FastAPI"
 optional = false
-python-versions = ">=3.8 <3.12"
-files = []
-develop = false
+python-versions = ">=3.8,<3.12"
+files = [
+    {file = "fastapi_injector-0.5.1-py3-none-any.whl", hash = "sha256:f80b216e624be00817a6c51a70c5d1cf1f38b68089d87203d459e5d7c0966088"},
+    {file = "fastapi_injector-0.5.1.tar.gz", hash = "sha256:9ff830b4e1a114ea10c9fd764c93b7dcee00b3baf1e2d0521faeaae2112bb84c"},
+]
 
 [package.dependencies]
 fastapi = ">=0.70.0"
 injector = ">=0.19.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/soldag/fastapi-injector.git"
-reference = "ws-support"
-resolved_reference = "c0ac9e31816cd40afd8aa43ea1f4769e4a1f3f46"
 
 [[package]]
 name = "flake8"
@@ -1743,4 +1739,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "a1143cdff80b66a59ceaca03891c1c4d735e4dd35789a0ecb7b5c93d512cc3a8"
+content-hash = "b23ffbb8626cb5faa147d1d782e5d5d48983cdfd11ddba0eb660a8ee53fb7b9f"
