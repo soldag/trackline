@@ -10,6 +10,8 @@ RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 FROM python:3.11-alpine
 
+ENV PORT=80
+
 WORKDIR /app
 
 COPY --from=poetry /tmp/requirements.txt /app
