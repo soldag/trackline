@@ -1,0 +1,11 @@
+{
+  "name": "trackline-database-utils",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "migrate-mongo": "^10.0.0"
+  },
+  "scripts": {
+    "migrate": "migrate-mongo"
+  }
+}
