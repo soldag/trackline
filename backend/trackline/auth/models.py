@@ -9,7 +9,7 @@ from trackline.core.fields import ResourceId
 from trackline.core.utils.datetime import utcnow
 
 
-def get_default_expiration_date():
+def get_default_expiration_time():
     return utcnow() + SESSION_EXPIRY_INTERVAL
 
 
@@ -20,5 +20,5 @@ def generate_token():
 class Session(IdentifiableModel):
     user_id: ResourceId
     token: str = Field(default_factory=generate_token)
-    creation_date: datetime = Field(default_factory=utcnow)
-    expiration_date: datetime = Field(default_factory=get_default_expiration_date)
+    creation_time: datetime = Field(default_factory=utcnow)
+    expiration_time: datetime = Field(default_factory=get_default_expiration_time)

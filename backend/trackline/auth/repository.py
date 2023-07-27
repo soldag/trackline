@@ -16,8 +16,8 @@ class SessionRepository(Repository[Session]):
         # Always exclude expired sessions
         query = {
             **query,
-            "expiration_date": {
-                **query.get("expiration_date", {}),
+            "expiration_time": {
+                **query.get("expiration_time", {}),
                 "$gt": utcnow(),
             },
         }
