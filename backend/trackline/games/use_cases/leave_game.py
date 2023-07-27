@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from injector import Inject
 from pydantic import BaseModel
 
@@ -39,7 +41,8 @@ class LeaveGame(BaseModel):
 
             if len(game.players) <= MIN_PLAYER_COUNT:
                 await self._game_repository.update_by_id(
-                    game.id, {"state": GameState.ABORTED}
+                    game.id,
+                    {"state": GameState.ABORTED, "completion_time": datetime.utcnow()},
                 )
                 await self._notifier.notify(user_id, game, GameAborted())
                 return

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from injector import Inject
 from pydantic import BaseModel
 
@@ -54,7 +56,11 @@ class CompleteTurn(BaseModel):
             game_completed = turn_completed and self._check_end_condition(game)
             if game_completed:
                 await self._game_repository.update_by_id(
-                    game.id, {"state": GameState.COMPLETED}
+                    game.id,
+                    {
+                        "state": GameState.COMPLETED,
+                        "completion_time": datetime.utcnow(),
+                    },
                 )
 
             completion_out = TurnCompletionOut(

@@ -67,6 +67,7 @@ class GameSettings(BaseModel):
 
 class Game(IdentifiableModel):
     creation_time: datetime = Field(default_factory=utcnow)
+    completion_time: datetime | None = None
     settings: GameSettings
     state: GameState = GameState.WAITING_FOR_PLAYERS
     turns: list[Turn] = []
