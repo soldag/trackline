@@ -21,8 +21,10 @@ def websocket_logger(connection: HTTPConnection):
         return
 
     log.info(f"GET {connection.url.path} - Websocket opened")
-    yield
-    log.info(f"GET {connection.url.path} - Websocket closed")
+    try:
+        yield
+    finally:
+        log.info(f"GET {connection.url.path} - Websocket closed")
 
 
 class OptionalHTTPBearer(HTTPBearer):
