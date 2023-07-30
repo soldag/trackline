@@ -16,6 +16,7 @@
   "ApiErrors.unexpectedState": "The game is not in the correct state to perform this operation.",
   "ApiErrors.unsupportedSpotifyProduct": "Spotify Premium is required to create a game.",
   "ApiErrors.userNotFound": "The user does not exist",
+  "ApiErrors.usernameExists": "This username is already taken.",
   "ApiErrors.validationError": "The entered data is invalid. Please check and try again.",
   "ApiErrors.wrongCredentials": "The entered username or password is wrong. Please try again.",
   "CircularCountdown.seconds": "{value} s",

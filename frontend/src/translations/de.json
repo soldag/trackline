@@ -16,6 +16,7 @@
   "ApiErrors.unexpectedState": "Diese Aktion kann im aktuellen Zustand des Spiels nicht ausgeführt werden.",
   "ApiErrors.unsupportedSpotifyProduct": "Spotify Premium wird benötigt um ein Spiel zu erstellen.",
   "ApiErrors.userNotFound": "Der Account existiert nicht.",
+  "ApiErrors.usernameExists": "Dieser Benutzername ist bereits vergeben.",
   "ApiErrors.validationError": "Die eingegebenen Daten sind ungültig. Bitte überprüfe die Eingabe und versuche es erneut.",
   "ApiErrors.wrongCredentials": "Der eingegebene Benutzername oder das Passwort ist falsch. Bitte versuche es erneut.",
   "CircularCountdown.seconds": "{value} s",

@@ -1,9 +1,10 @@
 from injector import Inject
 from pydantic import BaseModel
 
+from trackline.core.exceptions import UseCaseException
 from trackline.core.utils.security import hash_password
 from trackline.users.models import User
-from trackline.users.repository import UserRepository
+from trackline.users.repository import UsernameExistsError, UserRepository
 from trackline.users.schemas import UserOut
 
 
@@ -20,6 +21,14 @@ class CreateUser(BaseModel):
                 username=use_case.username,
                 password_hash=hash_password(use_case.password),
             )
-            await self._user_repository.create(user)
+
+            try:
+                await self._user_repository.create(user)
+            except UsernameExistsError:
+                raise UseCaseException(
+                    code="USERNAME_EXISTS",
+                    message="A user with this username already exists.",
+                    status_code=400,
+                )
 
             return UserOut.from_model(user)

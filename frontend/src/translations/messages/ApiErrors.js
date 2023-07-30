@@ -95,4 +95,8 @@ export default defineMessages({
     id: "ApiErrors.userNotFound",
     defaultMessage: "The user does not exist",
   },
+  USERNAME_EXISTS: {
+    id: "ApiErrors.usernameExists",
+    defaultMessage: "This username is already taken.",
+  },
 });
