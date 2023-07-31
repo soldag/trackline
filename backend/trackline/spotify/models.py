@@ -5,6 +5,6 @@ class SpotifyTrack(BaseModel):
     id: str
     artists: list[str]
     title: str
-    release_year: int | None
+    release_year: int | None = None
     is_playable: bool
-    image_url: str | None
+    image_url: str | None = None

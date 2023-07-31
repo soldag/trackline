@@ -17,8 +17,8 @@ from trackline.games.use_cases.base import BaseHandler
 class CreateGuess(BaseModel):
     game_id: ResourceId
     turn_id: int
-    position: int | None
-    release_year: int | None
+    position: int | None = None
+    release_year: int | None = None
 
     class Handler(BaseHandler):
         def __init__(

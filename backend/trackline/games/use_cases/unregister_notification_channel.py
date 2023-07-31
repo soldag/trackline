@@ -1,5 +1,5 @@
 from injector import Inject
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from trackline.games.notifier import NotificationChannel, Notifier
 from trackline.games.repository import GameRepository
@@ -7,10 +7,9 @@ from trackline.games.use_cases.base import BaseHandler
 
 
 class UnregisterNotificationChannel(BaseModel):
-    channel: NotificationChannel
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    class Config:
-        arbitrary_types_allowed = True
+    channel: NotificationChannel
 
     class Handler(BaseHandler):
         def __init__(

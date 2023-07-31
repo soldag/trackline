@@ -1,6 +1,6 @@
-from trackline.core.schemas import BaseSchema
+from pydantic import BaseModel
 
 
-class SpotifyAccessToken(BaseSchema):
+class SpotifyAccessToken(BaseModel):
     access_token: str
     refresh_token: str

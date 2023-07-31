@@ -1,11 +1,12 @@
 from datetime import datetime
 
+from pydantic import BaseModel
+
 from trackline.auth.models import Session
 from trackline.core.fields import ResourceId
-from trackline.core.schemas import BaseSchema
 
 
-class SessionOut(BaseSchema):
+class SessionOut(BaseModel):
     id: ResourceId
     user_id: ResourceId
     token: str

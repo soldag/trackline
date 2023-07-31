@@ -1,7 +1,7 @@
 import asyncio
 from collections import defaultdict
 from collections.abc import Collection
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Generic, Protocol, runtime_checkable, TypeVar
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -16,16 +16,18 @@ class Notification(BaseModel):
         return to_snake_case(self.__class__.__name__)
 
 
-class NotificationEnvelope(BaseModel):
+NotificationT = TypeVar("NotificationT", bound=Notification)
+
+
+class NotificationEnvelope(BaseModel, Generic[NotificationT]):
     type: str
-    payload: Notification
+    payload: NotificationT
 
-    class Config:
-        json_encoders = {ResourceId: str}
-
-    @staticmethod
-    def for_notification(notification: Notification) -> "NotificationEnvelope":
-        return NotificationEnvelope(type=notification.get_type(), payload=notification)
+    @classmethod
+    def for_notification(
+        cls, notification: NotificationT
+    ) -> "NotificationEnvelope[NotificationT]":
+        return cls(type=notification.get_type(), payload=notification)
 
 
 @runtime_checkable
@@ -64,7 +66,11 @@ class Notifier:
         if not recipient_ids:
             return
 
-        envelope = NotificationEnvelope.for_notification(notification)
+        notification_type = type(notification)
+        envelope = NotificationEnvelope[
+            notification_type  # type: ignore[valid-type]
+        ].for_notification(notification)
+
         await self._send_multicast(game.id, recipient_ids, envelope)
 
     async def _send_multicast(

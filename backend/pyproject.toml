@@ -11,7 +11,7 @@ python = ">=3.10,<3.12"
 argon2-cffi = "^21.3.0"
 async-spotify = "^0.4.4"
 decorator = "^5.1.1"
-fastapi = "^0.99.1"
+fastapi = "^0.100.0"
 fastapi-injector = "^0.5.1"
 httpx = "^0.24.0"
 injector = "^0.20.1"
@@ -21,6 +21,7 @@ python-dotenv = "^1.0.0"
 toml = "^0.10.2"
 uvicorn = "^0.22.0"
 websockets = "^11.0.2"
+pydantic-settings = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
@@ -40,15 +41,9 @@ requires = ["poetry-core"]
 trackline = "main:main"
 
 [tool.mypy]
-plugins = [
-    "pydantic.mypy",
-]
+plugins = ["pydantic.mypy"]
 check_untyped_defs = true
 
 [[tool.mypy.overrides]]
-module = [
-    "async_spotify.*",
-    "lucenequerybuilder.*",
-    "motor.*",
-]
+module = ["async_spotify.*", "lucenequerybuilder.*", "motor.*"]
 ignore_missing_imports = true

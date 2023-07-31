@@ -22,7 +22,7 @@ class Track(BaseModel):
     title: str
     artists: str
     release_year: int
-    image_url: str | None
+    image_url: str | None = None
 
 
 class Player(BaseModel):
@@ -39,7 +39,7 @@ class Guess(BaseModel):
 
 
 class CategoryScoring(BaseModel):
-    winner: ResourceId | None
+    winner: ResourceId | None = None
     tokens_delta: dict[ResourceId, int]
 
 

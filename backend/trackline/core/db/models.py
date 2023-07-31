@@ -4,8 +4,7 @@ from trackline.core.fields import ResourceId
 
 
 class BaseModel(pydantic.BaseModel):
-    class Config:
-        frozen = True
+    model_config = pydantic.ConfigDict(frozen=True)
 
 
 class IdentifiableModel(BaseModel):

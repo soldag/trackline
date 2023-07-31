@@ -1,7 +1,8 @@
 from enum import Enum
 import os
 
-from pydantic import BaseSettings, PositiveInt
+from pydantic import PositiveInt
+from pydantic_settings import BaseSettings
 
 
 class LogLevel(Enum):

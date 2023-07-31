@@ -14,9 +14,9 @@ from trackline.games.use_cases.base import BaseHandler
 class CreateGame(BaseModel):
     playlist_ids: list[str]
     spotify_market: str
-    initial_tokens = DEFAULT_INITIAL_TOKENS
-    timeline_length = DEFAULT_TIMELINE_LENGTH
-    guess_timeout = DEFAULT_GUESS_TIMEOUT
+    initial_tokens: int = DEFAULT_INITIAL_TOKENS
+    timeline_length: int = DEFAULT_TIMELINE_LENGTH
+    guess_timeout: int = DEFAULT_GUESS_TIMEOUT
 
     class Handler(BaseHandler):
         async def execute(self, user_id: ResourceId, use_case: "CreateGame") -> GameOut:
