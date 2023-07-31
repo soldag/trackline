@@ -39,7 +39,10 @@ class LeaveGame(BaseModel):
                     status_code=400,
                 )
 
-            if len(game.players) <= MIN_PLAYER_COUNT:
+            if (
+                game.state != GameState.WAITING_FOR_PLAYERS
+                and len(game.players) <= MIN_PLAYER_COUNT
+            ):
                 await self._game_repository.update_by_id(
                     game.id,
                     {"state": GameState.ABORTED, "completion_time": datetime.utcnow()},
