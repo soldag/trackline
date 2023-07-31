@@ -30,20 +30,21 @@
     "redux-saga": "^1.2.3",
     "redux-saga-routines": "^3.2.3",
     "screenfull": "^6.0.2",
-    "sonner": "^0.5.0",
+    "sonner": "^0.6.2",
     "web-vitals": "^3.3.1"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@formatjs/cli": "^6.1.1",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "colors": "^1.4.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-formatjs": "^4.10.1",
     "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^2.8.8"
+    "prettier": "^3.0.0"
   },
   "scripts": {
     "start": "react-app-rewired start",
