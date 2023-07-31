@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 
-import View from "components/views/View";
+import View from "~/components/views/View";
 
 const GameAbortView = () => {
   return (

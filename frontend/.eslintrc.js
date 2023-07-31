@@ -36,15 +36,15 @@ module.exports = {
       version: "detect",
     },
     "import/resolver": {
-      node: {
+      alias: {
+        map: [["~", "./src"]],
         extensions: [".js", ".jsx"],
-        moduleDirectory: ["node_modules", "src"],
       },
     },
   },
   overrides: [
     {
-      files: ["config-overrides.js", "scripts/*.js"],
+      files: ["scripts/*.js"],
       env: {
         node: true,
       },

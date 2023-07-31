@@ -1,4 +1,4 @@
-import { ERROR_CODES } from "constants";
+import { ERROR_CODES } from "~/constants";
 
 class SpotifyError extends Error {
   code = ERROR_CODES.SPOTIFY;

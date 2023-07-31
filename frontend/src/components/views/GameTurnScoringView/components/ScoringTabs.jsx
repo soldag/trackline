@@ -4,9 +4,9 @@ import { FormattedMessage } from "react-intl";
 import { Tab, TabList, TabPanel, Tabs } from "@mui/joy";
 import { tabClasses } from "@mui/joy/Tab";
 
-import GameScoringTable from "components/common/GameScoringTable";
-import { PlayerType, TurnType } from "types/games";
-import { UserType } from "types/users";
+import GameScoringTable from "~/components/common/GameScoringTable";
+import { PlayerType, TurnType } from "~/types/games";
+import { UserType } from "~/types/users";
 
 import TurnScoringTable from "./TurnScoringTable";
 

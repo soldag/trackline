@@ -4,11 +4,11 @@ import { Navigate, useLocation } from "react-router-dom";
 
 import { Box, Stack, Typography } from "@mui/joy";
 
-import Heading from "components/common/Heading";
-import View from "components/views/View";
-import { login } from "store/auth/actions";
-import { dismissAllErrors } from "store/errors/actions";
-import { useErrorSelector, useLoadingSelector } from "utils/hooks";
+import Heading from "~/components/common/Heading";
+import View from "~/components/views/View";
+import { login } from "~/store/auth/actions";
+import { dismissAllErrors } from "~/store/errors/actions";
+import { useErrorSelector, useLoadingSelector } from "~/utils/hooks";
 
 import LoginForm from "./components/LoginForm";
 

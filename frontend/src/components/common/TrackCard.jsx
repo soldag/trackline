@@ -2,8 +2,8 @@ import PropTypes from "prop-types";
 
 import { Card, CardContent, CardCover, Typography } from "@mui/joy";
 
-import { TrackType } from "types/games";
-import SxType from "types/mui";
+import { TrackType } from "~/types/games";
+import SxType from "~/types/mui";
 
 const TrackCard = ({ sx, track, onClick }) => (
   <Card

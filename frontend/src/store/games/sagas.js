@@ -11,12 +11,12 @@ import {
   takeLatest,
 } from "redux-saga/effects";
 
-import tracklineApi from "api/trackline";
+import tracklineApi from "~/api/trackline";
 import {
   WS_RECONNECT_MAX_INTERVAL,
   WS_RECONNECT_MIN_INTERVAL,
-} from "constants";
-import { registerSagaHandlers } from "store/utils/sagas";
+} from "~/constants";
+import { registerSagaHandlers } from "~/store/utils/sagas";
 
 import {
   abortGame,

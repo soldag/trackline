@@ -6,10 +6,10 @@ import TokenIcon from "@mui/icons-material/Token";
 import WebStoriesIcon from "@mui/icons-material/WebStories";
 import { Box, Typography } from "@mui/joy";
 
-import NumericDelta from "components/common/NumericDelta";
-import ShadowTable from "components/common/ShadowTable";
-import { PlayerType, TurnType } from "types/games";
-import { UserType } from "types/users";
+import NumericDelta from "~/components/common/NumericDelta";
+import ShadowTable from "~/components/common/ShadowTable";
+import { PlayerType, TurnType } from "~/types/games";
+import { UserType } from "~/types/users";
 
 const getTracksDelta = (userId, turn) =>
   turn?.scoring?.position?.winner === userId ? 1 : 0;

@@ -6,21 +6,21 @@ import { Link, Navigate } from "react-router-dom";
 import LinkIcon from "@mui/icons-material/Link";
 import { Button, Stack, Typography } from "@mui/joy";
 
-import View from "components/views/View";
-import { dismissAllErrors } from "store/errors/actions";
-import { createGame } from "store/games/actions";
+import View from "~/components/views/View";
+import { dismissAllErrors } from "~/store/errors/actions";
+import { createGame } from "~/store/games/actions";
 import {
   fetchRecommendedPlaylists,
   searchPlaylists,
   startAuth,
-} from "store/spotify/actions";
+} from "~/store/spotify/actions";
 import {
   useErrorSelector,
   useErrorToast,
   useLoadingSelector,
   usePrevious,
   useSpotify,
-} from "utils/hooks";
+} from "~/utils/hooks";
 
 import PlaylistSelector from "./components/PlaylistSelector";
 

@@ -1,5 +1,5 @@
-import { SPOTIFY_CLIENT_ID } from "configuration";
-import { REQUIRED_SPOTIFY_SCOPES } from "constants";
+import { SPOTIFY_CLIENT_ID } from "~/configuration";
+import { REQUIRED_SPOTIFY_SCOPES } from "~/constants";
 
 export const getAuthorizeUrl = () => {
   const redirectUrl = `${document.location.origin}/spotify/callback`;

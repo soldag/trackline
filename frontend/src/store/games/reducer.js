@@ -4,9 +4,9 @@ import {
   GAME_STATES,
   TOKEN_COST_BUY_TRACK,
   TOKEN_COST_EXCHANGE_TRACK,
-} from "constants";
-import { resetState } from "store/common/actions";
-import { isSuccess } from "store/utils/matchers";
+} from "~/constants";
+import { resetState } from "~/store/common/actions";
+import { isSuccess } from "~/store/utils/matchers";
 
 import {
   abortGame,

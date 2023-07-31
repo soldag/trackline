@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 import { Typography } from "@mui/joy";
 
-import SxType from "types/mui";
+import SxType from "~/types/mui";
 
 const NumericDelta = ({ value, icon, sx }) => {
   if (!value) {

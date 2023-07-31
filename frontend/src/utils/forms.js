@@ -1,4 +1,4 @@
-import FormValidationMessages from "translations/messages/FormValidation";
+import FormValidationMessages from "~/translations/messages/FormValidation";
 
 export const buildRules = (intl, rules) =>
   Object.assign(

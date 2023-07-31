@@ -4,7 +4,7 @@ import { FormattedMessage } from "react-intl";
 
 import { CircularProgress } from "@mui/joy";
 
-import { useInterval } from "utils/hooks";
+import { useInterval } from "~/utils/hooks";
 
 const DANGER_THRESHOLD = 0.75;
 const WARNING_THRESHOLD = 0.5;

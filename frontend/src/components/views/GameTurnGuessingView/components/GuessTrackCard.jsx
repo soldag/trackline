@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import LoopIcon from "@mui/icons-material/Loop";
 import { Button, Card, CardContent, Typography } from "@mui/joy";
 
-import CircularCountdown from "components/common/CircularCountdown";
+import CircularCountdown from "~/components/common/CircularCountdown";
 
 const GuessTrackCard = ({
   header,

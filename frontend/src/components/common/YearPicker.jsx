@@ -8,7 +8,7 @@ import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import { Box, Button, Stack, Typography } from "@mui/joy";
 
-import SxType from "types/mui";
+import SxType from "~/types/mui";
 
 const SMALL_STEP = 1;
 const LARGE_STEP = 10;

@@ -5,8 +5,8 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ReportIcon from "@mui/icons-material/Report";
 import { Alert, IconButton, Typography } from "@mui/joy";
 
-import { ErrorType } from "types/errors";
-import { getErrorMessage } from "utils/errors";
+import { ErrorType } from "~/types/errors";
+import { getErrorMessage } from "~/utils/errors";
 
 const ErrorAlert = ({ header, error, children, onDismiss }) => {
   const intl = useIntl();

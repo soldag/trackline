@@ -5,13 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { Button, Stack } from "@mui/joy";
 
-import TrackCard from "components/common/TrackCard";
-import BuyTrackModal from "components/views/GameTurnScoringView/components/BuyTrackModal";
-import View from "components/views/View";
-import { TOKEN_COST_BUY_TRACK } from "constants";
-import { buyTrack, completeTurn } from "store/games/actions";
-import { useConfetti, useStars } from "utils/confetti";
-import { useErrorToast, useLoadingSelector } from "utils/hooks";
+import TrackCard from "~/components/common/TrackCard";
+import BuyTrackModal from "~/components/views/GameTurnScoringView/components/BuyTrackModal";
+import View from "~/components/views/View";
+import { TOKEN_COST_BUY_TRACK } from "~/constants";
+import { buyTrack, completeTurn } from "~/store/games/actions";
+import { useConfetti, useStars } from "~/utils/confetti";
+import { useErrorToast, useLoadingSelector } from "~/utils/hooks";
 
 import ScoringTabs from "./components/ScoringTabs";
 

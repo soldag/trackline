@@ -3,9 +3,9 @@ import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 
-import ConfirmModal from "components/common/ConfirmModal";
-import SpotifyContext from "components/contexts/SpotifyContext";
-import { startAuth } from "store/spotify/actions";
+import ConfirmModal from "~/components/common/ConfirmModal";
+import SpotifyContext from "~/components/contexts/SpotifyContext";
+import { startAuth } from "~/store/spotify/actions";
 
 const SpotifyContainer = ({ children }) => {
   const [isRequired, setIsRequired] = useState(false);

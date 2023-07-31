@@ -1,8 +1,8 @@
 import { call, put } from "redux-saga/effects";
 
-import tracklineApi from "api/trackline";
-import { resetState } from "store/common/actions";
-import { registerSagaHandlers } from "store/utils/sagas";
+import tracklineApi from "~/api/trackline";
+import { resetState } from "~/store/common/actions";
+import { registerSagaHandlers } from "~/store/utils/sagas";
 
 import {
   createUser,

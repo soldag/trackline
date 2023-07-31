@@ -4,11 +4,11 @@ import { useIntl } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
-import api from "api/trackline";
-import SpotifyContext from "components/contexts/SpotifyContext";
-import { dismissError } from "store/errors/actions";
-import { getErrorMessage } from "utils/errors";
-import { getRoutinePrefix } from "utils/routines";
+import api from "~/api/trackline";
+import SpotifyContext from "~/components/contexts/SpotifyContext";
+import { dismissError } from "~/store/errors/actions";
+import { getErrorMessage } from "~/utils/errors";
+import { getRoutinePrefix } from "~/utils/routines";
 
 export const useMountEffect = (effect) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps

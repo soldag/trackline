@@ -5,9 +5,9 @@ import { FormattedMessage } from "react-intl";
 
 import { Stack } from "@mui/joy";
 
-import TrackCard from "components/common/TrackCard";
-import YearRange from "components/common/YearRange";
-import { TrackType } from "types/games";
+import TrackCard from "~/components/common/TrackCard";
+import YearRange from "~/components/common/YearRange";
+import { TrackType } from "~/types/games";
 
 import ConfirmGuessModal from "./ConfirmGuessModal";
 import ExchangeTrackModal from "./ExchangeTrackModal";

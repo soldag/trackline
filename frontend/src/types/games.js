@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-import { GAME_STATES } from "constants";
+import { GAME_STATES } from "~/constants";
 
 export const TrackType = PropTypes.shape({
   spotifyId: PropTypes.string.isRequired,

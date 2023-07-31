@@ -6,8 +6,8 @@ import TokenIcon from "@mui/icons-material/Token";
 import WebStoriesIcon from "@mui/icons-material/WebStories";
 import { Box, Typography } from "@mui/joy";
 
-import { PlayerType } from "types/games";
-import { UserType } from "types/users";
+import { PlayerType } from "~/types/games";
+import { UserType } from "~/types/users";
 
 const PlayerInfo = ({ player, user, active = false }) => (
   <Box>

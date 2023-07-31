@@ -1,9 +1,9 @@
 import axios from "axios";
 import rateLimit from "axios-rate-limit";
 
-import ApiError from "api/trackline/error";
-import { camelizeResponse, decamelizeRequest } from "api/utils/interceptors";
-import { BACKEND_URL } from "configuration";
+import ApiError from "~/api/trackline/error";
+import { camelizeResponse, decamelizeRequest } from "~/api/utils/interceptors";
+import { BACKEND_URL } from "~/configuration";
 
 export let getSessionToken = () => {};
 export let setSessionToken = () => {};

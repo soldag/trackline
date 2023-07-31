@@ -1,10 +1,10 @@
 import { createReducer } from "@reduxjs/toolkit";
 
-import actions from "store/actions";
-import { resetState } from "store/common/actions";
-import { dismissAllErrors, dismissError } from "store/errors/actions";
-import { isFailure, isTrigger } from "store/utils/matchers";
-import { getRoutinePrefix } from "utils/routines";
+import actions from "~/store/actions";
+import { resetState } from "~/store/common/actions";
+import { dismissAllErrors, dismissError } from "~/store/errors/actions";
+import { isFailure, isTrigger } from "~/store/utils/matchers";
+import { getRoutinePrefix } from "~/utils/routines";
 
 const routinePrefixes = actions.map(getRoutinePrefix).filter((p) => p);
 const initialState = {

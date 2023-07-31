@@ -4,8 +4,8 @@ import { FormattedMessage } from "react-intl";
 
 import { Switch, Typography } from "@mui/joy";
 
-import ConfirmModal from "components/common/ConfirmModal";
-import YearPicker from "components/common/YearPicker";
+import ConfirmModal from "~/components/common/ConfirmModal";
+import YearPicker from "~/components/common/YearPicker";
 
 const getInitialYear = (min, max) => min || max || new Date().getFullYear();
 

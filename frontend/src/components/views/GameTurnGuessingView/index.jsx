@@ -3,22 +3,22 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box } from "@mui/joy";
 
-import StatusBar from "components/views/GameTurnGuessingView/components/StatusBar";
-import View from "components/views/View";
+import StatusBar from "~/components/views/GameTurnGuessingView/components/StatusBar";
+import View from "~/components/views/View";
 import {
   TOKEN_COST_EXCHANGE_TRACK,
   TOKEN_COST_POSITION_GUESS,
   TOKEN_COST_YEAR_GUESS,
-} from "constants";
+} from "~/constants";
 import {
   exchangeTrack,
   guessTrack,
   rejectGuess,
   scoreTurn,
-} from "store/games/actions";
-import { play } from "store/spotify/actions";
-import { isValidGuess } from "utils/games";
-import { useErrorToast, useInterval, useLoadingSelector } from "utils/hooks";
+} from "~/store/games/actions";
+import { play } from "~/store/spotify/actions";
+import { isValidGuess } from "~/utils/games";
+import { useErrorToast, useInterval, useLoadingSelector } from "~/utils/hooks";
 
 import Timeline from "./components/Timeline";
 

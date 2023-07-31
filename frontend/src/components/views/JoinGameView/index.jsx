@@ -5,9 +5,9 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import { Box, Stack, Typography } from "@mui/joy";
 
-import View from "components/views/View";
-import { joinGame } from "store/games/actions";
-import { useErrorToast, useLoadingSelector } from "utils/hooks";
+import View from "~/components/views/View";
+import { joinGame } from "~/store/games/actions";
+import { useErrorToast, useLoadingSelector } from "~/utils/hooks";
 
 import JoinGameForm from "./components/JoinGameForm";
 import QrScanner from "./components/QrScanner";

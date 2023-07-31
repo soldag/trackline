@@ -6,7 +6,7 @@ import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import { IconButton, LinearProgress, Stack, Typography } from "@mui/joy";
 
-import FormattedDuration from "components/common/FormattedDuration";
+import FormattedDuration from "~/components/common/FormattedDuration";
 
 const VOLUME_STEP = 0.1;
 

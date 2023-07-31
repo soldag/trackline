@@ -1,4 +1,4 @@
-import { ERROR_CODES } from "constants";
+import { ERROR_CODES } from "~/constants";
 
 class ApiError extends Error {
   code = ERROR_CODES.API;

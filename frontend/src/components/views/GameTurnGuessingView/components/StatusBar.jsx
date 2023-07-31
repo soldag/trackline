@@ -4,8 +4,8 @@ import { FormattedMessage } from "react-intl";
 
 import { Stack, Typography } from "@mui/joy";
 
-import { GameType } from "types/games";
-import { UserType } from "types/users";
+import { GameType } from "~/types/games";
+import { UserType } from "~/types/users";
 
 const StatusBar = ({ game, users, currentUserId }) => {
   const round = Math.max(

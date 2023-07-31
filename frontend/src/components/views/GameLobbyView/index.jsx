@@ -4,11 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Button, Stack, Typography } from "@mui/joy";
 
-import ResponsiveQrCode from "components/common/ResponsiveQrCode";
-import View from "components/views/View";
-import { MIN_PLAYER_COUNT } from "constants";
-import { abortGame, leaveGame, startGame } from "store/games/actions";
-import { useErrorToast, useLoadingSelector } from "utils/hooks";
+import ResponsiveQrCode from "~/components/common/ResponsiveQrCode";
+import View from "~/components/views/View";
+import { MIN_PLAYER_COUNT } from "~/constants";
+import { abortGame, leaveGame, startGame } from "~/store/games/actions";
+import { useErrorToast, useLoadingSelector } from "~/utils/hooks";
 
 import PlayersList from "./components/PlayersList";
 import QrCodeModal from "./components/QrCodeModal";

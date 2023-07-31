@@ -8,12 +8,12 @@ import TokenIcon from "@mui/icons-material/Token";
 import WebStoriesIcon from "@mui/icons-material/WebStories";
 import { Box, Typography } from "@mui/material";
 
-import NumericDelta from "components/common/NumericDelta";
-import ShadowTable from "components/common/ShadowTable";
-import YearRange from "components/common/YearRange";
-import { GuessType, PlayerType, TrackType, TurnType } from "types/games";
-import { UserType } from "types/users";
-import { isValidGuess } from "utils/games";
+import NumericDelta from "~/components/common/NumericDelta";
+import ShadowTable from "~/components/common/ShadowTable";
+import YearRange from "~/components/common/YearRange";
+import { GuessType, PlayerType, TrackType, TurnType } from "~/types/games";
+import { UserType } from "~/types/users";
+import { isValidGuess } from "~/utils/games";
 
 const Result = ({ isCorrect, tracksDelta, tokensDelta, children }) => (
   <Typography

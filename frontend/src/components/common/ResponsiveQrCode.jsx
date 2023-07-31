@@ -3,7 +3,7 @@ import QRCode from "react-qr-code";
 
 import { Box, useTheme } from "@mui/joy";
 
-import SxType from "types/mui";
+import SxType from "~/types/mui";
 
 const ResponsiveQrCode = ({ data, sx, onClick }) => {
   const theme = useTheme();

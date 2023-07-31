@@ -3,9 +3,9 @@ import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import screenfull from "screenfull";
 
-import ConfirmModal from "components/common/ConfirmModal";
-import FullscreenContext from "components/contexts/FullscreenContext";
-import { useMountEffect } from "utils/hooks";
+import ConfirmModal from "~/components/common/ConfirmModal";
+import FullscreenContext from "~/components/contexts/FullscreenContext";
+import { useMountEffect } from "~/utils/hooks";
 
 const isSupported = screenfull.isEnabled;
 const isStandalone =
@@ -27,7 +27,7 @@ const FullscreenContainer = ({ children }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
   useMountEffect(() => {
-    if (isPreferred && !isEnabled && process.env.NODE_ENV !== "development") {
+    if (isPreferred && !isEnabled && import.meta.env.PROD) {
       setModalOpen(true);
     }
   });

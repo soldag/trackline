@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 import { Box, Modal, ModalDialog } from "@mui/joy";
 
-import ResponsiveQrCode from "components/common/ResponsiveQrCode";
+import ResponsiveQrCode from "~/components/common/ResponsiveQrCode";
 
 const QrCodeModal = ({ joinUrl, open, onClose }) => (
   <Modal open={open} onClose={onClose} onClick={onClose}>

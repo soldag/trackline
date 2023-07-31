@@ -2,8 +2,8 @@ import { createReducer } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-import { resetState } from "store/common/actions";
-import { isSuccess } from "store/utils/matchers";
+import { resetState } from "~/store/common/actions";
+import { isSuccess } from "~/store/utils/matchers";
 
 import {
   completeAuth,

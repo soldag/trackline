@@ -24,7 +24,7 @@ function* handleAction(saga, options = {}, action) {
     const { result } = yield race(tasks);
     return result;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") {
+    if (import.meta.env.DEV) {
       console.error(e);
     }
     throw e;

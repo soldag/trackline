@@ -4,8 +4,8 @@ import { useZxing } from "react-zxing";
 
 import { Box, CircularProgress } from "@mui/joy";
 
-import { JOIN_URL_REGEX } from "constants";
-import SxType from "types/mui";
+import { JOIN_URL_REGEX } from "~/constants";
+import SxType from "~/types/mui";
 
 const QrScanner = ({ sx, onResult = () => {} }) => {
   const lastGameId = useRef();
