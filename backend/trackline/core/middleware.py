@@ -1,10 +1,12 @@
 import asyncio
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 import logging
 import random
 import time
 
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from injector import Injector
 from pymongo.errors import OperationFailure
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -15,10 +17,9 @@ from starlette.websockets import WebSocket
 
 from trackline.core.db.client import DatabaseClient
 from trackline.core.exceptions import RequestException
-from trackline.core.schemas import ErrorDetail
+from trackline.core.schemas import Error, ErrorDetail, ErrorResponse
 from trackline.core.settings import Settings
 from trackline.core.utils.datetime import utcnow
-from trackline.core.utils.response import make_error
 
 
 log = logging.getLogger(__name__)
@@ -77,7 +78,7 @@ class ExceptionHandlingMiddleware:
         try:
             await self.app(scope, receive, send)
         except RequestValidationError as exc:
-            await make_error(
+            await self._create_response(
                 code="VALIDATION_ERROR",
                 message="The request is invalid.",
                 details=[
@@ -87,14 +88,14 @@ class ExceptionHandlingMiddleware:
                 status_code=400,
             )(scope, receive, send)
         except RequestException as exc:
-            await make_error(
+            await self._create_response(
                 code=exc.code,
                 message=exc.message,
                 status_code=exc.status_code,
             )(scope, receive, send)
         except Exception:
             log.exception("Unhandled exception", exc_info=True)
-            await make_error(
+            await self._create_response(
                 code="UNEXPECTED_ERROR",
                 message="An unexpected error occurred.",
                 status_code=500,
@@ -113,6 +114,18 @@ class ExceptionHandlingMiddleware:
         except Exception:
             log.exception("Unhandled exception", exc_info=True)
             await ws.close(code=1008)
+
+    def _create_response(
+        self,
+        code: str,
+        message: str,
+        status_code: int,
+        details: Sequence[ErrorDetail] | None = None,
+    ) -> JSONResponse:
+        content = ErrorResponse(
+            error=Error(code=code, message=message, details=details),
+        )
+        return JSONResponse(jsonable_encoder(content, exclude_none=True), status_code)
 
 
 class DatabaseTransactionMiddleware(BaseHTTPMiddleware):
@@ -136,7 +149,7 @@ class DatabaseTransactionMiddleware(BaseHTTPMiddleware):
                     raise e
 
                 if retries >= settings.db_txn_retries_max:
-                    return make_error(
+                    raise RequestException(
                         status_code=409,
                         code="REQUEST_CONFLICT",
                         message="The request could not be executed due to a conflict with another request.",
