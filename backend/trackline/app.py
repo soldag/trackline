@@ -16,6 +16,7 @@ from trackline.core.middleware import (
     NoIndexMiddleware,
     ServerTimeMiddleware,
 )
+from trackline.core.schemas import ErrorResponse
 from trackline.games.di import GamesModule
 from trackline.games.router import router as games_router
 from trackline.spotify.client import SpotifyClient
@@ -30,6 +31,9 @@ log = logging.getLogger(__name__)
 app = FastAPI(
     title="Trackline",
     dependencies=[Depends(websocket_logger)],
+    responses={
+        422: {"description": "Validation Error", "model": ErrorResponse},
+    },
 )
 
 injector = Injector([CoreModule(), GamesModule(), SpotifyModule()])
