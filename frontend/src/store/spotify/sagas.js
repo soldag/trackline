@@ -130,12 +130,14 @@ function* pollPlayback() {
 function* simulatePlayback() {
   yield waitForPlaybackState({ isPlaying: true });
 
-  const interval = PLAYBACK_SIMULATE_PROGRESS_INTERVAL;
   while (true) {
     const { paused } = yield race({
       progressIncreased: (function* () {
-        yield delay(interval);
-        yield put(increasePlaybackProgress({ value: interval }));
+        const startTimestamp = Date.now();
+        yield delay(PLAYBACK_SIMULATE_PROGRESS_INTERVAL);
+        const actualDelay = Date.now() - startTimestamp;
+
+        yield put(increasePlaybackProgress({ value: actualDelay }));
       })(),
       paused: waitForPlaybackState({ isPlaying: false }),
     });
