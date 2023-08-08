@@ -78,9 +78,7 @@ const GuessTrackCard = ({
         "flexGrow": 0,
         "flexDirection": "row",
         "& button": {
-          "flexGrow": 1,
-          "&:not(:first-child)": { ml: "3px" },
-          "&:not(:last-child)": { mr: "3px" },
+          flexGrow: 1,
         },
       }}
     >
