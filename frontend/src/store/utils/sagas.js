@@ -1,4 +1,5 @@
-import { put, race, take, takeEvery } from "redux-saga/effects";
+import { eventChannel } from "redux-saga";
+import { fork, put, race, take, takeEvery } from "redux-saga/effects";
 
 export function* ignoreError(effect, { filter, fallbackValue = null } = {}) {
   try {
@@ -8,6 +9,28 @@ export function* ignoreError(effect, { filter, fallbackValue = null } = {}) {
       return fallbackValue;
     }
     throw e;
+  }
+}
+
+export function* runWhileVisible(effect) {
+  const visibilityEventChannel = eventChannel((emitter) => {
+    document.addEventListener("visibilitychange", emitter);
+    return () => document.removeEventListener("visibilitychange", emitter);
+  });
+
+  let task = yield fork(effect);
+  try {
+    while (true) {
+      yield take(visibilityEventChannel);
+
+      if (document.visibilityState === "hidden") {
+        task.cancel();
+      } else if (task.isCancelled) {
+        task = yield fork(effect);
+      }
+    }
+  } finally {
+    task.cancel();
   }
 }
 

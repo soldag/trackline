@@ -10,7 +10,11 @@ import {
   PLAYBACK_SIMULATE_PROGRESS_INTERVAL,
   RECOMMENDED_PLAYLIST_IDS,
 } from "~/constants";
-import { ignoreError, registerSagaHandlers } from "~/store/utils/sagas";
+import {
+  ignoreError,
+  registerSagaHandlers,
+  runWhileVisible,
+} from "~/store/utils/sagas";
 
 import {
   completeAuth,
@@ -85,25 +89,28 @@ function* handleSetVolume({ volume }) {
 function* handleWatchPlayback() {
   let progressSimulator = yield fork(simulatePlayback);
 
-  while (true) {
-    const { cancellation } = yield race({
-      listener: pollPlayback(),
-      play: take(play.SUCCESS),
-      pause: take(pause.SUCCESS),
-      volume: take(setVolume.SUCCESS),
-      cancellation: take(unwatchPlayback),
-    });
+  try {
+    while (true) {
+      const { cancellation } = yield race({
+        listener: runWhileVisible(pollPlayback),
+        play: take(play.SUCCESS),
+        pause: take(pause.SUCCESS),
+        volume: take(setVolume.SUCCESS),
+        cancellation: take(unwatchPlayback),
+      });
 
-    if (cancellation) {
-      progressSimulator.cancel();
-      return;
+      if (cancellation) {
+        break;
+      }
+
+      // Playback state returned by Spotify API might not reflect
+      // actual state for a short time after it was altered. To prevent
+      // getting outdated data we pause polling after every
+      // play/pause/volume command for a few seconds.
+      yield delay(PLAYBACK_POLL_COMMAND_COOLDOWN);
     }
-
-    // Playback state returned by Spotify API might not reflect
-    // actual state for a short time after it was altered. To prevent
-    // getting outdated data we pause polling after every
-    // play/pause/volume command for a few seconds.
-    yield delay(PLAYBACK_POLL_COMMAND_COOLDOWN);
+  } finally {
+    progressSimulator.cancel();
   }
 }
 
