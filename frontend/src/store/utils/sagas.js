@@ -31,6 +31,7 @@ export function* runWhileVisible(effect) {
     }
   } finally {
     task.cancel();
+    visibilityEventChannel.close();
   }
 }
 
