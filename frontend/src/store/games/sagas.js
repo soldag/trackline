@@ -181,22 +181,20 @@ function* handleListenNotifications({ gameId }) {
 }
 
 function* setupNotificationsListener({ gameId, reconnect = false }) {
-  const subscribe = () =>
-    eventChannel((emitter) => {
-      const url = tracklineApi.notifications.getWebSocketUrl(gameId);
-      const ws = new WebSocket(url);
+  const channel = eventChannel((emitter) => {
+    const url = tracklineApi.notifications.getWebSocketUrl(gameId);
+    const ws = new WebSocket(url);
 
-      ws.addEventListener("open", () => emitter(WS_OPEN));
-      ws.addEventListener("message", ({ data }) =>
-        emitter(camelizeKeys(JSON.parse(data))),
-      );
-      ws.addEventListener("error", () => emitter(END));
-      ws.addEventListener("close", () => emitter(END));
+    ws.addEventListener("open", () => emitter(WS_OPEN));
+    ws.addEventListener("message", ({ data }) =>
+      emitter(camelizeKeys(JSON.parse(data))),
+    );
+    ws.addEventListener("error", () => emitter(END));
+    ws.addEventListener("close", () => emitter(END));
 
-      return () => ws.close(1000);
-    });
+    return () => ws.close(1000);
+  });
 
-  const channel = yield call(subscribe);
   try {
     while (true) {
       const notification = yield take(channel);
