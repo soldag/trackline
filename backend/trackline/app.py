@@ -6,8 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_injector import attach_injector, InjectorMiddleware
 from injector import Injector
 
-from trackline.auth.deps import websocket_logger
 from trackline.auth.router import router as auth_router
+from trackline.core.deps import websocket_logger
 from trackline.core.di import CoreModule
 from trackline.core.middleware import (
     DatabaseTransactionMiddleware,

@@ -1,10 +1,9 @@
 import logging
 from typing import Annotated
 
-from fastapi import Depends, Query, Request, WebSocket
+from fastapi import Depends, Query, Request
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_injector import Injected
-from starlette.requests import HTTPConnection
 
 from trackline.auth.repository import SessionRepository
 from trackline.auth.use_cases import GetSessionUser
@@ -13,18 +12,6 @@ from trackline.core.fields import ResourceId
 
 
 log = logging.getLogger(__name__)
-
-
-def websocket_logger(connection: HTTPConnection):
-    if not isinstance(connection, WebSocket):
-        yield
-        return
-
-    log.info(f"GET {connection.url.path} - Websocket opened")
-    try:
-        yield
-    finally:
-        log.info(f"GET {connection.url.path} - Websocket closed")
 
 
 class OptionalHTTPBearer(HTTPBearer):
