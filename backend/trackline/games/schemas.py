@@ -22,7 +22,7 @@ from trackline.users.schemas import UserOut
 class TrackOut(BaseModel):
     spotify_id: str
     title: str
-    artists: str
+    artists: list[str]
     release_year: int
     image_url: str | None = None
 

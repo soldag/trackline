@@ -5,7 +5,7 @@ import { GAME_STATES } from "~/constants";
 export const TrackType = PropTypes.shape({
   spotifyId: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  artists: PropTypes.string.isRequired,
+  artists: PropTypes.arrayOf(PropTypes.string).isRequired,
   releaseYear: PropTypes.number.isRequired,
   imageUrl: PropTypes.string.isRequired,
 });

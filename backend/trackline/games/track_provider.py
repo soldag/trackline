@@ -92,7 +92,7 @@ class TrackProvider:
                 return Track(
                     spotify_id=track.id,
                     title=clean_title,
-                    artists=", ".join(track.artists),
+                    artists=track.artists,
                     release_year=release_year,
                     image_url=track.image_url,
                 )

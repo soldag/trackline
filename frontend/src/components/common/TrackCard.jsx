@@ -48,7 +48,7 @@ const TrackCard = ({ sx, track, onClick }) => (
         {track.title}
       </Typography>
       <Typography fontSize="md" textColor="neutral.300">
-        {track.artists}
+        {track.artists.join(", ")}
       </Typography>
     </CardContent>
   </Card>
