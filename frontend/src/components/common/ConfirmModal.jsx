@@ -7,7 +7,9 @@ const ConfirmModal = ({
   open,
   header,
   children,
+  canConfirm = true,
   confirmLabel,
+  showCancel = true,
   canCancel = true,
   cancelLabel,
   onConfirm,
@@ -54,8 +56,13 @@ const ConfirmModal = ({
         )}
 
         <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-          {canCancel && (
-            <Button variant="soft" color="neutral" onClick={onClose}>
+          {showCancel && (
+            <Button
+              variant="soft"
+              color="neutral"
+              disabled={!canCancel}
+              onClick={onClose}
+            >
               {cancelLabel || (
                 <FormattedMessage
                   id="ConfirmModal.cancel"
@@ -64,7 +71,7 @@ const ConfirmModal = ({
               )}
             </Button>
           )}
-          <Button onClick={handleConfirm}>
+          <Button disabled={!canConfirm} onClick={handleConfirm}>
             {confirmLabel || (
               <FormattedMessage
                 id="ConfirmModal.confirm"
@@ -82,7 +89,9 @@ ConfirmModal.propTypes = {
   open: PropTypes.bool,
   header: PropTypes.node,
   children: PropTypes.node,
+  canConfirm: PropTypes.bool,
   confirmLabel: PropTypes.node,
+  showCancel: PropTypes.bool,
   canCancel: PropTypes.bool,
   cancelLabel: PropTypes.node,
   onConfirm: PropTypes.func,

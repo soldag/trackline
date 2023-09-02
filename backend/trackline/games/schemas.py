@@ -1,3 +1,4 @@
+import abc
 from collections.abc import Mapping
 from datetime import datetime
 
@@ -5,14 +6,19 @@ from pydantic import BaseModel
 
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
-    CategoryScoring,
+    CreditsGuess,
+    CreditsScoring,
     Game,
     GameSettings,
     GameState,
-    Guess,
     Player,
+    ReleaseYearGuess,
+    ReleaseYearScoring,
+    Scoring,
     Track,
     Turn,
+    TurnGuesses,
+    TurnPass,
     TurnScoring,
 )
 from trackline.games.notifier import Notification
@@ -24,7 +30,7 @@ class TrackOut(BaseModel):
     title: str
     artists: list[str]
     release_year: int
-    image_url: str | None = None
+    image_url: str | None
 
     @staticmethod
     def from_model(model: Track) -> "TrackOut":
@@ -53,43 +59,122 @@ class PlayerOut(BaseModel):
         )
 
 
-class GuessOut(BaseModel):
+class GuessOut(BaseModel, abc.ABC):
     user_id: ResourceId
     creation_time: datetime
-    position: int | None = None
-    release_year: int | None = None
+    token_cost: int
+
+
+class ReleaseYearGuessOut(GuessOut):
+    position: int
+    year: int
 
     @staticmethod
-    def from_model(model: Guess, user_id: ResourceId) -> "GuessOut":
-        return GuessOut(
+    def from_model(
+        model: ReleaseYearGuess, user_id: ResourceId
+    ) -> "ReleaseYearGuessOut":
+        return ReleaseYearGuessOut(
             user_id=user_id,
             creation_time=model.creation_time,
+            token_cost=model.token_cost,
             position=model.position,
-            release_year=model.release_year,
+            year=model.year,
         )
 
 
-class CategoryScoringOut(BaseModel):
-    winner: ResourceId | None = None
-    tokens_delta: Mapping[ResourceId, int]
+class CreditsGuessOut(GuessOut):
+    artists: list[str]
+    title: str
 
     @staticmethod
-    def from_model(model: CategoryScoring) -> "CategoryScoringOut":
-        return CategoryScoringOut(
+    def from_model(model: CreditsGuess, user_id: ResourceId) -> "CreditsGuessOut":
+        return CreditsGuessOut(
+            user_id=user_id,
+            creation_time=model.creation_time,
+            token_cost=model.token_cost,
+            artists=model.artists,
+            title=model.title,
+        )
+
+
+class TurnGuessesOut(BaseModel):
+    release_year: list[ReleaseYearGuessOut] = []
+    credits: list[CreditsGuessOut] = []
+
+    @staticmethod
+    def from_model(model: TurnGuesses) -> "TurnGuessesOut":
+        return TurnGuessesOut(
+            release_year=[
+                ReleaseYearGuessOut.from_model(guess, user_id)
+                for user_id, guess in model.release_year.items()
+            ],
+            credits=[
+                CreditsGuessOut.from_model(guess, user_id)
+                for user_id, guess in model.credits.items()
+            ],
+        )
+
+
+class TurnPassOut(BaseModel):
+    user_id: ResourceId
+    creation_time: datetime
+
+    @staticmethod
+    def from_model(user_id: ResourceId, model: TurnPass) -> "TurnPassOut":
+        return TurnPassOut(user_id=user_id, creation_time=model.creation_time)
+
+
+class ScoringOut(BaseModel):
+    winner: ResourceId | None
+    correct_guesses: list[ResourceId]
+    token_gain: Mapping[ResourceId, int]
+
+    @staticmethod
+    def from_model(model: Scoring) -> "ScoringOut":
+        return ScoringOut(
             winner=model.winner,
-            tokens_delta=model.tokens_delta,
+            correct_guesses=model.correct_guesses,
+            token_gain=model.token_gain,
+        )
+
+
+class ReleaseYearScoringOut(BaseModel):
+    position: ScoringOut
+    year: ScoringOut
+
+    @staticmethod
+    def from_model(model: ReleaseYearScoring) -> "ReleaseYearScoringOut":
+        return ReleaseYearScoringOut(
+            position=ScoringOut.from_model(model.position),
+            year=ScoringOut.from_model(model.year),
+        )
+
+
+class CreditsScoringOut(BaseModel):
+    winner: ResourceId | None
+    correct_guesses: list[ResourceId]
+    token_gain: Mapping[ResourceId, int]
+    similarity_scores: dict[ResourceId, float]
+
+    @staticmethod
+    def from_model(model: CreditsScoring) -> "CreditsScoringOut":
+        return CreditsScoringOut(
+            winner=model.winner,
+            correct_guesses=model.correct_guesses,
+            token_gain=model.token_gain,
+            similarity_scores=model.similarity_scores,
         )
 
 
 class TurnScoringOut(BaseModel):
-    position: CategoryScoringOut
-    release_year: CategoryScoringOut
+    release_year: ReleaseYearScoringOut
+    credits: CreditsScoringOut
 
     @staticmethod
     def from_model(model: TurnScoring) -> "TurnScoringOut":
         return TurnScoringOut(
-            position=CategoryScoringOut.from_model(model.position),
-            release_year=CategoryScoringOut.from_model(model.release_year),
+            release_year=ReleaseYearScoringOut.from_model(model.release_year),
+            credits=CreditsScoringOut.from_model(model.credits),
         )
 
 
@@ -97,8 +182,9 @@ class TurnOut(BaseModel):
     creation_time: datetime
     active_user_id: ResourceId
     track: TrackOut
-    guesses: list[GuessOut]
-    scoring: TurnScoringOut | None = None
+    guesses: TurnGuessesOut
+    passes: list[TurnPassOut]
+    scoring: TurnScoringOut | None
     completed_by: list[ResourceId]
 
     @staticmethod
@@ -107,9 +193,10 @@ class TurnOut(BaseModel):
             creation_time=model.creation_time,
             active_user_id=model.active_user_id,
             track=TrackOut.from_model(model.track),
-            guesses=[
-                GuessOut.from_model(guess, user_id)
-                for user_id, guess in model.guesses.items()
+            guesses=TurnGuessesOut.from_model(model.guesses),
+            passes=[
+                TurnPassOut.from_model(user_id, turn_pass)
+                for user_id, turn_pass in model.passes.items()
             ],
             scoring=TurnScoringOut.from_model(model.scoring) if model.scoring else None,
             completed_by=model.completed_by,
@@ -190,8 +277,16 @@ class TrackExchanged(Notification):
     track: TrackOut
 
 
-class NewGuess(Notification):
-    guess: GuessOut
+class ReleaseYearGuessCreated(Notification):
+    guess: ReleaseYearGuessOut
+
+
+class CreditsGuessCreated(Notification):
+    guess: CreditsGuessOut
+
+
+class TurnPassed(Notification):
+    turn_pass: TurnPassOut
 
 
 class TurnScored(Notification):

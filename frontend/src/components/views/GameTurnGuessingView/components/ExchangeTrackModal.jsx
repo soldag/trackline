@@ -17,7 +17,7 @@ const ExchangeTrackModal = ({ open, onConfirm, onClose }) => (
     }
   >
     <FormattedMessage
-      id="GameTurnGuessingView.ExchangeTrackModal.mainContent"
+      id="GameTurnGuessingView.ExchangeTrackModal.content"
       defaultMessage="Do you want to exchange the current track by paying {cost} token?"
       values={{ cost: TOKEN_COST_EXCHANGE_TRACK }}
     />

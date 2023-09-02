@@ -17,28 +17,61 @@ export const PlayerType = PropTypes.shape({
   timeline: PropTypes.arrayOf(TrackType).isRequired,
 });
 
-export const GuessType = PropTypes.shape({
+const GuessProps = {
   creationTime: PropTypes.string.isRequired,
   userId: PropTypes.string.isRequired,
-  position: PropTypes.number,
-  releaseYear: PropTypes.number,
+  tokenCost: PropTypes.number.isRequired,
+};
+export const GuessType = PropTypes.shape(GuessProps);
+
+export const ReleaseYearGuessType = PropTypes.shape({
+  ...GuessProps,
+  position: PropTypes.number.isRequired,
+  year: PropTypes.number.isRequired,
 });
 
-export const CategoryScoringType = PropTypes.shape({
+export const CreditsGuessType = PropTypes.shape({
+  ...GuessProps,
+  artists: PropTypes.arrayOf(PropTypes.string).isRequired,
+  title: PropTypes.string.isRequired,
+});
+
+export const TurnPassType = PropTypes.shape({
+  userId: PropTypes.string.isRequired,
+  creationTime: PropTypes.string.isRequired,
+});
+
+const ScoringProps = {
   winner: PropTypes.string,
-  tokensDelta: PropTypes.objectOf(PropTypes.number).isRequired,
+  correctGuesses: PropTypes.arrayOf(PropTypes.string).isRequired,
+  tokenGain: PropTypes.objectOf(PropTypes.number).isRequired,
+};
+export const ScoringType = PropTypes.shape(ScoringProps);
+
+export const ReleaseYearScoringType = PropTypes.shape({
+  position: ScoringType.isRequired,
+  year: ScoringType.isRequired,
+});
+
+export const CreditsScoringType = PropTypes.shape({
+  ...ScoringProps,
+  similarityScores: PropTypes.objectOf(PropTypes.number).isRequired,
 });
 
 export const TurnScoringType = PropTypes.shape({
-  position: CategoryScoringType,
-  releaseYear: CategoryScoringType,
+  releaseYear: ReleaseYearScoringType,
+  credits: CreditsScoringType,
 });
 
 export const TurnType = PropTypes.shape({
   creationTime: PropTypes.string.isRequired,
   activeUserId: PropTypes.string.isRequired,
   track: TrackType.isRequired,
-  guesses: PropTypes.arrayOf(GuessType).isRequired,
+  guesses: PropTypes.shape({
+    releaseYear: PropTypes.arrayOf(ReleaseYearGuessType).isRequired,
+    credits: PropTypes.arrayOf(CreditsGuessType).isRequired,
+  }),
+  passes: PropTypes.arrayOf(TurnPassType).isRequired,
   scoring: TurnScoringType,
   completedBy: PropTypes.arrayOf(PropTypes.string).isRequired,
 });

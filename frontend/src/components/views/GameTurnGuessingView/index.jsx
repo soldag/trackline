@@ -3,42 +3,47 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box } from "@mui/joy";
 
-import StatusBar from "~/components/views/GameTurnGuessingView/components/StatusBar";
 import View from "~/components/views/View";
 import {
+  TOKEN_COST_CREDITS_GUESS,
   TOKEN_COST_EXCHANGE_TRACK,
-  TOKEN_COST_POSITION_GUESS,
-  TOKEN_COST_YEAR_GUESS,
+  TOKEN_COST_RELEASE_YEAR_GUESS,
 } from "~/constants";
 import {
   exchangeTrack,
-  guessTrack,
-  rejectGuess,
+  guessTrackCredits,
+  guessTrackReleaseYear,
+  passTurn,
   scoreTurn,
 } from "~/store/games/actions";
 import { play } from "~/store/spotify/actions";
-import { isValidGuess } from "~/utils/games";
 import { useErrorToast, useInterval, useLoadingSelector } from "~/utils/hooks";
 
+import ExchangeTrackModal from "./components/ExchangeTrackModal";
+import GuessCreditsModal from "./components/GuessCreditsModal";
+import GuessReleaseYearModal from "./components/GuessReleaseYearModal";
+import PassTurnModal from "./components/PassTurnModal";
+import SideMenu from "./components/SideMenu";
+import StatusBar from "./components/StatusBar";
 import Timeline from "./components/Timeline";
 
-// You can only guess the exact year when guessing the position, too
-const TOKEN_COST_YEAR_GUESS_TOTAL =
-  TOKEN_COST_POSITION_GUESS + TOKEN_COST_YEAR_GUESS;
+const hasTokensToGuess = (turn, player, cost) => {
+  const isActivePlayer = turn?.activeUserId === player?.userId;
+  const hasEnoughTokens = player?.tokens >= cost;
 
-const canGuess = (turn, player, cost) =>
-  turn?.activeUserId === player?.userId || player?.tokens >= cost;
+  return isActivePlayer || hasEnoughTokens;
+};
 
 const getTimeout = (game, turn, timeDeviation) => {
-  const activePlayerGuess = turn.guesses.find(
-    (g) => g.userId === turn.activeUserId,
+  const activeUserPass = turn.passes.find(
+    (p) => p.userId === turn.activeUserId,
   );
-  if (!activePlayerGuess) {
+
+  if (!activeUserPass) {
     return { timeoutStart: null, timeoutEnd: null };
   }
 
-  const { creationTime } = activePlayerGuess;
-  const timeoutStart = Date.parse(creationTime) + timeDeviation;
+  const timeoutStart = Date.parse(activeUserPass.creationTime) + timeDeviation;
   const timeoutEnd = timeoutStart + game.settings.guessTimeout;
 
   return { timeoutStart, timeoutEnd };
@@ -46,6 +51,10 @@ const getTimeout = (game, turn, timeDeviation) => {
 
 const GameTurnGuessingView = () => {
   const [tracks, setTracks] = useState([]);
+  const [releaseYearModalOpen, setReleaseYearModalOpen] = useState(false);
+  const [creditsModalOpen, setCreditsModalOpen] = useState(false);
+  const [passTurnModalOpen, setPassTurnModalOpen] = useState(false);
+  const [exchangeTrackModalOpen, setExchangeTrackModalOpen] = useState(false);
   const [scoringTriggered, setScoringTriggered] = useState(false);
 
   const dispatch = useDispatch();
@@ -56,42 +65,59 @@ const GameTurnGuessingView = () => {
     (state) => state.timing.timeDeviation.trackline,
   );
 
+  const loadingReleaseYearGuess = useLoadingSelector(guessTrackReleaseYear);
+  const loadingCreditsGuess = useLoadingSelector(guessTrackCredits);
+  const loadingPassTurn = useLoadingSelector(passTurn);
   const loadingExchangeTrack = useLoadingSelector(exchangeTrack);
-  const loadingGuessTrack = useLoadingSelector(guessTrack);
-  const loadingRejectGuess = useLoadingSelector(rejectGuess);
-  useErrorToast(exchangeTrack, guessTrack, rejectGuess, scoreTurn);
+
+  useErrorToast(
+    exchangeTrack,
+    guessTrackReleaseYear,
+    guessTrackCredits,
+    passTurn,
+    scoreTurn,
+  );
 
   const gameId = game?.id;
   const turnId = game.turns.length - 1;
   const turn = game.turns[turnId];
-  const guess = turn?.guesses.find((g) => g.userId === user?.id);
   const currentPlayer = game?.players.find((p) => p.userId === user?.id);
   const { isGameMaster = false } = currentPlayer || {};
   const activePlayer = game?.players.find(
     (p) => p.userId === turn.activeUserId,
   );
   const isActivePlayer = user?.id === turn?.activeUserId;
+  const hasPassed = turn?.passes?.some((p) => p.userId === user?.id);
 
-  const canGuessPosition =
-    guess == null && canGuess(turn, currentPlayer, TOKEN_COST_POSITION_GUESS);
-  const canGuessYear =
-    guess == null && canGuess(turn, currentPlayer, TOKEN_COST_YEAR_GUESS_TOTAL);
+  const releaseYearGuess = turn.guesses.releaseYear.find(
+    (g) => g.userId === user?.id,
+  );
+  const creditsGuess = turn.guesses.credits.find((g) => g.userId === user?.id);
+
+  const canGuessReleaseYear =
+    !hasPassed &&
+    releaseYearGuess == null &&
+    hasTokensToGuess(turn, currentPlayer, TOKEN_COST_RELEASE_YEAR_GUESS);
+  const canGuessCredits =
+    !hasPassed &&
+    creditsGuess == null &&
+    hasTokensToGuess(turn, currentPlayer, TOKEN_COST_CREDITS_GUESS);
   const canExchangeTrack =
-    guess == null && activePlayer?.tokens >= TOKEN_COST_EXCHANGE_TRACK;
+    !hasPassed && activePlayer?.tokens >= TOKEN_COST_EXCHANGE_TRACK;
 
   const { timeoutStart, timeoutEnd } = getTimeout(game, turn, timeDeviation);
 
   useEffect(() => {
-    if (guess == null) {
+    if (releaseYearGuess == null) {
       setTracks([turn.track, ...activePlayer.timeline]);
-    } else if (guess.position != null) {
+    } else if (releaseYearGuess.position != null) {
       setTracks([
-        ...activePlayer.timeline.slice(0, guess.position),
+        ...activePlayer.timeline.slice(0, releaseYearGuess.position),
         turn.track,
-        ...activePlayer.timeline.slice(guess.position),
+        ...activePlayer.timeline.slice(releaseYearGuess.position),
       ]);
     }
-  }, [guess, turn.track, activePlayer.timeline]);
+  }, [releaseYearGuess, turn.track, activePlayer.timeline]);
 
   useInterval(() => {
     if (
@@ -106,15 +132,25 @@ const GameTurnGuessingView = () => {
   }, 1000);
 
   useEffect(() => {
+    if (!hasPassed && !canGuessReleaseYear && !canGuessCredits) {
+      dispatch(passTurn({ gameId, turnId }));
+    }
+  }, [
+    dispatch,
+    hasPassed,
+    canGuessReleaseYear,
+    canGuessCredits,
+    gameId,
+    turnId,
+  ]);
+
+  useEffect(() => {
     if (!isActivePlayer || scoringTriggered) return;
 
-    const hasOutstandingGuesses = game.players.some(
-      (p) =>
-        !turn.guesses.some((g) => g.userId == p.userId) &&
-        (p.userId === turn.activeUserId ||
-          p.tokens >= TOKEN_COST_POSITION_GUESS),
+    const haveAllPlayersPassed = game.players.every(({ userId }) =>
+      turn.passes.some((p) => p.userId === userId),
     );
-    if (!hasOutstandingGuesses) {
+    if (haveAllPlayersPassed) {
       setScoringTriggered(true);
       dispatch(scoreTurn({ gameId, turnId }));
     }
@@ -126,23 +162,33 @@ const GameTurnGuessingView = () => {
     }
   }, [dispatch, turn.track.spotifyId, isGameMaster]);
 
-  const handleGuess = ({ year }) => {
-    const index = tracks.findIndex((t) => t.spotifyId === turn.track.spotifyId);
+  const handleGuessReleaseYear = ({ position, year }) => {
     dispatch(
-      guessTrack({
+      guessTrackReleaseYear({
         gameId,
         turnId,
-        position: index >= 0 ? index : null,
-        releaseYear: year,
+        position,
+        year,
       }),
     );
   };
 
-  const handleReject = () => {
-    dispatch(rejectGuess({ gameId, turnId }));
+  const handleGuessCredits = ({ artists, title }) => {
+    dispatch(
+      guessTrackCredits({
+        gameId,
+        turnId,
+        artists,
+        title,
+      }),
+    );
   };
 
-  const handleExchange = () => {
+  const handlePassTurn = () => {
+    dispatch(passTurn({ gameId, turnId }));
+  };
+
+  const handleExchangeTrack = () => {
     dispatch(exchangeTrack({ gameId, turnId }));
   };
 
@@ -156,38 +202,75 @@ const GameTurnGuessingView = () => {
       disablePadding
       disableScrolling
     >
+      <GuessReleaseYearModal
+        open={releaseYearModalOpen}
+        tracks={tracks}
+        activeTrackId={turn?.track?.spotifyId}
+        onConfirm={handleGuessReleaseYear}
+        onClose={() => setReleaseYearModalOpen(false)}
+      />
+      <GuessCreditsModal
+        open={creditsModalOpen}
+        onConfirm={handleGuessCredits}
+        onClose={() => setCreditsModalOpen(false)}
+      />
+      <ExchangeTrackModal
+        open={exchangeTrackModalOpen}
+        onConfirm={handleExchangeTrack}
+        onClose={() => setExchangeTrackModalOpen(false)}
+      />
+      <PassTurnModal
+        open={passTurnModalOpen}
+        canGuessReleaseYear={canGuessReleaseYear}
+        canGuessCredits={canGuessCredits}
+        onConfirm={handlePassTurn}
+        onClose={() => setPassTurnModalOpen(false)}
+      />
+
       <Box
         sx={{
-          "display": "flex",
-          "px": 2,
-          "py": 1,
-          "overflowX": "auto",
-          "WebkitOverflowScrolling": "touch",
-          "msOverflowStyle": "none",
-          "scrollbarWidth": "none",
-          "&::-webkit-scrollbar": { display: "none" },
+          display: "flex",
+          py: 1,
         }}
       >
-        <Timeline
-          tracks={tracks}
-          activeTrackId={turn.track.spotifyId}
-          showRange={isValidGuess(guess)}
-          canGuessPosition={canGuessPosition}
-          canGuessYear={canGuessYear}
-          showExchange={isActivePlayer}
-          canExchange={canExchangeTrack}
-          showReject={!isActivePlayer}
-          canReject={canGuessPosition || canGuessYear}
-          timeoutStart={timeoutStart}
-          timeoutEnd={timeoutEnd}
-          loadingGuess={loadingGuessTrack}
-          loadingReject={loadingRejectGuess}
-          loadingExchange={loadingExchangeTrack}
-          onTracksChange={setTracks}
-          onGuess={handleGuess}
-          onReject={handleReject}
-          onExchange={handleExchange}
+        <SideMenu
+          showExchangeTrack={isActivePlayer}
+          canExchangeTrack={canExchangeTrack}
+          canPassTurn={!hasPassed}
+          loadingPassTurn={loadingPassTurn}
+          loadingExchangeTrack={loadingExchangeTrack}
+          onExchangeTrack={() => setExchangeTrackModalOpen(true)}
+          onPassTurn={() => setPassTurnModalOpen(true)}
         />
+        <Box
+          sx={{
+            "display": "flex",
+            "ml": "-5px",
+            "pl": (theme) => `calc(${theme.spacing(1)} + 5px)`,
+            "pr": 2,
+            "overflowX": "auto",
+            "WebkitOverflowScrolling": "touch",
+            "msOverflowStyle": "none",
+            "scrollbarWidth": "none",
+            "&::-webkit-scrollbar": { display: "none" },
+          }}
+        >
+          <Timeline
+            tracks={tracks}
+            activeTrackId={turn?.track?.spotifyId}
+            releaseYearGuess={releaseYearGuess}
+            creditsGuess={creditsGuess}
+            canGuessReleaseYear={canGuessReleaseYear}
+            canGuessCredits={canGuessCredits}
+            loadingReleaseYearGuess={loadingReleaseYearGuess}
+            loadingCreditsGuess={loadingCreditsGuess}
+            timeoutStart={timeoutStart}
+            timeoutEnd={timeoutEnd}
+            onTracksChange={setTracks}
+            onGuessReleaseYear={() => setReleaseYearModalOpen(true)}
+            onGuessCredits={() => setCreditsModalOpen(true)}
+          />
+        </Box>
       </Box>
 
       <Box

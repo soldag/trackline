@@ -1,10 +1,13 @@
+import abc
 from collections.abc import Collection, Sequence
+from typing import Mapping
 
 from injector import Inject
 
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
-from trackline.games.models import Game, Track
+from trackline.games.models import Game, Guess, Track, Turn
+from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import GameState
 from trackline.games.track_provider import TrackProvider
@@ -40,6 +43,16 @@ class BaseHandler:
                 code="NO_GAME_MASTER",
                 message="Only the game master can perform this operation.",
                 status_code=403,
+            )
+
+    def _assert_has_not_passed(
+        self, game: Game, turn_id: int, user_id: ResourceId
+    ) -> None:
+        if user_id in game.turns[turn_id].passes:
+            raise UseCaseException(
+                code="TURN_PASSED",
+                message="You have passed already this turn.",
+                status_code=400,
             )
 
     def _assert_has_tokens(self, game: Game, user_id: ResourceId, tokens: int) -> None:
@@ -154,3 +167,48 @@ class TrackProvidingBaseHandler(BaseHandler):
             )
 
         return track
+
+
+class CreateGuessBaseHandler(BaseHandler, abc.ABC):
+    def __init__(
+        self,
+        game_repository: Inject[GameRepository],
+        notifier: Inject[Notifier],
+    ) -> None:
+        super().__init__(game_repository)
+        self._notifier = notifier
+
+    @abc.abstractmethod
+    def _get_guesses(self, turn: Turn) -> Mapping[ResourceId, Guess]:
+        pass
+
+    def _get_token_cost(self, user_id: ResourceId, game: Game, base_cost: int) -> int:
+        active_player = game.get_active_player()
+        if active_player and active_player.user_id == user_id:
+            return 0
+
+        return base_cost
+
+    def _assert_can_guess(
+        self, user_id: ResourceId, game: Game, turn_id: int, token_cost: int
+    ) -> None:
+        self._assert_is_player(game, user_id)
+        self._assert_has_state(game, GameState.GUESSING)
+        self._assert_is_active_turn(game, turn_id)
+
+        turn = game.turns[turn_id]
+        if user_id in self._get_guesses(turn):
+            raise UseCaseException(
+                code="TURN_GUESSED",
+                message="You have already guessed this item for this turn.",
+                status_code=400,
+            )
+        if user_id in turn.passes:
+            raise UseCaseException(
+                code="TURN_PASSED",
+                message="You have already passed for this turn.",
+                status_code=400,
+            )
+
+        if token_cost > 0:
+            self._assert_has_tokens(game, user_id, token_cost)

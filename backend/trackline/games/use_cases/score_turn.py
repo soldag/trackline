@@ -1,16 +1,23 @@
+from collections import defaultdict
+from typing import TypeVar
+
 from injector import Inject
 from pydantic import BaseModel
 
 from trackline.constants import (
-    TOKEN_COST_POSITION_GUESS,
-    TOKEN_COST_YEAR_GUESS,
+    CREDITS_GUESS_MIN_SIMILARITY,
+    TOKEN_GAIN_CREDITS_GUESS,
     TOKEN_GAIN_YEAR_GUESS,
 )
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
-    CategoryScoring,
+    CreditsGuess,
+    CreditsScoring,
     Game,
     Guess,
+    ReleaseYearGuess,
+    ReleaseYearScoring,
+    Scoring,
     Track,
     Turn,
     TurnScoring,
@@ -18,7 +25,12 @@ from trackline.games.models import (
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import GameState, TurnScored, TurnScoringOut
+from trackline.games.string_similarity import compare_strings
 from trackline.games.use_cases.base import BaseHandler
+from trackline.games.utils import is_valid_release_year
+
+
+GuessT = TypeVar("GuessT", bound=Guess)
 
 
 class ScoreTurn(BaseModel):
@@ -47,34 +59,19 @@ class ScoreTurn(BaseModel):
             assert current_player
 
             turn = game.turns[use_case.turn_id]
-            sorted_guesses = dict(
-                sorted(
-                    turn.guesses.items(),
-                    key=lambda kv: (kv[0] != turn.active_user_id, kv[1].creation_time),
-                )
-            )
-            tokens = {p.user_id: p.tokens for p in game.players}
+            release_year_scoring = await self._score_release_year(game, turn)
+            credits_scoring = self._score_credits(game, turn)
 
-            position_scoring = await self._score_position(
-                game, turn, sorted_guesses, tokens
+            token_gain = self._merge_token_gain(
+                release_year_scoring.position.token_gain,
+                release_year_scoring.year.token_gain,
+                credits_scoring.token_gain,
             )
-            tokens = self._apply_tokens_delta(tokens, position_scoring.tokens_delta)
-
-            release_year_scoring = self._score_release_year(
-                game, turn, sorted_guesses, tokens
-            )
-            tokens = self._apply_tokens_delta(tokens, release_year_scoring.tokens_delta)
-
-            tokens_delta = {
-                p.user_id: tokens[p.user_id] - p.tokens
-                for p in game.players
-                if tokens[p.user_id] != p.tokens
-            }
-            await self._game_repository.inc_tokens(game.id, tokens_delta)
+            await self._game_repository.inc_tokens(game.id, token_gain)
 
             scoring = TurnScoring(
-                position=position_scoring,
                 release_year=release_year_scoring,
+                credits=credits_scoring,
             )
             await self._game_repository.set_turn_scoring(
                 game.id, use_case.turn_id, scoring
@@ -92,115 +89,181 @@ class ScoreTurn(BaseModel):
 
             return scoring_out
 
-        async def _score_position(
+        def _sort_guesses(
+            self,
+            guesses: dict[ResourceId, GuessT],
+            active_user_id: ResourceId,
+        ) -> dict[ResourceId, GuessT]:
+            return dict(
+                sorted(
+                    guesses.items(),
+                    key=lambda kv: (kv[0] != active_user_id, kv[1].creation_time),
+                )
+            )
+
+        async def _score_release_year(
             self,
             game: Game,
             turn: Turn,
-            sorted_guesses: dict[ResourceId, Guess],
-            tokens: dict[ResourceId, int],
-        ) -> CategoryScoring:
-            seen_positions = set()
-            tokens_delta: dict[ResourceId, int] = {}
+        ) -> ReleaseYearScoring:
+            guesses = turn.guesses.release_year
+            sorted_guesses = self._sort_guesses(guesses, turn.active_user_id)
+
+            position_scoring = await self._score_release_year_position(
+                game, turn, sorted_guesses
+            )
+            year_scoring = self._score_release_year_year(turn, sorted_guesses)
+
+            return ReleaseYearScoring(position=position_scoring, year=year_scoring)
+
+        async def _score_release_year_position(
+            self,
+            game: Game,
+            turn: Turn,
+            sorted_guesses: dict[ResourceId, ReleaseYearGuess],
+        ) -> Scoring:
+            active_player = game.get_active_player()
+            assert active_player
+
+            seen_positions: set[int] = set()
             winner: ResourceId | None = None
+            token_gain: dict[ResourceId, int] = {}
 
-            for guess_user_id, guess in sorted_guesses.items():
-                if guess.position is None or guess.position in seen_positions:
-                    continue
-
-                player = game.get_player(guess_user_id)
-                active_player = game.get_active_player()
-                if not player or not active_player:
-                    continue
-
-                is_active_player = guess_user_id == active_player.user_id
-                if (
-                    not is_active_player
-                    and tokens[guess_user_id] < TOKEN_COST_POSITION_GUESS
-                ):
-                    continue
-
-                position_correct = self._check_position(
-                    active_player.timeline, turn.track, guess.position
+            correct_guesses = [
+                user_id
+                for user_id, guess in sorted_guesses.items()
+                if is_valid_release_year(
+                    active_player.timeline, guess.position, turn.track.release_year
                 )
-                if position_correct and not winner:
-                    winner = guess_user_id
+            ]
+            for user_id, guess in sorted_guesses.items():
+                player = game.get_player(user_id)
+                if not player:
+                    continue
+
+                is_correct = user_id in correct_guesses
+                is_duplicate = guess.position in seen_positions
+                if is_correct and not winner:
+                    winner = user_id
                     position = self._get_track_position(player.timeline, turn.track)
                     await self._game_repository.insert_in_timeline(
                         game.id, player.user_id, turn.track, position
                     )
-
-                # There might be multiple correct positions. If the position is correct,
-                # but there's already a winner, the player shouldn't be penalized as this
-                # is the same as if they had guessed the same position.
-                if not is_active_player and (not position_correct or not winner):
-                    tokens_delta[guess_user_id] = -TOKEN_COST_POSITION_GUESS
+                elif is_correct or is_duplicate:
+                    # Duplicate guesses are ignored and these players get
+                    # their spent token back. There might be multiple correct
+                    # positions that's why we also need to check for is_correct.
+                    token_gain[user_id] = guess.token_cost
 
                 seen_positions.add(guess.position)
 
-            return CategoryScoring(winner=winner, tokens_delta=tokens_delta)
-
-        def _check_position(
-            self, timeline: list[Track], track: Track, position: int
-        ) -> bool:
-            if position is None:
-                return False
-
-            if position == 0:
-                min_year = 0
-            else:
-                min_year = timeline[position - 1].release_year
-
-            max_year = None
-            if position < len(timeline):
-                max_year = timeline[position].release_year
-
-            return min_year <= track.release_year and (
-                not max_year or track.release_year <= max_year
+            return Scoring(
+                winner=winner,
+                correct_guesses=correct_guesses,
+                token_gain=token_gain,
             )
 
-        def _score_release_year(
+        def _score_release_year_year(
+            self,
+            turn: Turn,
+            sorted_guesses: dict[ResourceId, ReleaseYearGuess],
+        ) -> Scoring:
+            winner: ResourceId | None = None
+            token_gain: dict[ResourceId, int] = {}
+
+            correct_guesses = [
+                user_id
+                for user_id, guess in sorted_guesses.items()
+                if guess.year == turn.track.release_year
+            ]
+            for user_id in sorted_guesses.keys():
+                if user_id in correct_guesses:
+                    winner = user_id
+                    token_gain[user_id] = TOKEN_GAIN_YEAR_GUESS
+                    break
+
+            return Scoring(
+                winner=winner,
+                correct_guesses=correct_guesses,
+                token_gain=token_gain,
+            )
+
+        def _score_credits(
             self,
             game: Game,
             turn: Turn,
-            sorted_guesses: dict[ResourceId, Guess],
-            tokens: dict[ResourceId, int],
-        ) -> CategoryScoring:
-            seen_years = set()
-            tokens_delta: dict[ResourceId, int] = {}
+        ) -> CreditsScoring:
+            token_gain: dict[ResourceId, int] = defaultdict(lambda: 0)
+
+            active_player = game.get_active_player()
+            assert active_player
+
+            guesses = turn.guesses.credits
+            sorted_guesses = self._sort_guesses(guesses, turn.active_user_id)
+
             winner: ResourceId | None = None
-
-            for guess_user_id, guess in sorted_guesses.items():
-                if guess.release_year is None or guess.release_year in seen_years:
-                    continue
-
-                player = game.get_player(guess_user_id)
-                active_player = game.get_active_player()
-                if not player or not active_player:
-                    continue
-
-                is_active_player = guess_user_id == active_player.user_id
-                if (
-                    not is_active_player
-                    and tokens[guess_user_id] < TOKEN_COST_YEAR_GUESS
-                ):
-                    continue
-
-                year_correct = guess.release_year == turn.track.release_year
-                if year_correct and not winner:
-                    winner = guess_user_id
-                    tokens_delta[guess_user_id] = TOKEN_GAIN_YEAR_GUESS
-
-                if not is_active_player and guess_user_id != winner:
-                    tokens_delta[guess_user_id] = -TOKEN_COST_POSITION_GUESS
-
-                seen_years.add(guess.release_year)
-
-            return CategoryScoring(winner=winner, tokens_delta=tokens_delta)
-
-        def _apply_tokens_delta(
-            self, tokens: dict[ResourceId, int], delta: dict[ResourceId, int]
-        ) -> dict[ResourceId, int]:
-            return {
-                user_id: curr_tokens + delta.get(user_id, 0)
-                for user_id, curr_tokens in tokens.items()
+            similarity_scores = {
+                user_id: self._get_credits_similarity(turn.track, guess)
+                for user_id, guess in guesses.items()
             }
+            correct_credits = [
+                user_id
+                for user_id, similarity in similarity_scores.items()
+                if similarity >= CREDITS_GUESS_MIN_SIMILARITY
+            ]
+
+            seen_guesses: list[CreditsGuess] = []
+            for user_id, guess in sorted_guesses.items():
+                player = game.get_player(user_id)
+                if not player:
+                    continue
+
+                is_correct = user_id in correct_credits
+                seen_guesses_similarities = [
+                    self._get_credits_similarity(turn.track, guess)
+                    for guess in seen_guesses
+                ]
+                is_duplicate = (
+                    similarity >= CREDITS_GUESS_MIN_SIMILARITY
+                    for similarity in seen_guesses_similarities
+                )
+                if is_correct and not winner:
+                    winner = user_id
+                    token_gain[user_id] = TOKEN_GAIN_CREDITS_GUESS
+                    if user_id != active_player.user_id:
+                        # Passive players get their stake back
+                        token_gain[user_id] += guess.token_cost
+                elif is_correct or is_duplicate:
+                    # Duplicate guesses are ignored and these players get
+                    # their spent token back
+                    token_gain[user_id] = guess.token_cost
+
+                seen_guesses.append(guess)
+
+            return CreditsScoring(
+                token_gain=token_gain,
+                winner=winner,
+                correct_guesses=correct_credits,
+                similarity_scores=similarity_scores,
+            )
+
+        def _get_credits_similarity(self, track: Track, guess: CreditsGuess) -> float:
+            sim_artists = [
+                max(
+                    compare_strings(track_artist, guess_artist)
+                    for guess_artist in guess.artists
+                )
+                for track_artist in track.artists
+            ]
+            sim_title = compare_strings(track.title, guess.title)
+            return (sum(sim_artists) + sim_title) / (len(sim_artists) + 1)
+
+        def _merge_token_gain(
+            self, *deltas: dict[ResourceId, int]
+        ) -> dict[ResourceId, int]:
+            result: dict[ResourceId, int] = {}
+            for delta in deltas:
+                for user_id, token_delta in delta.items():
+                    result[user_id] = result.get(user_id, 0) + token_delta
+
+            return result

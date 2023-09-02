@@ -10,15 +10,30 @@ import NumericDelta from "~/components/common/NumericDelta";
 import ShadowTable from "~/components/common/ShadowTable";
 import { PlayerType, TurnType } from "~/types/games";
 import { UserType } from "~/types/users";
+import { getTotalTokenGain } from "~/utils/games";
 
-const getTracksDelta = (userId, turn) =>
-  turn?.scoring?.position?.winner === userId ? 1 : 0;
+const getTracksDelta = (userId, turn) => {
+  if (!turn?.scoring) {
+    return 0;
+  }
 
-const getTokensDelta = (userId, turn) =>
-  Object.values(turn?.scoring || {})
-    .filter((s) => s.tokensDelta != null)
-    .map((s) => s.tokensDelta[userId] || 0)
+  return turn.scoring.releaseYear.position.winner === userId ? 1 : 0;
+};
+
+const getTokensDelta = (userId, turn) => {
+  if (!turn?.scoring) {
+    return 0;
+  }
+
+  const tokenGain = getTotalTokenGain(userId, turn.scoring);
+  const tokenCost = Object.values(turn.guesses)
+    .flat()
+    .filter((g) => g.userId === userId)
+    .map((g) => g.tokenCost)
     .reduce((acc, curr) => acc + curr, 0);
+
+  return tokenGain - tokenCost;
+};
 
 const getPosition = (player, players) =>
   players.filter(

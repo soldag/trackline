@@ -66,6 +66,10 @@ export default defineMessages({
     id: "ApiErrors.turnNotFound",
     defaultMessage: "The turn does not exist.",
   },
+  TURN_PASSED: {
+    id: "ApiErrors.turnPassed",
+    defaultMessage: "You have already passed this turn.",
+  },
   UNEXPECTED_STATE: {
     id: "ApiErrors.unexpectedState",
     defaultMessage:

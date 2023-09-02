@@ -16,26 +16,30 @@ from trackline.core.exceptions import RequestException
 from trackline.core.fields import ResourceId
 from trackline.core.schemas import EntityResponse, Response
 from trackline.games.schemas import (
+    CreditsGuessOut,
     GameOut,
-    GuessOut,
+    ReleaseYearGuessOut,
     TrackOut,
     TrackPurchaseReceiptOut,
     TurnCompletionOut,
     TurnOut,
+    TurnPassOut,
     TurnScoringOut,
 )
 from trackline.games.use_cases import (
     AbortGame,
     BuyTrack,
     CompleteTurn,
+    CreateCreditsGuess,
     CreateGame,
-    CreateGuess,
+    CreateReleaseYearGuess,
     CreateTurn,
     ExchangeTrack,
     GetGame,
     GetGameUsers,
     JoinGame,
     LeaveGame,
+    PassTurn,
     RegisterNotificationChannel,
     ScoreTurn,
     StartGame,
@@ -137,24 +141,59 @@ async def create_turn(
 
 
 @dataclass
-class CreateGuessParams:
-    game_id: ResourceId = Path()
-    turn_id: int = Path()
-    position: int | None = Body(None)
-    release_year: int | None = Body(None)
+class CreateReleaseYearGuessParams:
+    game_id: Annotated[ResourceId, Path()]
+    turn_id: Annotated[int, Path()]
+    position: Annotated[int, Body()]
+    year: Annotated[int, Body()]
 
-    def to_use_case(self) -> CreateGuess:
-        return CreateGuess(**asdict(self))
+    def to_use_case(self) -> CreateReleaseYearGuess:
+        return CreateReleaseYearGuess(**asdict(self))
 
 
-@router.post("/{game_id}/turns/{turn_id}/guess")
-async def create_guess(
+@router.post("/{game_id}/turns/{turn_id}/guesses/release-year")
+async def create_release_year_guess(
     auth_user_id: AuthUserId,
-    params: Annotated[CreateGuessParams, Depends()],
-    handler: Annotated[CreateGuess.Handler, Injected(CreateGuess.Handler)],
-) -> EntityResponse[GuessOut]:
-    turn_out = await handler.execute(auth_user_id, params.to_use_case())
-    return EntityResponse(data=turn_out)
+    params: Annotated[CreateReleaseYearGuessParams, Depends()],
+    handler: Annotated[
+        CreateReleaseYearGuess.Handler, Injected(CreateReleaseYearGuess.Handler)
+    ],
+) -> EntityResponse[ReleaseYearGuessOut]:
+    guess_out = await handler.execute(auth_user_id, params.to_use_case())
+    return EntityResponse(data=guess_out)
+
+
+@dataclass
+class CreateCreditsGuessParams:
+    game_id: Annotated[ResourceId, Path()]
+    turn_id: Annotated[int, Path()]
+    artists: Annotated[list[str], Body()]
+    title: Annotated[str, Body()]
+
+    def to_use_case(self) -> CreateCreditsGuess:
+        return CreateCreditsGuess(**asdict(self))
+
+
+@router.post("/{game_id}/turns/{turn_id}/guesses/credits")
+async def create_credits_guess(
+    auth_user_id: AuthUserId,
+    params: Annotated[CreateCreditsGuessParams, Depends()],
+    handler: Annotated[
+        CreateCreditsGuess.Handler, Injected(CreateCreditsGuess.Handler)
+    ],
+) -> EntityResponse[CreditsGuessOut]:
+    guess_out = await handler.execute(auth_user_id, params.to_use_case())
+    return EntityResponse(data=guess_out)
+
+
+@router.post("/{game_id}/turns/{turn_id}/pass")
+async def pass_turn(
+    auth_user_id: AuthUserId,
+    use_case: Annotated[PassTurn, Depends()],
+    handler: Annotated[PassTurn.Handler, Injected(PassTurn.Handler)],
+) -> EntityResponse[TurnPassOut]:
+    turn_pass_out = await handler.execute(auth_user_id, use_case)
+    return EntityResponse(data=turn_pass_out)
 
 
 @router.post("/{game_id}/turns/{turn_id}/score")

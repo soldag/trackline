@@ -6,13 +6,13 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { Button, Stack } from "@mui/joy";
 
 import TrackCard from "~/components/common/TrackCard";
-import BuyTrackModal from "~/components/views/GameTurnScoringView/components/BuyTrackModal";
 import View from "~/components/views/View";
 import { TOKEN_COST_BUY_TRACK } from "~/constants";
 import { buyTrack, completeTurn } from "~/store/games/actions";
 import { useConfetti, useStars } from "~/utils/confetti";
 import { useErrorToast, useLoadingSelector } from "~/utils/hooks";
 
+import BuyTrackModal from "./components/BuyTrackModal";
 import ScoringTabs from "./components/ScoringTabs";
 
 const GameTurnScoringView = () => {
@@ -36,19 +36,24 @@ const GameTurnScoringView = () => {
   const hasCompletedTurn = turn.completedBy.includes(userId);
   const canBuyTrack =
     !hasCompletedTurn && currentPlayer?.tokens >= TOKEN_COST_BUY_TRACK;
-  const isPositionWinner = turn?.scoring?.position?.winner === userId;
-  const isReleaseYearWinner = turn?.scoring?.releaseYear?.winner === userId;
 
+  const showStars = turn?.scoring?.releaseYear?.position?.winner === userId;
   const { start: startStars } = useStars();
-  const { start: startConfetti } = useConfetti();
-
   useEffect(() => {
-    if (isPositionWinner) {
+    if (showStars) {
       startStars();
-    } else if (isReleaseYearWinner) {
+    }
+  }, [showStars, startStars]);
+
+  const showConfetti =
+    turn?.scoring?.releaseYear?.year?.winner === userId ||
+    turn?.scoring?.credits?.winner === userId;
+  const { start: startConfetti } = useConfetti();
+  useEffect(() => {
+    if (showConfetti) {
       startConfetti();
     }
-  }, [isPositionWinner, isReleaseYearWinner, startStars, startConfetti]);
+  }, [showConfetti, startConfetti]);
 
   return (
     <View

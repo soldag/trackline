@@ -24,25 +24,28 @@ import {
   completeTurn,
   createGame,
   createTurn,
+  creditsGuessCreated,
   exchangeTrack,
   fetchGame,
   fetchGameUsers,
   gameAborted,
   gameStarted,
-  guessTrack,
+  guessTrackCredits,
+  guessTrackReleaseYear,
   joinGame,
   leaveGame,
   listenNotifications,
+  passTurn,
   playerJoined,
   playerLeft,
-  rejectGuess,
+  releaseYearGuessCreated,
   scoreTurn,
   startGame,
   trackBought,
   trackExchanged,
-  trackGuessed,
   turnCompleted,
   turnCreated,
+  turnPassed,
   turnScored,
   unlistenNotifications,
 } from "./actions";
@@ -55,8 +58,10 @@ const NOTIFICATION_ACTIONS = {
   game_started: gameStarted,
   game_aborted: gameAborted,
   new_turn: turnCreated,
-  new_guess: trackGuessed,
+  release_year_guess_created: releaseYearGuessCreated,
+  credits_guess_created: creditsGuessCreated,
   track_exchanged: trackExchanged,
+  turn_passed: turnPassed,
   turn_completed: turnCompleted,
   turn_scored: turnScored,
   track_bought: trackBought,
@@ -112,24 +117,32 @@ function* handleCreateTurn({ gameId }) {
   return { turn };
 }
 
-function* handleGuessTrack({
-  gameId,
-  turnId,
-  position = null,
-  releaseYear = null,
-}) {
-  const guess = yield call(tracklineApi.games.createGuess, {
+function* handleGuessTrackReleaseYear({ gameId, turnId, position, year }) {
+  const guess = yield call(tracklineApi.games.createReleaseYearGuess, {
     gameId,
     turnId,
     position,
-    releaseYear,
+    year,
   });
+
   return { guess };
 }
 
-function* handleRejectGuess({ gameId, turnId }) {
-  const guess = yield call(tracklineApi.games.createGuess, { gameId, turnId });
+function* handleGuessTrackCredits({ gameId, turnId, artists, title }) {
+  const guess = yield call(tracklineApi.games.createCreditsGuess, {
+    gameId,
+    turnId,
+    artists,
+    title,
+  });
+
   return { guess };
+}
+
+function* handlePassTurn({ gameId, turnId }) {
+  const turnPass = yield call(tracklineApi.games.passTurn, { gameId, turnId });
+
+  return { turnPass };
 }
 
 function* handleScoreTurn({ gameId, turnId }) {
@@ -241,8 +254,9 @@ export default registerSagaHandlers([
   [leaveGame, handleLeaveGame],
   [createTurn, handleCreateTurn],
   [exchangeTrack, handleExchangeTrack],
-  [guessTrack, handleGuessTrack],
-  [rejectGuess, handleRejectGuess],
+  [guessTrackReleaseYear, handleGuessTrackReleaseYear],
+  [guessTrackCredits, handleGuessTrackCredits],
+  [passTurn, handlePassTurn],
   [scoreTurn, handleScoreTurn],
   [completeTurn, handleCompleteTurn],
   [buyTrack, handleBuyTrack],

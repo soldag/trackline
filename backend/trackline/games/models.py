@@ -1,3 +1,4 @@
+import abc
 from datetime import datetime
 from enum import Enum
 
@@ -32,27 +33,56 @@ class Player(BaseModel):
     timeline: list[Track] = []
 
 
-class Guess(BaseModel):
+class Guess(BaseModel, abc.ABC):
     creation_time: datetime = Field(default_factory=utcnow)
-    position: int | None = None
-    release_year: int | None = None
+    token_cost: int
 
 
-class CategoryScoring(BaseModel):
-    winner: ResourceId | None = None
-    tokens_delta: dict[ResourceId, int]
+class ReleaseYearGuess(Guess):
+    position: int
+    year: int
+
+
+class CreditsGuess(Guess):
+    artists: list[str]
+    title: str
+
+
+class TurnPass(BaseModel):
+    creation_time: datetime = Field(default_factory=utcnow)
+
+
+class Scoring(BaseModel):
+    winner: ResourceId | None
+    correct_guesses: list[ResourceId]
+    token_gain: dict[ResourceId, int]
+
+
+class ReleaseYearScoring(BaseModel):
+    position: Scoring
+    year: Scoring
+
+
+class CreditsScoring(Scoring):
+    similarity_scores: dict[ResourceId, float]
 
 
 class TurnScoring(BaseModel):
-    position: CategoryScoring
-    release_year: CategoryScoring
+    release_year: ReleaseYearScoring
+    credits: CreditsScoring
+
+
+class TurnGuesses(BaseModel):
+    release_year: dict[ResourceId, ReleaseYearGuess] = {}
+    credits: dict[ResourceId, CreditsGuess] = {}
 
 
 class Turn(BaseModel):
     creation_time: datetime = Field(default_factory=utcnow)
     active_user_id: ResourceId
     track: Track
-    guesses: dict[ResourceId, Guess] = {}
+    guesses: TurnGuesses = TurnGuesses()
+    passes: dict[ResourceId, TurnPass] = {}
     scoring: TurnScoring | None = None
     completed_by: list[ResourceId] = []
 

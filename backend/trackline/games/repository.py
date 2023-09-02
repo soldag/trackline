@@ -2,7 +2,17 @@ from collections.abc import Mapping
 
 from trackline.core.db.repository import Repository
 from trackline.core.fields import ResourceId
-from trackline.games.models import Game, Guess, Player, Track, Turn, TurnScoring
+from trackline.games.models import (
+    CreditsGuess,
+    Game,
+    Guess,
+    Player,
+    ReleaseYearGuess,
+    Track,
+    Turn,
+    TurnPass,
+    TurnScoring,
+)
 
 
 class GameRepository(Repository[Game]):
@@ -41,7 +51,9 @@ class GameRepository(Repository[Game]):
             {
                 "$set": {
                     f"turns.{turn_id}.track": self._to_document(track, root=False),
-                    f"turns.{turn_id}.guesses": {},
+                    f"turns.{turn_id}.guesses.releaseYear": {},
+                    f"turns.{turn_id}.guesses.credits": {},
+                    f"turns.{turn_id}.passes": {},
                 },
                 "$push": {
                     "discarded_track_ids": old_track_id,
@@ -52,13 +64,59 @@ class GameRepository(Repository[Game]):
     async def add_guess(
         self, game_id: ResourceId, turn_id: int, user_id: ResourceId, guess: Guess
     ) -> int:
+        match guess:
+            case ReleaseYearGuess():
+                guess_type = "release_year"
+            case CreditsGuess():
+                guess_type = "credits"
+            case _:
+                raise ValueError("Invalid guess type")
+
         return await self._update_one(
             self._id_query(game_id),
             {
                 "$set": {
-                    f"turns.{turn_id}.guesses.{user_id}": self._to_document(
-                        guess, root=False
+                    f"turns.{turn_id}.guesses.{guess_type}.{user_id}": self._to_document(
+                        guess,
+                        root=False,
                     )
+                }
+            },
+        )
+
+    async def add_turn_pass(
+        self,
+        game_id: ResourceId,
+        turn_id: int,
+        user_id: ResourceId,
+        turn_pass: TurnPass,
+    ) -> int:
+        return await self._update_one(
+            self._id_query(game_id),
+            {
+                "$set": {
+                    f"turns.{turn_id}.passes.{user_id}": self._to_document(
+                        turn_pass,
+                        root=False,
+                    ),
+                }
+            },
+        )
+
+    async def validate_credits_guess(
+        self,
+        game_id: ResourceId,
+        turn_id: int,
+        user_id: ResourceId,
+        is_correct: bool,
+    ) -> int:
+        guess_path = f"turns.{turn_id}.guesses.credits.{user_id}"
+        return await self._update_one(
+            self._id_query(game_id),
+            {
+                "$set": {
+                    f"{guess_path}.is_validated": True,
+                    f"{guess_path}.is_correct": is_correct,
                 }
             },
         )

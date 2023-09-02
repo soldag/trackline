@@ -24,7 +24,7 @@ const SpotifyContainer = ({ children }) => {
       <ConfirmModal
         open={needsAuth}
         onConfirm={() => dispatch(startAuth())}
-        canCancel={false}
+        showCancel={false}
         header={
           <FormattedMessage
             id="SpotifyContainer.authModal.header"

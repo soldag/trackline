@@ -1,0 +1,50 @@
+from typing import Mapping
+
+from pydantic import BaseModel
+
+from trackline.constants import TOKEN_COST_CREDITS_GUESS
+from trackline.core.fields import ResourceId
+from trackline.games.models import CreditsGuess, Guess, Turn
+from trackline.games.schemas import CreditsGuessCreated, CreditsGuessOut
+from trackline.games.use_cases.base import CreateGuessBaseHandler
+
+
+class CreateCreditsGuess(BaseModel):
+    game_id: ResourceId
+    turn_id: int
+    artists: list[str]
+    title: str
+
+    class Handler(CreateGuessBaseHandler):
+        def _get_guesses(self, turn: Turn) -> Mapping[ResourceId, Guess]:
+            return turn.guesses.credits
+
+        async def execute(
+            self, user_id: ResourceId, use_case: "CreateCreditsGuess"
+        ) -> CreditsGuessOut:
+            game = await self._get_game(use_case.game_id)
+            token_cost = self._get_token_cost(user_id, game, TOKEN_COST_CREDITS_GUESS)
+            self._assert_can_guess(user_id, game, use_case.turn_id, token_cost)
+
+            guess = CreditsGuess(
+                token_cost=token_cost,
+                artists=use_case.artists,
+                title=use_case.title,
+            )
+            await self._game_repository.add_guess(
+                game.id, use_case.turn_id, user_id, guess
+            )
+
+            if token_cost > 0:
+                await self._game_repository.inc_tokens(
+                    game.id, {user_id: -guess.token_cost}
+                )
+
+            guess_out = CreditsGuessOut.from_model(guess, user_id)
+            await self._notifier.notify(
+                user_id,
+                game,
+                CreditsGuessCreated(guess=guess_out),
+            )
+
+            return guess_out

@@ -36,6 +36,7 @@ class ExchangeTrack(BaseModel):
             self._assert_has_state(game, GameState.GUESSING)
             self._assert_is_active_turn(game, use_case.turn_id)
             self._assert_is_active_player(game, use_case.turn_id, user_id)
+            self._assert_has_not_passed(game, use_case.turn_id, user_id)
             self._assert_has_tokens(game, user_id, TOKEN_COST_EXCHANGE_TRACK)
 
             old_track = game.turns[use_case.turn_id].track

@@ -7,6 +7,7 @@ import {
 } from "~/constants";
 import { resetState } from "~/store/common/actions";
 import { isSuccess } from "~/store/utils/matchers";
+import { getTotalTokenGain } from "~/utils/games";
 
 import {
   abortGame,
@@ -15,24 +16,27 @@ import {
   completeTurn,
   createGame,
   createTurn,
+  creditsGuessCreated,
   exchangeTrack,
   fetchGame,
   fetchGameUsers,
   gameAborted,
   gameStarted,
-  guessTrack,
+  guessTrackCredits,
+  guessTrackReleaseYear,
   joinGame,
   leaveGame,
+  passTurn,
   playerJoined,
   playerLeft,
-  rejectGuess,
+  releaseYearGuessCreated,
   scoreTurn,
   startGame,
   trackBought,
   trackExchanged,
-  trackGuessed,
   turnCompleted,
   turnCreated,
+  turnPassed,
   turnScored,
 } from "./actions";
 
@@ -119,12 +123,46 @@ const reducer = createReducer(initialState, (builder) => {
     )
 
     .addMatcher(
-      isAnyOf(isSuccess(guessTrack, rejectGuess), trackGuessed),
+      isAnyOf(isSuccess(guessTrackReleaseYear), releaseYearGuessCreated),
       (state, { payload: { guess } }) => {
-        const turn = state.game.turns.at(-1);
-        turn.guesses = [
-          ...turn.guesses.filter(({ userId }) => userId !== guess.userId),
+        const guesses = state.game.turns.at(-1).guesses;
+        guesses.releaseYear = [
+          ...guesses.releaseYear.filter(
+            ({ userId }) => userId !== guess.userId,
+          ),
           guess,
+        ];
+
+        const player = state.game.players.find(
+          (p) => p.userId === guess.userId,
+        );
+        player.tokens += guess.tokenCost;
+      },
+    )
+
+    .addMatcher(
+      isAnyOf(isSuccess(guessTrackCredits), creditsGuessCreated),
+      (state, { payload: { guess } }) => {
+        const guesses = state.game.turns.at(-1).guesses;
+        guesses.credits = [
+          ...guesses.credits.filter(({ userId }) => userId !== guess.userId),
+          guess,
+        ];
+
+        const player = state.game.players.find(
+          (p) => p.userId === guess.userId,
+        );
+        player.tokens += guess.tokenCost;
+      },
+    )
+
+    .addMatcher(
+      isAnyOf(isSuccess(passTurn), turnPassed),
+      (state, { payload: { turnPass } }) => {
+        const turn = state.game.turns.at(-1);
+        turn.passes = [
+          ...turn.passes.filter(({ userId }) => userId !== turn.userId),
+          turnPass,
         ];
       },
     )
@@ -132,9 +170,6 @@ const reducer = createReducer(initialState, (builder) => {
     .addMatcher(
       isAnyOf(isSuccess(scoreTurn), turnScored),
       (state, { payload: { scoring } }) => {
-        const { position: positionScoring, releaseYear: releaseYearScoring } =
-          scoring;
-
         state.game.state = GAME_STATES.SCORING;
 
         const turn = state.game.turns.at(-1);
@@ -142,13 +177,15 @@ const reducer = createReducer(initialState, (builder) => {
 
         for (const player of state.game.players) {
           const { userId } = player;
-          player.tokens += positionScoring.tokensDelta[userId] || 0;
-          player.tokens += releaseYearScoring.tokensDelta[userId] || 0;
+          player.tokens += getTotalTokenGain(userId, scoring);
 
-          if (userId === positionScoring.winner) {
+          if (userId === scoring.releaseYear.position.winner) {
+            const guess = turn.guesses.releaseYear.find(
+              (g) => g.userId === userId,
+            );
             const position =
               userId === turn.activeUserId
-                ? turn.guesses.find((g) => g.userId === userId)?.position
+                ? guess?.position
                 : getTrackPosition(player.timeline, turn.track);
 
             if (position != null) {
@@ -197,7 +234,10 @@ const reducer = createReducer(initialState, (builder) => {
       (state, { payload: { track } }) => {
         const turn = state.game.turns.at(-1);
         turn.track = track;
-        turn.guesses = [];
+        turn.passes = [];
+        for (const key of Object.keys(turn.guesses)) {
+          turn.guesses[key] = [];
+        }
 
         const activePlayer = state.game.players.find(
           (p) => p.userId === turn.activeUserId,

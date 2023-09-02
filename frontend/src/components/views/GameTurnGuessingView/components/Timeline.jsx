@@ -1,18 +1,15 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { FormattedMessage } from "react-intl";
 
 import { Stack } from "@mui/joy";
 
 import TrackCard from "~/components/common/TrackCard";
-import YearRange from "~/components/common/YearRange";
-import { TrackType } from "~/types/games";
-
-import ConfirmGuessModal from "./ConfirmGuessModal";
-import ExchangeTrackModal from "./ExchangeTrackModal";
-import GuessTrackCard from "./GuessTrackCard";
-import RejectGuessModal from "./RejectGuessModal";
+import {
+  CreditsGuessType,
+  ReleaseYearGuessType,
+  TrackType,
+} from "~/types/games";
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -25,26 +22,19 @@ const reorder = (list, startIndex, endIndex) => {
 const Timeline = ({
   tracks = [],
   activeTrackId,
-  showRange = false,
-  canGuessPosition = true,
-  canGuessYear = true,
-  showExchange = false,
-  canExchange = false,
-  showReject = false,
-  canReject = false,
-  loadingGuess = false,
-  loadingReject = false,
-  loadingExchange = false,
+  releaseYearGuess,
+  creditsGuess,
+  canGuessReleaseYear,
+  canGuessCredits,
+  loadingReleaseYearGuess,
+  loadingCreditsGuess,
   timeoutStart,
   timeoutEnd,
   onTracksChange,
-  onGuess,
-  onReject,
-  onExchange,
+  onGuessReleaseYear,
+  onGuessCredits,
 }) => {
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [rejectModalOpen, setRejectModalOpen] = useState(false);
-  const [exchangeModalOpen, setExchangeModalOpen] = useState(false);
+  const [isSelectingPosition, setIsSelectingPosition] = useState(false);
 
   const index = tracks.findIndex((t) => t.spotifyId === activeTrackId);
   const minYear = tracks[index - 1]?.releaseYear;
@@ -67,43 +57,19 @@ const Timeline = ({
   };
 
   const handleTrackClick = (newIndex) => {
-    if (!canGuessPosition) {
-      return;
+    if (isSelectingPosition) {
+      onTracksChange(reorder(tracks, index, newIndex));
     }
-
-    onTracksChange(reorder(tracks, index, newIndex));
   };
 
-  const cardHeader = showRange ? (
-    <YearRange min={minYear} max={maxYear} />
-  ) : (
-    <FormattedMessage
-      id="GameTurnGuessingView.Timeline.cardHeader.guess"
-      defaultMessage="Guess the song!"
-    />
-  );
+  useEffect(() => {
+    if (isSelectingPosition && releaseYearGuess) {
+      setIsSelectingPosition(false);
+    }
+  }, [isSelectingPosition, releaseYearGuess]);
 
   return (
     <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <ConfirmGuessModal
-        open={confirmModalOpen}
-        minYear={minYear}
-        maxYear={maxYear}
-        canGuessYear={canGuessYear}
-        onConfirm={onGuess}
-        onClose={() => setConfirmModalOpen(false)}
-      />
-      <RejectGuessModal
-        open={rejectModalOpen}
-        onConfirm={onReject}
-        onClose={() => setRejectModalOpen(false)}
-      />
-      <ExchangeTrackModal
-        open={exchangeModalOpen}
-        onConfirm={onExchange}
-        onClose={() => setExchangeModalOpen(false)}
-      />
-
       <Droppable droppableId="droppable" direction="horizontal">
         {(provided) => (
           <Stack
@@ -119,7 +85,7 @@ const Timeline = ({
                 draggableId={track.spotifyId}
                 index={i}
                 isDragDisabled={
-                  !canGuessPosition || track.spotifyId !== activeTrackId
+                  !isSelectingPosition || track.spotifyId !== activeTrackId
                 }
               >
                 {(provided) => (
@@ -130,21 +96,21 @@ const Timeline = ({
                     style={provided.draggableProps.style}
                   >
                     {track.spotifyId === activeTrackId ? (
-                      <GuessTrackCard
-                        header={cardHeader}
-                        canConfirm={canGuessPosition}
-                        showReject={showReject}
-                        canReject={canReject}
-                        showExchange={showExchange}
-                        canExchange={canExchange}
+                      <TrackCard
+                        releaseYearGuess={releaseYearGuess}
+                        creditsGuess={creditsGuess}
+                        canGuessReleaseYear={canGuessReleaseYear}
+                        canGuessCredits={canGuessCredits}
+                        loadingReleaseYearGuess={loadingReleaseYearGuess}
+                        loadingCreditsGuess={loadingCreditsGuess}
+                        isSelectingPosition={isSelectingPosition}
+                        minReleaseYear={minYear}
+                        maxReleaseYear={maxYear}
                         timeoutStart={timeoutStart}
                         timeoutEnd={timeoutEnd}
-                        loadingConfirm={loadingGuess}
-                        loadingReject={loadingReject}
-                        loadingExchange={loadingExchange}
-                        onConfirm={() => setConfirmModalOpen(true)}
-                        onReject={() => setRejectModalOpen(true)}
-                        onExchange={() => setExchangeModalOpen(true)}
+                        onIsSelectingPositionChanged={setIsSelectingPosition}
+                        onGuessReleaseYear={onGuessReleaseYear}
+                        onGuessCredits={onGuessCredits}
                       />
                     ) : (
                       <TrackCard
@@ -167,22 +133,17 @@ const Timeline = ({
 Timeline.propTypes = {
   tracks: PropTypes.arrayOf(TrackType),
   activeTrackId: PropTypes.string,
-  showRange: PropTypes.bool,
-  canGuessPosition: PropTypes.bool,
-  canGuessYear: PropTypes.bool,
-  showReject: PropTypes.bool,
-  canReject: PropTypes.bool,
-  loadingGuess: PropTypes.bool,
-  loadingReject: PropTypes.bool,
-  loadingExchange: PropTypes.bool,
-  showExchange: PropTypes.bool,
-  canExchange: PropTypes.bool,
+  releaseYearGuess: ReleaseYearGuessType,
+  creditsGuess: CreditsGuessType,
+  canGuessReleaseYear: PropTypes.bool,
+  canGuessCredits: PropTypes.bool,
+  loadingReleaseYearGuess: PropTypes.bool,
+  loadingCreditsGuess: PropTypes.bool,
   timeoutStart: PropTypes.number,
   timeoutEnd: PropTypes.number,
   onTracksChange: PropTypes.func.isRequired,
-  onGuess: PropTypes.func,
-  onReject: PropTypes.func,
-  onExchange: PropTypes.func,
+  onGuessReleaseYear: PropTypes.func.isRequired,
+  onGuessCredits: PropTypes.func.isRequired,
 };
 
 export default Timeline;

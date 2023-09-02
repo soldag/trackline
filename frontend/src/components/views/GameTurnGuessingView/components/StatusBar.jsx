@@ -15,11 +15,12 @@ const StatusBar = ({ game, users, currentUserId }) => {
   const turn = game.turns.at(-1);
   const activeUser = users.find((u) => u.id === turn?.activeUserId);
   const isActivePlayer = activeUser != null && activeUser.id === currentUserId;
-  const challengeGuessesCount = turn?.guesses?.filter(
-    (g) =>
-      g.userId !== turn?.activeUserId &&
-      (g.position != null || g.releaseYear != null),
-  )?.length;
+  const challengeGuessesCount = new Set(
+    Object.values(turn?.guesses || {})
+      .flat()
+      .filter((g) => g.userId !== turn?.activeUserId)
+      .map((g) => g.userId),
+  ).size;
 
   return (
     <Stack
