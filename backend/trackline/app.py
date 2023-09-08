@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import Depends, FastAPI, WebSocket
-from fastapi.exceptions import WebSocketRequestValidationError
+from fastapi.exceptions import RequestValidationError, WebSocketRequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_injector import attach_injector, InjectorMiddleware
 from injector import Injector
@@ -78,6 +78,13 @@ async def on_shutdown():
     await spotify_client.close()
 
     log.info("Application shutdown complete.")
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    # This is needed to disable the builtin error handler of fastapi
+    # and instead use the custom ExceptionHandlingMiddleware
+    raise exc
 
 
 @app.exception_handler(WebSocketRequestValidationError)

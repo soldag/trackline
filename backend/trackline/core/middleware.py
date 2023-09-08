@@ -19,6 +19,7 @@ from trackline.core.db.client import DatabaseClient
 from trackline.core.exceptions import RequestException
 from trackline.core.schemas import Error, ErrorDetail, ErrorResponse
 from trackline.core.settings import Settings
+from trackline.core.utils import list_or_none
 from trackline.core.utils.datetime import utcnow
 
 
@@ -82,7 +83,9 @@ class ExceptionHandlingMiddleware:
                 code="VALIDATION_ERROR",
                 message="The request is invalid.",
                 details=[
-                    ErrorDetail(message=err["msg"], location=err.get("loc"))
+                    ErrorDetail(
+                        message=err["msg"], location=list_or_none(err.get("loc"))
+                    )
                     for err in exc.errors()
                 ],
                 status_code=400,
@@ -123,7 +126,7 @@ class ExceptionHandlingMiddleware:
         details: Sequence[ErrorDetail] | None = None,
     ) -> JSONResponse:
         content = ErrorResponse(
-            error=Error(code=code, message=message, details=details),
+            error=Error(code=code, message=message, details=list_or_none(details)),
         )
         return JSONResponse(jsonable_encoder(content, exclude_none=True), status_code)
 
