@@ -12,13 +12,17 @@ from trackline.spotify.client import PlaylistNotFoundException, SpotifyClient
 
 class TrackProvider:
     TITLE_CLEANUP_PATTERNS = (
-        r" - [^-]*Remaster(ed)?(.*)$",
-        r" - [^-]+ Edit(.*)$",
-        r" - [^-]+ Version(.*)$",
-        r" - [^-]+ Anniversary Edition(.*)$",
         r" - From (.*)$",
         r" - The Original$",
-        r" \(feat\. [^)]+\)",
+        r" - [^-]*Remaster(ed)?(.*)$",
+        r" - [^-]+ Edit(.*)$",
+        r" - [^-]+ Remix(.*)$",
+        r" - [^-]+ Version(.*)$",
+        r" - [^-]+ Anniversary Edition(.*)$",
+        r" \([^\)]+ Edit(.*)\)",
+        r" \([^\)]+ Remix(.*)\)",
+        r" \([^\)]+ Version(.*)\)",
+        r" [\(\[]feat\. [^)]+[\)\]]",
     )
 
     def __init__(
