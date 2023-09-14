@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Link } from "react-router-dom";
 
@@ -8,7 +8,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { Button, Grid, Input } from "@mui/joy";
 
 import ErrorAlert from "~/components/common/ErrorAlert";
-import FormError from "~/components/common/FormError";
+import FormController from "~/components/common/FormController";
 import {
   MAX_PASSWORD_LENGTH,
   MAX_USERNAME_LENGTH,
@@ -50,27 +50,26 @@ const RegisterForm = ({ loading, error, onSubmit, onDismissError }) => {
           </Grid>
         )}
         <Grid xs={12}>
-          <Controller
-            name="username"
-            control={control}
-            rules={buildRules(intl, {
-              required: true,
-              minLength: MIN_USERNAME_LENGTH,
-              maxLength: MAX_USERNAME_LENGTH,
-            })}
-            render={({ field }) => (
-              <FormattedMessage
-                id="RegisterView.RegisterForm.username.placeholder"
-                defaultMessage="Username"
-              >
-                {([label]) => (
+          <FormattedMessage
+            id="RegisterView.RegisterForm.username.placeholder"
+            defaultMessage="Username"
+          >
+            {([placeholder]) => (
+              <FormController
+                name="username"
+                control={control}
+                rules={buildRules(intl, {
+                  required: true,
+                  minLength: MIN_USERNAME_LENGTH,
+                  maxLength: MAX_USERNAME_LENGTH,
+                })}
+                render={({ field }) => (
                   <Input
                     {...field}
                     autoComplete="username"
                     variant="soft"
                     startDecorator={<PersonIcon />}
-                    label={label}
-                    placeholder={label}
+                    placeholder={placeholder}
                     error={!!errors.username}
                     slotProps={{
                       input: {
@@ -80,35 +79,33 @@ const RegisterForm = ({ loading, error, onSubmit, onDismissError }) => {
                     }}
                   />
                 )}
-              </FormattedMessage>
+              />
             )}
-          />
-          {errors.username && <FormError>{errors.username.message}</FormError>}
+          </FormattedMessage>
         </Grid>
 
         <Grid xs={12}>
-          <Controller
-            name="password"
-            control={control}
-            rules={buildRules(intl, {
-              required: true,
-              minLength: MIN_PASSWORD_LENGTH,
-              maxLength: MAX_PASSWORD_LENGTH,
-            })}
-            render={({ field }) => (
-              <FormattedMessage
-                id="RegisterView.RegisterForm.password.label"
-                defaultMessage="Password"
-              >
-                {([label]) => (
+          <FormattedMessage
+            id="RegisterView.RegisterForm.password.label"
+            defaultMessage="Password"
+          >
+            {([placeholder]) => (
+              <FormController
+                name="password"
+                control={control}
+                rules={buildRules(intl, {
+                  required: true,
+                  minLength: MIN_PASSWORD_LENGTH,
+                  maxLength: MAX_PASSWORD_LENGTH,
+                })}
+                render={({ field }) => (
                   <Input
                     {...field}
                     type="password"
                     autoComplete="new-password"
                     variant="soft"
                     startDecorator={<KeyIcon />}
-                    label={label}
-                    placeholder={label}
+                    placeholder={placeholder}
                     error={!!errors.password}
                     slotProps={{
                       input: {
@@ -117,10 +114,9 @@ const RegisterForm = ({ loading, error, onSubmit, onDismissError }) => {
                     }}
                   />
                 )}
-              </FormattedMessage>
+              />
             )}
-          />
-          {errors.password && <FormError>{errors.password.message}</FormError>}
+          </FormattedMessage>
         </Grid>
 
         <Grid xs={6}>
