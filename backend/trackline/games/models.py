@@ -18,6 +18,11 @@ class GameState(str, Enum):
     ABORTED = "aborted"
 
 
+class ArtistsMatchMode(str, Enum):
+    ALL = "all"
+    ONE = "one"
+
+
 class Track(BaseModel):
     spotify_id: str
     title: str
@@ -93,6 +98,8 @@ class GameSettings(BaseModel):
     initial_tokens: int
     timeline_length: int
     guess_timeout: int
+    artists_match_mode: ArtistsMatchMode
+    credits_similarity_threshold: float
 
 
 class Game(IdentifiableModel):

@@ -1,9 +1,12 @@
-from typing import Any, Type
+from typing import Annotated, Any, Type
 
 from bson import ObjectId
-from pydantic import GetCoreSchemaHandler, GetJsonSchemaHandler
+from pydantic import Field, GetCoreSchemaHandler, GetJsonSchemaHandler
 from pydantic.json_schema import JsonSchemaValue
 from pydantic_core import core_schema, CoreSchema
+
+
+Fraction = Annotated[float, Field(ge=0, le=1)]
 
 
 class ResourceId(ObjectId):

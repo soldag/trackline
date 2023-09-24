@@ -77,10 +77,21 @@ function* handleFetchGameUsers({ gameId }) {
   return { users };
 }
 
-function* handleCreateGame({ playlistIds, spotifyMarket }) {
+function* handleCreateGame({
+  playlistIds,
+  spotifyMarket,
+  initialTokens,
+  timelineLength,
+  artistsMatchMode,
+  creditsSimilarityThreshold,
+}) {
   const game = yield call(tracklineApi.games.create, {
     playlistIds,
     spotifyMarket,
+    initialTokens,
+    timelineLength,
+    artistsMatchMode,
+    creditsSimilarityThreshold,
   });
   return { game };
 }

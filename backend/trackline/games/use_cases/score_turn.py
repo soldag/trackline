@@ -5,15 +5,16 @@ from injector import Inject
 from pydantic import BaseModel
 
 from trackline.constants import (
-    CREDITS_GUESS_MIN_SIMILARITY,
     TOKEN_GAIN_CREDITS_GUESS,
     TOKEN_GAIN_YEAR_GUESS,
 )
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
+    ArtistsMatchMode,
     CreditsGuess,
     CreditsScoring,
     Game,
+    GameSettings,
     Guess,
     ReleaseYearGuess,
     ReleaseYearScoring,
@@ -203,13 +204,13 @@ class ScoreTurn(BaseModel):
 
             winner: ResourceId | None = None
             similarity_scores = {
-                user_id: self._get_credits_similarity(turn.track, guess)
+                user_id: self._get_credits_similarity(turn.track, guess, game.settings)
                 for user_id, guess in guesses.items()
             }
             correct_credits = [
                 user_id
                 for user_id, similarity in similarity_scores.items()
-                if similarity >= CREDITS_GUESS_MIN_SIMILARITY
+                if similarity >= game.settings.credits_similarity_threshold
             ]
 
             seen_guesses: list[CreditsGuess] = []
@@ -220,11 +221,11 @@ class ScoreTurn(BaseModel):
 
                 is_correct = user_id in correct_credits
                 seen_guesses_similarities = [
-                    self._get_credits_similarity(turn.track, guess)
+                    self._get_credits_similarity(turn.track, guess, game.settings)
                     for guess in seen_guesses
                 ]
                 is_duplicate = (
-                    similarity >= CREDITS_GUESS_MIN_SIMILARITY
+                    similarity >= game.settings.credits_similarity_threshold
                     for similarity in seen_guesses_similarities
                 )
                 if is_correct and not winner:
@@ -247,16 +248,24 @@ class ScoreTurn(BaseModel):
                 similarity_scores=similarity_scores,
             )
 
-        def _get_credits_similarity(self, track: Track, guess: CreditsGuess) -> float:
-            sim_artists = [
+        def _get_credits_similarity(
+            self, track: Track, guess: CreditsGuess, settings: GameSettings
+        ) -> float:
+            sim_all_artists = [
                 max(
                     compare_strings(track_artist, guess_artist)
                     for guess_artist in guess.artists
                 )
                 for track_artist in track.artists
             ]
+            match settings.artists_match_mode:
+                case ArtistsMatchMode.ALL:
+                    sim_artists = sum(sim_all_artists) / len(track.artists)
+                case ArtistsMatchMode.ONE:
+                    sim_artists = max(sim_all_artists)
+
             sim_title = compare_strings(track.title, guess.title)
-            return (sum(sim_artists) + sim_title) / (len(sim_artists) + 1)
+            return (sim_artists + sim_title) / 2
 
         def _merge_token_gain(
             self, *deltas: dict[ResourceId, int]

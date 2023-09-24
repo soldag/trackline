@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
+    ArtistsMatchMode,
     CreditsGuess,
     CreditsScoring,
     Game,
@@ -209,6 +210,8 @@ class GameSettingsOut(BaseModel):
     initial_tokens: int
     timeline_length: int
     guess_timeout: int
+    artists_match_mode: ArtistsMatchMode
+    credits_similarity_threshold: float
 
     @staticmethod
     def from_model(model: GameSettings) -> "GameSettingsOut":
@@ -218,6 +221,8 @@ class GameSettingsOut(BaseModel):
             initial_tokens=model.initial_tokens,
             timeline_length=model.timeline_length,
             guess_timeout=model.guess_timeout,
+            artists_match_mode=model.artists_match_mode,
+            credits_similarity_threshold=model.credits_similarity_threshold,
         )
 
 

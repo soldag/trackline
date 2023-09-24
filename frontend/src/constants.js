@@ -42,6 +42,44 @@ export const GAME_STATES = {
 };
 export const TURN_GAME_STATES = [GAME_STATES.GUESSING, GAME_STATES.SCORING];
 
+export const ARTIST_MATCH_MODES = {
+  ALL: "all",
+  ONE: "one",
+};
+
+export const CREDITS_STRICTNESS = {
+  EXACT: "exact",
+  STRICT: "strict",
+  MODERATE: "moderate",
+  RELAXED: "relaxed",
+};
+
+export const CREDITS_STRICTNESS_VALUES = {
+  [CREDITS_STRICTNESS.EXACT]: {
+    artistsMatchMode: ARTIST_MATCH_MODES.ALL,
+    creditsSimilarityThreshold: 1.0,
+  },
+  [CREDITS_STRICTNESS.STRICT]: {
+    artistsMatchMode: ARTIST_MATCH_MODES.ALL,
+    creditsSimilarityThreshold: 0.9,
+  },
+  [CREDITS_STRICTNESS.MODERATE]: {
+    artistsMatchMode: ARTIST_MATCH_MODES.ONE,
+    creditsSimilarityThreshold: 0.9,
+  },
+  [CREDITS_STRICTNESS.RELAXED]: {
+    artistsMatchMode: ARTIST_MATCH_MODES.ONE,
+    creditsSimilarityThreshold: 0.8,
+  },
+};
+
+export const DEFAULT_GAME_SETTINGS = {
+  initialTokens: 2,
+  timelineLength: 10,
+  artistsMatchMode: ARTIST_MATCH_MODES.ONE,
+  creditsSimilarityThreshold: 0.9,
+};
+
 export const REQUIRED_SPOTIFY_SCOPES = [
   "playlist-read-private",
   "user-modify-playback-state",

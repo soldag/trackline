@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Button, Stack, Typography } from "@mui/joy";
 
+import ButtonFooter from "~/components/common/ButtonFooter";
 import ResponsiveQrCode from "~/components/common/ResponsiveQrCode";
 import View from "~/components/views/View";
 import { MIN_PLAYER_COUNT } from "~/constants";
@@ -95,48 +96,44 @@ const GameLobbyView = () => {
           </Stack>
         </Stack>
 
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-          {user?.id === gameMasterId ? (
-            <>
-              <Button
-                fullWidth
-                color="danger"
-                loading={loadingAbortGame}
-                onClick={() => dispatch(abortGame({ gameId }))}
-              >
-                <FormattedMessage
-                  id="GameLobbyView.abortGame"
-                  defaultMessage="Abort game"
-                />
-              </Button>
-              <Button
-                fullWidth
-                loading={loadingStartGame}
-                disabled={
-                  loadingStartGame || game.players.length < MIN_PLAYER_COUNT
-                }
-                onClick={() => dispatch(startGame({ gameId }))}
-              >
-                <FormattedMessage
-                  id="GameLobbyView.startGame"
-                  defaultMessage="Start game"
-                />
-              </Button>
-            </>
-          ) : (
+        {user?.id === gameMasterId ? (
+          <ButtonFooter>
             <Button
-              fullWidth
               color="danger"
-              loading={loadingLeaveGame}
-              onClick={() => dispatch(leaveGame({ gameId, userId }))}
+              loading={loadingAbortGame}
+              onClick={() => dispatch(abortGame({ gameId }))}
             >
               <FormattedMessage
-                id="GameLobbyView.leaveGame"
-                defaultMessage="Leave game"
+                id="GameLobbyView.abortGame"
+                defaultMessage="Abort game"
               />
             </Button>
-          )}
-        </Stack>
+            <Button
+              loading={loadingStartGame}
+              disabled={
+                loadingStartGame || game.players.length < MIN_PLAYER_COUNT
+              }
+              onClick={() => dispatch(startGame({ gameId }))}
+            >
+              <FormattedMessage
+                id="GameLobbyView.startGame"
+                defaultMessage="Start game"
+              />
+            </Button>
+          </ButtonFooter>
+        ) : (
+          <Button
+            fullWidth
+            color="danger"
+            loading={loadingLeaveGame}
+            onClick={() => dispatch(leaveGame({ gameId, userId }))}
+          >
+            <FormattedMessage
+              id="GameLobbyView.leaveGame"
+              defaultMessage="Leave game"
+            />
+          </Button>
+        )}
       </Stack>
     </View>
   );

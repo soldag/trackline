@@ -1,11 +1,22 @@
 import instance from "./instance";
 
-export const create = async ({ playlistIds, spotifyMarket }) => {
+export const create = async ({
+  playlistIds,
+  spotifyMarket,
+  initialTokens,
+  timelineLength,
+  artistsMatchMode,
+  creditsSimilarityThreshold,
+}) => {
   const {
     data: { data: game },
   } = await instance.post("games", {
     playlistIds,
     spotifyMarket,
+    initialTokens,
+    timelineLength,
+    artistsMatchMode,
+    creditsSimilarityThreshold,
   });
 
   return game;
