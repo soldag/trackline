@@ -4,6 +4,7 @@ import rateLimit from "axios-rate-limit";
 import ApiError from "~/api/trackline/error";
 import { camelizeResponse, decamelizeRequest } from "~/api/utils/interceptors";
 import { BACKEND_URL } from "~/configuration";
+import { NetworkError } from "~/utils/errors";
 
 export let getSessionToken = () => {};
 export let setSessionToken = () => {};
@@ -46,19 +47,25 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
-    const {
-      message,
-      response: {
-        status,
-        data: { error: apiError },
-      },
-    } = error;
-
-    if (status === 401 || apiError.code === "INVALID_TOKEN") {
-      setSessionToken(null);
+    const { code, message, response } = error;
+    if (code === "ERR_NETWORK") {
+      throw new NetworkError(message);
     }
 
-    throw new ApiError(message, status, apiError);
+    if (response) {
+      const {
+        status,
+        data: { error: apiError },
+      } = response;
+
+      if (status === 401 || apiError.code === "INVALID_TOKEN") {
+        setSessionToken(null);
+      }
+
+      throw new ApiError(message, status, apiError);
+    }
+
+    throw new Error(message);
   },
 );
 

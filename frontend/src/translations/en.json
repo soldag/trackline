@@ -84,6 +84,7 @@
   "GameTurnScoringView.TurnScoringTable.header.releaseYear": "Year",
   "GameTurnScoringView.continue": "Continue",
   "GameTurnScoringView.waitingForPlayers": "Waiting for players...",
+  "GlobalErrors.networkError": "Oops, something went wrong! It seems like there's a problem with your network connection.",
   "GlobalErrors.unexpectedError": "An unexpected error occurred.",
   "Heading.tagline": "Guess your favorite songs!",
   "Heading.title": "Trackline",

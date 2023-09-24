@@ -26,6 +26,7 @@ export const TOKEN_COST_EXCHANGE_TRACK = 1;
 export const TOKEN_COST_BUY_TRACK = 3;
 
 export const ERROR_CODES = {
+  NETWORK: "NETWORK_ERROR",
   API: "API_ERROR",
   SPOTIFY: "SPOTIFY_ERROR",
 };

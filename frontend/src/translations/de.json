@@ -84,6 +84,7 @@
   "GameTurnScoringView.TurnScoringTable.header.position": "Position",
   "GameTurnScoringView.TurnScoringTable.header.releaseYear": "Jahr",
   "GameTurnScoringView.waitingForPlayers": "Warte auf Spieler...",
+  "GlobalErrors.networkError": "Ups, da ist etwas schief gelaufen. Scheinbar besteht ein Problem mit deiner Internetverbindung.",
   "GlobalErrors.unexpectedError": "Es ist ein unerwarteter Fehler aufgetreten.",
   "Heading.tagline": "Guess your favorite songs!",
   "Heading.title": "Trackline",
