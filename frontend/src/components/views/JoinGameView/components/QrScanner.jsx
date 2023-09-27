@@ -12,7 +12,7 @@ const QrScanner = ({ sx, onResult = () => {} }) => {
   const [videoPlaying, setVideoPlaying] = useState(false);
 
   const { ref: videoRef } = useZxing({
-    onResult: ({ text }) => {
+    onDecodeResult: ({ text }) => {
       const [, gameId] = text.match(JOIN_URL_REGEX) || [];
       if (gameId != null && gameId !== lastGameId.current) {
         onResult({ gameId });
