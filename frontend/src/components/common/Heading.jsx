@@ -15,20 +15,24 @@ const Heading = ({ sx }) => (
     }}
   >
     <Typography
-      level="display2"
-      textColor="primary.softColor"
+      level="h1"
+      color="primary"
       startDecorator={<AlbumIcon />}
       slotProps={{
         startDecorator: {
           sx: {
-            marginInlineEnd: "4px",
+            marginInlineEnd: 0.5,
           },
         },
+      }}
+      sx={{
+        fontSize: "3.75rem",
+        mb: 0.25,
       }}
     >
       <FormattedMessage id="Heading.title" defaultMessage="Trackline" />
     </Typography>
-    <Typography level="h2" fontSize="xl2" textColor="neutral.600">
+    <Typography level="h2" fontSize="xl2" textColor="text.tertiary">
       <FormattedMessage
         id="Heading.tagline"
         defaultMessage="Guess your favorite songs!"

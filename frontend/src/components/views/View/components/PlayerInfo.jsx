@@ -12,15 +12,15 @@ import { UserType } from "~/types/users";
 const PlayerInfo = ({ player, user, active = false }) => (
   <Box>
     <Typography
-      level="body1"
+      level="body-sm"
       fontWeight="lg"
+      color="primary"
       startDecorator={<PersonIcon />}
       endDecorator={active && <FlagIcon />}
-      sx={{ color: "inherit" }}
     >
       {user.username}
     </Typography>
-    <Typography level="body2" sx={{ color: "inherit" }}>
+    <Typography level="body-sm" color="primary">
       <Typography startDecorator={<WebStoriesIcon />} mr={1}>
         {player.timeline.length}
       </Typography>

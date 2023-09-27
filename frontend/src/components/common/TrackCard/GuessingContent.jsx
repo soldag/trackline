@@ -11,7 +11,7 @@ const pulseEffect = keyframes`
     transform: scale(1);
   }
   50% {
-    transform: scale(1.15);
+    transform: scale(1.1);
   }
   to {
     transform: scale(1);
@@ -19,7 +19,9 @@ const pulseEffect = keyframes`
 `;
 
 const GuessingContent = ({ timeoutStart, timeoutEnd }) => (
-  <CardContent sx={{ justifyContent: "center", alignItems: "center" }}>
+  <CardContent
+    sx={{ flexGrow: 1, justifyContent: "center", alignItems: "center" }}
+  >
     {timeoutStart == null || timeoutEnd == null ? (
       <AudiotrackIcon
         sx={{
@@ -28,6 +30,7 @@ const GuessingContent = ({ timeoutStart, timeoutEnd }) => (
             md: "125px",
             lg: "150px",
           },
+          color: "var(--TrackCard-color-primary)",
           animation: `${pulseEffect} 3500ms ease-in-out infinite`,
         }}
       />

@@ -25,7 +25,7 @@ import PlaylistType from "~/types/spotify";
 import PlaylistList from "./PlaylistList";
 
 const ListError = ({ children }) => (
-  <Typography level="body2" color="danger" sx={{ ml: "5px" }}>
+  <Typography level="body-sm" color="danger" sx={{ ml: "5px" }}>
     {children}
   </Typography>
 );
@@ -99,11 +99,7 @@ const SearchModal = ({
               startDecorator={<SearchIcon />}
               endDecorator={
                 query.length > 0 && (
-                  <IconButton
-                    variant="soft"
-                    color="neutral"
-                    onClick={() => onQueryChange("")}
-                  >
+                  <IconButton variant="soft" onClick={() => onQueryChange("")}>
                     <ClearIcon />
                   </IconButton>
                 )
@@ -214,7 +210,7 @@ const SearchModal = ({
             mt: 2,
           }}
         >
-          <Typography level="body2" sx={{ flexGrow: 1 }}>
+          <Typography level="body-sm" sx={{ flexGrow: 1 }}>
             <FormattedMessage
               id="CreateGameView.PlaylistSelector.SearchModal.selectionSummary"
               defaultMessage="{count, plural, =0 {No playlists} =1 {# playlist} other {# playlists}} selected"

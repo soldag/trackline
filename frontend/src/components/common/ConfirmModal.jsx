@@ -1,7 +1,15 @@
 import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
-import { Box, Button, Divider, Modal, ModalDialog, Typography } from "@mui/joy";
+import {
+  Button,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Modal,
+  ModalDialog,
+} from "@mui/joy";
 
 const ConfirmModal = ({
   open,
@@ -29,36 +37,31 @@ const ConfirmModal = ({
       <ModalDialog
         sx={{
           "overflowY": "auto",
+          "overflowX": "hidden",
           "maxWidth": "500px",
           "--ModalDialog-minWidth": "400px",
         }}
       >
-        {header && (
-          <>
-            <Typography
-              component="h2"
-              level="inherit"
-              fontSize="1.25em"
-              mb="0.25em"
-            >
-              {header}
-            </Typography>
+        {header && <DialogTitle>{header}</DialogTitle>}
+        {header && children && <Divider />}
+        {children && <DialogContent>{children}</DialogContent>}
 
-            <Divider sx={{ my: 2 }} />
-          </>
-        )}
-
-        {children && (
-          <>
-            {children}
-            <Divider sx={{ my: 2 }} />
-          </>
-        )}
-
-        <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+        <DialogActions>
+          <Button
+            variant="solid"
+            disabled={!canConfirm}
+            onClick={handleConfirm}
+          >
+            {confirmLabel || (
+              <FormattedMessage
+                id="ConfirmModal.confirm"
+                defaultMessage="Confirm"
+              />
+            )}
+          </Button>
           {showCancel && (
             <Button
-              variant="soft"
+              variant="plain"
               color="neutral"
               disabled={!canCancel}
               onClick={onClose}
@@ -71,15 +74,7 @@ const ConfirmModal = ({
               )}
             </Button>
           )}
-          <Button disabled={!canConfirm} onClick={handleConfirm}>
-            {confirmLabel || (
-              <FormattedMessage
-                id="ConfirmModal.confirm"
-                defaultMessage="Confirm"
-              />
-            )}
-          </Button>
-        </Box>
+        </DialogActions>
       </ModalDialog>
     </Modal>
   );

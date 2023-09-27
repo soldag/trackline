@@ -5,7 +5,13 @@ import { CardContent, CircularProgress, Typography } from "@mui/joy";
 import YearRange from "~/components/common/YearRange";
 
 const ReleaseYearHeader = ({ loading, year, minYear, maxYear }) => (
-  <CardContent sx={{ justifyContent: "flex-start", maxHeight: "32px" }}>
+  <CardContent
+    sx={{
+      flexGrow: 0,
+      justifyContent: "flex-start",
+      minHeight: "2.25rem",
+    }}
+  >
     {loading ? (
       <CircularProgress
         color="neutral"
@@ -16,7 +22,7 @@ const ReleaseYearHeader = ({ loading, year, minYear, maxYear }) => (
       />
     ) : (
       <Typography
-        level="h1"
+        level="title-lg"
         fontSize="xl"
         textColor="var(--TrackCard-color-primary)"
       >

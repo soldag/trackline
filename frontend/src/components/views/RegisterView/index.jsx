@@ -37,7 +37,7 @@ const RegisterView = () => {
         <Box sx={{ flexGrow: 1 }} />
 
         <Stack direction="column" spacing={2}>
-          <Typography level="h3" fontSize="xl2" fontWeight="lg">
+          <Typography level="title-lg">
             <FormattedMessage
               id="RegisterView.header"
               defaultMessage="Register"

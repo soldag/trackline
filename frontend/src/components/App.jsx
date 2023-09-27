@@ -10,6 +10,7 @@ import JoyToaster from "~/components/common/JoyToaster";
 import RootContainer from "~/components/containers/RootContainer";
 import LoadingView from "~/components/views/LoadingView";
 import { persistor, store } from "~/store";
+import { theme } from "~/style";
 import translations from "~/translations";
 
 const locale = navigator.language && navigator.language.split(/[-_]/)[0];
@@ -19,7 +20,7 @@ const App = () => (
     <IntlProvider locale={locale} messages={translations[locale]}>
       <Provider store={store}>
         <PersistGate persistor={persistor} loading={<LoadingView />}>
-          <CssVarsProvider>
+          <CssVarsProvider theme={theme}>
             <CssBaseline />
             <JoyToaster />
             <RootContainer />

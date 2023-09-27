@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { CardContent, CircularProgress, Typography } from "@mui/joy";
 
 const ReleaseYearHeader = ({ loading, artists, title }) => (
-  <CardContent sx={{ justifyContent: "flex-end" }}>
+  <CardContent sx={{ flexGrow: 0, justifyContent: "flex-end" }}>
     {loading ? (
       <CircularProgress
         color="neutral"
@@ -15,13 +15,17 @@ const ReleaseYearHeader = ({ loading, artists, title }) => (
     ) : (
       <>
         <Typography
-          level="h2"
-          fontSize="md"
+          level="title-md"
+          fontWeight="lg"
           textColor="var(--TrackCard-color-primary)"
+          sx={{ lineHeight: 1.25 }}
         >
           {title}
         </Typography>
-        <Typography fontSize="md" textColor="var(--TrackCard-color-secondary)">
+        <Typography
+          level="title-md"
+          textColor="var(--TrackCard-color-secondary)"
+        >
           {artists?.join(", ")}
         </Typography>
       </>

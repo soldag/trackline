@@ -58,11 +58,7 @@ const JoinGameForm = ({ loading = false, onSubmit }) => {
                     startDecorator={<NumbersIcon />}
                     endDecorator={
                       gameId.length > 0 && (
-                        <IconButton
-                          variant="plain"
-                          color="neutral"
-                          onClick={() => setGameId("")}
-                        >
+                        <IconButton onClick={() => setGameId("")}>
                           <ClearIcon />
                         </IconButton>
                       )

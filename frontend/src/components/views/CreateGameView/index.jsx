@@ -126,7 +126,7 @@ const CreateGameView = () => {
           sx={{ overflow: { xs: "auto", sm: "hidden" } }}
         >
           <Stack direction="column" spacing={1} sx={{ flex: "1 1 0" }}>
-            <Typography level="h6">
+            <Typography level="title-md">
               <FormattedMessage
                 id="CreateGameView.playlists.header"
                 defaultMessage="Playlists"
@@ -158,7 +158,7 @@ const CreateGameView = () => {
           </Stack>
 
           <Stack direction="column" spacing={1} sx={{ flex: "1 1 0" }}>
-            <Typography level="h6">
+            <Typography level="title-md">
               <FormattedMessage
                 id="CreateGameView.settings.header"
                 defaultMessage="Advanced settings"

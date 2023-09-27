@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import { Button, CardContent } from "@mui/joy";
+import { Button, CardContent, Stack } from "@mui/joy";
 
 const ConfirmFooter = ({
   loadingCancel = false,
@@ -12,32 +12,32 @@ const ConfirmFooter = ({
 }) => (
   <CardContent
     sx={{
-      "justifyContent": "flex-end",
-      "flexGrow": 0,
-      "flexDirection": "row",
-      "& button": {
-        flexGrow: 1,
-      },
+      flexGrow: 0,
+      justifyContent: "flex-end",
     }}
   >
-    <Button
-      variant="soft"
-      color="danger"
-      loading={loadingCancel}
-      disabled={loadingCancel}
-      onClick={onCancel}
-    >
-      <CloseIcon />
-    </Button>
-    <Button
-      variant="soft"
-      color="success"
-      loading={loadingConfirm}
-      disabled={loadingConfirm}
-      onClick={onConfirm}
-    >
-      <CheckIcon />
-    </Button>
+    <Stack direction="row" spacing={1}>
+      <Button
+        fullWidth
+        variant="soft"
+        color="danger"
+        loading={loadingCancel}
+        disabled={loadingCancel}
+        onClick={onCancel}
+      >
+        <CloseIcon />
+      </Button>
+      <Button
+        fullWidth
+        variant="soft"
+        color="success"
+        loading={loadingConfirm}
+        disabled={loadingConfirm}
+        onClick={onConfirm}
+      >
+        <CheckIcon />
+      </Button>
+    </Stack>
   </CardContent>
 );
 

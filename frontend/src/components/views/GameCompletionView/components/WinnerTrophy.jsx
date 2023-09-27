@@ -5,8 +5,8 @@ import { Stack, Typography } from "@mui/joy";
 
 const WinnerTrophy = ({ username }) => (
   <Stack direction="column" alignItems="center">
-    <EmojiEventsIcon sx={{ fontSize: "220px", color: "warning.200" }} />
-    <Typography level="h4" sx={{ mt: "-25px" }}>
+    <EmojiEventsIcon sx={{ fontSize: "220px", color: "warning.400" }} />
+    <Typography fontSize="xl" fontWeight="lg" sx={{ mt: -3 }}>
       {username}
     </Typography>
   </Stack>

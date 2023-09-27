@@ -104,6 +104,7 @@ const TrackCard = ({
           lg: 350,
         },
         "flexShrink": 0,
+        "justifyContent": "space-between",
         "textAlign": "center",
         "userSelect": "none",
         "boxShadow": "sm",

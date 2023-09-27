@@ -16,7 +16,7 @@ import PlaylistType from "~/types/spotify";
 
 const ItemTypography = (props) => (
   <Typography
-    level="body1"
+    level="body-md"
     {...props}
     sx={{
       ...props.sx,
@@ -93,10 +93,10 @@ const PlaylistList = ({
             )}
 
             <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
-              <ItemTypography level="body1" sx={{ fontWeight: "bold" }}>
+              <ItemTypography level="body-md" sx={{ fontWeight: "xl" }}>
                 {playlist.name}
               </ItemTypography>
-              <ItemTypography level="body2">
+              <ItemTypography level="body-sm">
                 <FormattedMessage
                   id="CreateGameView.PlaylistSelector.PlaylistList.owner"
                   defaultMessage="From {owner}"
@@ -105,7 +105,7 @@ const PlaylistList = ({
                   }}
                 />
               </ItemTypography>
-              <ItemTypography level="body2">
+              <ItemTypography level="body-sm">
                 <FormattedMessage
                   id="CreateGameView.PlaylistSelector.PlaylistList.tracks"
                   defaultMessage="{count} tracks"
@@ -119,11 +119,7 @@ const PlaylistList = ({
             {selection && selectedIds.includes(playlist.id) && <CheckIcon />}
 
             {actionIcon && (
-              <IconButton
-                variant="plain"
-                color="neutral"
-                onClick={() => onAction(playlist)}
-              >
+              <IconButton onClick={() => onAction(playlist)}>
                 {actionIcon}
               </IconButton>
             )}
@@ -132,7 +128,7 @@ const PlaylistList = ({
       ))}
 
       {items.length === 0 && emptyText != null && (
-        <Typography level="body2" sx={{ ml: "5px" }}>
+        <Typography level="body-sm" sx={{ ml: "5px" }}>
           {emptyText}
         </Typography>
       )}

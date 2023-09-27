@@ -29,7 +29,7 @@ const StatusBar = ({ game, users, currentUserId }) => {
       sx={{ "& > *": { flex: 1 } }}
     >
       <Stack direction={{ xs: "column", sm: "row" }}>
-        <Typography level="body2" sx={{ fontWeight: "bold" }}>
+        <Typography level="body-sm" sx={{ fontWeight: "lg" }}>
           <FormattedMessage
             id="GameTurnGuessingView.StatusBar.round"
             defaultMessage="Round {number}"
@@ -39,11 +39,11 @@ const StatusBar = ({ game, users, currentUserId }) => {
 
         {activeUser && (
           <Typography
-            level="body2"
+            level="body-sm"
             sx={{
               "&::before": {
                 content: { sm: "': '" },
-                fontWeight: "bold",
+                fontWeight: "lg",
               },
             }}
           >
@@ -64,7 +64,7 @@ const StatusBar = ({ game, users, currentUserId }) => {
       </Stack>
 
       {turn && (
-        <Typography level="body2" sx={{ textAlign: "right" }}>
+        <Typography level="body-sm" sx={{ textAlign: "right" }}>
           {isActivePlayer ? (
             <FormattedMessage
               id="GameTurnGuessingView.StatusBar.challenges.active"

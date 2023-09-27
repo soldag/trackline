@@ -30,11 +30,11 @@ const SpotifyPlayer = ({
   return (
     <Stack direction="row" alignItems="center" spacing={1}>
       {isPlaying ? (
-        <IconButton variant="plain" onClick={onPause}>
+        <IconButton color="primary" onClick={onPause}>
           <PauseIcon />
         </IconButton>
       ) : (
-        <IconButton variant="plain" onClick={onPlay}>
+        <IconButton color="primary" onClick={onPlay}>
           <PlayArrowIcon />
         </IconButton>
       )}
@@ -50,7 +50,7 @@ const SpotifyPlayer = ({
           },
         }}
       >
-        <Typography level="body3" sx={{ minWidth: "34px", color: "inherit" }}>
+        <Typography level="body-xs" color="primary" sx={{ minWidth: "34px" }}>
           <FormattedDuration ms={progress} />
         </Typography>
 
@@ -58,7 +58,7 @@ const SpotifyPlayer = ({
           determinate
           value={!progress || !duration ? 0 : (progress / duration) * 100}
           size="sm"
-          variant="soft"
+          variant="plain"
           sx={{
             width: {
               sm: "150px",
@@ -71,13 +71,13 @@ const SpotifyPlayer = ({
           }}
         />
 
-        <Typography level="body3" sx={{ minWidth: "34px", color: "inherit" }}>
+        <Typography level="body-xs" color="primary" sx={{ minWidth: "34px" }}>
           <FormattedDuration ms={duration} />
         </Typography>
       </Stack>
 
       <IconButton
-        variant="plain"
+        color="primary"
         disabled={volume === 0}
         sx={{
           display: {
@@ -94,7 +94,7 @@ const SpotifyPlayer = ({
         determinate
         value={volume * 100}
         size="sm"
-        variant="soft"
+        variant="plain"
         sx={{
           display: {
             xs: "none",
@@ -109,7 +109,7 @@ const SpotifyPlayer = ({
         }}
       />
       <IconButton
-        variant="plain"
+        color="primary"
         disabled={volume === 1}
         sx={{
           display: {

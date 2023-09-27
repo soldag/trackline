@@ -45,7 +45,7 @@ const JoinGameView = () => {
         spacing={2}
       >
         <Stack direction="column" spacing={1} sx={{ flex: "1 1 0" }}>
-          <Typography level="h6">
+          <Typography level="title-md">
             <FormattedMessage
               id="JoinGameView.scanQrCode.header"
               defaultMessage="Scan QR code"
@@ -62,7 +62,7 @@ const JoinGameView = () => {
         </Stack>
 
         <Stack direction="column" spacing={1}>
-          <Typography level="h6">
+          <Typography level="title-md">
             <FormattedMessage
               id="JoinGameView.enterGameId.header"
               defaultMessage="Enter game ID manually"

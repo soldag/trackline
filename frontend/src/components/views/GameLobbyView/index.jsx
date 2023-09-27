@@ -53,7 +53,7 @@ const GameLobbyView = () => {
           sx={{ overflow: "hidden" }}
         >
           <Stack direction="column" spacing={1} sx={{ flex: { sm: "1 1 0" } }}>
-            <Typography level="h6">
+            <Typography level="title-md">
               <FormattedMessage
                 id="GameLobbyView.invitePlayers.header"
                 defaultMessage="Invite players"
@@ -80,7 +80,7 @@ const GameLobbyView = () => {
             spacing={1}
             sx={{ flex: { sm: "1 1 0" }, overflow: "hidden" }}
           >
-            <Typography level="h6">
+            <Typography level="title-md">
               <FormattedMessage
                 id="GameLobbyView.joinedPlayers.header"
                 defaultMessage="Joined players"

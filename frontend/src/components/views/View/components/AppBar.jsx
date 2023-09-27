@@ -112,7 +112,6 @@ const AppBar = ({
         width: "100vw",
         padding: "10px",
         backgroundColor: "primary.softBg",
-        color: "primary.softColor",
         borderColor: "primary.softColor",
         borderBottom: "1px solid",
       }}
@@ -134,12 +133,13 @@ const AppBar = ({
       />
 
       <AlbumIcon
+        color="primary"
         sx={{ fontSize: "45px", cursor: "pointer" }}
         onClick={handleLogoClick}
       />
 
       {showTitle && (
-        <Typography level="h1" fontSize="xl" sx={{ color: "inherit" }}>
+        <Typography level="h1" fontSize="xl">
           <FormattedMessage id="View.AppBar.title" defaultMessage="Trackline" />
         </Typography>
       )}
@@ -163,19 +163,19 @@ const AppBar = ({
       )}
 
       {isFullscreenPreferred && !isFullscreenEnabled && (
-        <IconButton variant="plain" onClick={requestFullscreen}>
+        <IconButton color="primary" onClick={requestFullscreen}>
           <FullscreenIcon />
         </IconButton>
       )}
 
       {showExitGame && game && (
-        <IconButton variant="plain" onClick={handleExitGame}>
+        <IconButton color="primary" onClick={handleExitGame}>
           <ClearIcon />
         </IconButton>
       )}
 
       {showLogout && user && (
-        <IconButton variant="plain" onClick={() => setLogoutModalOpen(true)}>
+        <IconButton color="primary" onClick={() => setLogoutModalOpen(true)}>
           <LogoutIcon />
         </IconButton>
       )}

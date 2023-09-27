@@ -43,7 +43,7 @@ const ExpandableMenuItem = ({
         {label}
       </ListItemButton>
     ) : (
-      <IconButton variant="plain" disabled={disabled} onClick={onClick}>
+      <IconButton color="primary" disabled={disabled} onClick={onClick}>
         {loading ? <CircularProgress variant="plain" size="sm" /> : icon}
       </IconButton>
     )}
