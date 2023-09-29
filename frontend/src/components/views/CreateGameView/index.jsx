@@ -23,6 +23,7 @@ import { CREDITS_STRICTNESS, CREDITS_STRICTNESS_VALUES } from "~/constants";
 import { dismissAllErrors } from "~/store/errors/actions";
 import { createGame } from "~/store/games/actions";
 import {
+  clearPlaylistSearchResults,
   fetchRecommendedPlaylists,
   searchPlaylists,
   startAuth,
@@ -89,6 +90,11 @@ const CreateGameView = () => {
     [dispatch],
   );
 
+  const handleClearPlaylistSearchResults = useCallback(
+    () => dispatch(clearPlaylistSearchResults()),
+    [dispatch],
+  );
+
   const handleCreate = useCallback(() => {
     dispatch(
       createGame({
@@ -137,6 +143,7 @@ const CreateGameView = () => {
       recommendations={playlistRecommendations}
       searchResults={playlistSearchResults}
       onSearch={handleSearchPlaylists}
+      onClearSearchResults={handleClearPlaylistSearchResults}
     />
   ) : (
     <Button

@@ -6,6 +6,7 @@ import { resetState } from "~/store/common/actions";
 import { isSuccess } from "~/store/utils/matchers";
 
 import {
+  clearPlaylistSearchResults,
   completeAuth,
   fetchCurrentUser,
   fetchRecommendedPlaylists,
@@ -78,6 +79,10 @@ const reducer = createReducer(initialState, (builder) => {
         state.playback.progress + value,
         state.playback.duration,
       );
+    })
+
+    .addCase(clearPlaylistSearchResults, (state) => {
+      state.playlists.searchResults = [];
     })
 
     .addMatcher(

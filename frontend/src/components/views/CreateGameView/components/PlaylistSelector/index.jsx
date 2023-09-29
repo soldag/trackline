@@ -25,6 +25,7 @@ const PlaylistSelector = ({
   recommendations = [],
   searchResults = [],
   onSearch = () => {},
+  onClearSearchResults = () => {},
 }) => {
   const [query, setQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,8 +50,15 @@ const PlaylistSelector = ({
     onChange(value.filter(({ id }) => id !== playlist.id));
   };
 
+  const handleQueryChange = (value) => {
+    setQuery(value);
+    if (value.length < MIN_QUERY_LENGTH && query.length >= MIN_QUERY_LENGTH) {
+      onClearSearchResults();
+    }
+  };
+
   const handleCloseModal = () => {
-    setQuery("");
+    handleQueryChange("");
     setIsModalOpen(false);
   };
 
@@ -94,7 +102,7 @@ const PlaylistSelector = ({
         searchError={error}
         searchResults={searchResultsToDisplay}
         onClose={handleCloseModal}
-        onQueryChange={setQuery}
+        onQueryChange={handleQueryChange}
         onSelectionChange={onChange}
       />
     </Stack>
@@ -109,6 +117,7 @@ PlaylistSelector.propTypes = {
   recommendations: PropTypes.arrayOf(PlaylistType),
   searchResults: PropTypes.arrayOf(PlaylistType),
   onSearch: PropTypes.func,
+  onClearSearchResults: PropTypes.func,
 };
 
 export default PlaylistSelector;

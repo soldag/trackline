@@ -25,3 +25,6 @@ export const fetchRecommendedPlaylists = createRoutine(
   "SPOTIFY/FETCH_RECOMMENDED_PLAYLISTS",
 );
 export const searchPlaylists = createRoutine("SPOTIFY/SEARCH_PLAYLISTS");
+export const clearPlaylistSearchResults = createAction(
+  "SPOTIFY/CLEAR_PLAYLIST_SEARCH_RESULTS",
+);
