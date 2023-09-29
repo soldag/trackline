@@ -53,6 +53,7 @@ const PlaylistList = ({
     <List
       sx={{
         "padding": "0px",
+        "--ListItem-marginInline": "0px",
         "--ListItem-paddingY": "0px",
         "--ListItem-paddingX": "0px",
       }}

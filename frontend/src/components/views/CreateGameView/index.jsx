@@ -1,10 +1,21 @@
 import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
+import MediaQuery from "react-responsive";
 import { Link, Navigate } from "react-router-dom";
 
 import LinkIcon from "@mui/icons-material/Link";
-import { Button, Stack, Typography } from "@mui/joy";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionGroup,
+  AccordionSummary,
+  Box,
+  Button,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/joy";
 
 import ButtonFooter from "~/components/common/ButtonFooter";
 import View from "~/components/views/View";
@@ -28,6 +39,8 @@ import PlaylistSelector from "./components/PlaylistSelector";
 import SettingsForm from "./components/SettingsForm";
 
 const CreateGameView = () => {
+  const theme = useTheme();
+
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const game = useSelector((state) => state.games.game);
@@ -48,6 +61,7 @@ const CreateGameView = () => {
     (state) => state.spotify.playlists.searchResults,
   );
 
+  const [expandPlaylists, setExpandPlaylists] = useState(true);
   const [playlists, setPlaylists] = useState([]);
   const [initialTokens, setInitialTokens] = useState(2);
   const [timelineLength, setTimelineLength] = useState(10);
@@ -108,6 +122,53 @@ const CreateGameView = () => {
     return <Navigate replace to="/login" />;
   }
 
+  const playlistsHeader = (
+    <FormattedMessage
+      id="CreateGameView.playlists.header"
+      defaultMessage="Playlists"
+    />
+  );
+  const playlistsSection = spotifyUser ? (
+    <PlaylistSelector
+      value={playlists}
+      onChange={setPlaylists}
+      error={errorSpotify}
+      loading={loadingSpotify}
+      recommendations={playlistRecommendations}
+      searchResults={playlistSearchResults}
+      onSearch={handleSearchPlaylists}
+    />
+  ) : (
+    <Button
+      variant="soft"
+      sx={{ alignSelf: "start" }}
+      startDecorator={<LinkIcon />}
+      onClick={handleStartSpotifyAuth}
+    >
+      <FormattedMessage
+        id="CreateGameView.connectSpotifyAccount"
+        defaultMessage="Connect Spotify account"
+      />
+    </Button>
+  );
+
+  const settingsHeader = (
+    <FormattedMessage
+      id="CreateGameView.settings.header"
+      defaultMessage="Advanced settings"
+    />
+  );
+  const settingsSection = (
+    <SettingsForm
+      initialTokens={initialTokens}
+      timelineLength={timelineLength}
+      creditsStrictness={creditsStrictness}
+      onInitialTokensChange={setInitialTokens}
+      onTimelineLengthChange={setTimelineLength}
+      onCreditsStrictnessChange={setCreditsStrictness}
+    />
+  );
+
   return (
     <View appBar={{ showTitle: true, showLogout: true }}>
       <Stack
@@ -119,61 +180,68 @@ const CreateGameView = () => {
           width: "100%",
         }}
       >
-        {/* TODO: use accordion in xs */}
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          sx={{ overflow: { xs: "auto", sm: "hidden" } }}
-        >
-          <Stack direction="column" spacing={1} sx={{ flex: "1 1 0" }}>
-            <Typography level="title-md">
-              <FormattedMessage
-                id="CreateGameView.playlists.header"
-                defaultMessage="Playlists"
-              />
-            </Typography>
-            {spotifyUser ? (
-              <PlaylistSelector
-                value={playlists}
-                onChange={setPlaylists}
-                error={errorSpotify}
-                loading={loadingSpotify}
-                recommendations={playlistRecommendations}
-                searchResults={playlistSearchResults}
-                onSearch={handleSearchPlaylists}
-              />
-            ) : (
-              <Button
-                variant="soft"
-                sx={{ alignSelf: "start" }}
-                startDecorator={<LinkIcon />}
-                onClick={handleStartSpotifyAuth}
-              >
-                <FormattedMessage
-                  id="CreateGameView.connectSpotifyAccount"
-                  defaultMessage="Connect Spotify account"
-                />
-              </Button>
-            )}
-          </Stack>
+        <MediaQuery maxWidth={theme.breakpoints.values.sm}>
+          <AccordionGroup
+            disableDivider
+            size="md"
+            sx={{
+              "overflow": "hidden",
+              "--ListItem-paddingX": "8px",
+            }}
+          >
+            <Accordion
+              expanded={expandPlaylists}
+              onChange={(e, expanded) => setExpandPlaylists(expanded)}
+              sx={{ flexShrink: 1, overflow: "hidden" }}
+            >
+              <AccordionSummary>{playlistsHeader}</AccordionSummary>
+              <AccordionDetails>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    maxHeight: "100%",
+                    pt: 1,
+                  }}
+                >
+                  {playlistsSection}
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+            <Accordion
+              expanded={!expandPlaylists}
+              onChange={(e, expanded) => setExpandPlaylists(!expanded)}
+              sx={{ flexShrink: 1, overflow: "hidden" }}
+            >
+              <AccordionSummary>{settingsHeader}</AccordionSummary>
+              <AccordionDetails>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    maxHeight: "100%",
+                    pt: 1,
+                  }}
+                >
+                  {settingsSection}
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+          </AccordionGroup>
+        </MediaQuery>
+        <MediaQuery minWidth={theme.breakpoints.values.sm}>
+          <Stack direction="row" spacing={2} sx={{ overflow: "hidden" }}>
+            <Stack direction="column" spacing={1} sx={{ flex: "1 1 0" }}>
+              <Typography level="title-md">{playlistsHeader}</Typography>
+              {playlistsSection}
+            </Stack>
 
-          <Stack direction="column" spacing={1} sx={{ flex: "1 1 0" }}>
-            <Typography level="title-md">
-              <FormattedMessage
-                id="CreateGameView.settings.header"
-                defaultMessage="Advanced settings"
-              />
-            </Typography>
-            <SettingsForm
-              initialTokens={initialTokens}
-              timelineLength={timelineLength}
-              creditsStrictness={creditsStrictness}
-              onInitialTokensChange={setInitialTokens}
-              onTimelineLengthChange={setTimelineLength}
-              onCreditsStrictnessChange={setCreditsStrictness}
-            />
+            <Stack direction="column" spacing={1} sx={{ flex: "1 1 0" }}>
+              <Typography level="title-md">{settingsHeader}</Typography>
+              {settingsSection}
+            </Stack>
           </Stack>
-        </Stack>
+        </MediaQuery>
 
         <ButtonFooter>
           <Button
