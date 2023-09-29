@@ -47,11 +47,7 @@ const ConfirmModal = ({
         {children && <DialogContent>{children}</DialogContent>}
 
         <DialogActions>
-          <Button
-            variant="solid"
-            disabled={!canConfirm}
-            onClick={handleConfirm}
-          >
+          <Button disabled={!canConfirm} onClick={handleConfirm}>
             {confirmLabel || (
               <FormattedMessage
                 id="ConfirmModal.confirm"

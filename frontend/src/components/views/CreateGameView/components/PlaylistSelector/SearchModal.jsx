@@ -8,11 +8,10 @@ import {
   Box,
   Button,
   CircularProgress,
+  DialogActions,
+  DialogTitle,
   IconButton,
   Input,
-  List,
-  ListItem,
-  ListSubheader,
   Modal,
   ModalClose,
   ModalDialog,
@@ -24,14 +23,85 @@ import PlaylistType from "~/types/spotify";
 
 import PlaylistList from "./PlaylistList";
 
-const ListError = ({ children }) => (
-  <Typography level="body-sm" color="danger" sx={{ ml: "5px" }}>
-    {children}
-  </Typography>
-);
+const RecommendationsList = ({
+  items = [],
+  error,
+  selectedItems = [],
+  onSelectedItemsChange = () => {},
+}) => {
+  return error ? (
+    <Typography level="body-sm" color="danger">
+      <FormattedMessage
+        id="CreateGameView.PlaylistSelector.SearchModal.recommendations.error"
+        defaultMessage="Failed to retrieve recommended playlists."
+      />
+    </Typography>
+  ) : (
+    <PlaylistList
+      selection
+      items={items}
+      selectedItems={selectedItems}
+      onSelectedItemsChange={onSelectedItemsChange}
+    />
+  );
+};
 
-ListError.propTypes = {
-  children: PropTypes.node,
+RecommendationsList.propTypes = {
+  items: PropTypes.arrayOf(PlaylistType),
+  error: ErrorType,
+  selectedItems: PropTypes.arrayOf(PlaylistType),
+  onSelectedItemsChange: PropTypes.func,
+};
+
+const SearchResultsList = ({
+  items = [],
+  loading = false,
+  error,
+  queryLength = 0,
+  minQueryLength = 0,
+  selectedItems = [],
+  onSelectedItemsChange = () => {},
+}) => {
+  return error ? (
+    <Typography level="body-sm" color="danger">
+      <FormattedMessage
+        id="CreateGameView.PlaylistSelector.SearchModal.searchResults.error"
+        defaultMessage="Failed to search playlists."
+      />
+    </Typography>
+  ) : (
+    <PlaylistList
+      selection
+      items={items}
+      selectedItems={selectedItems}
+      emptyText={
+        !loading &&
+        (queryLength < minQueryLength ? (
+          <FormattedMessage
+            id="CreateGameView.PlaylistSelector.SearchModal.searchResults.shortQuery"
+            defaultMessage="Please enter at least {minQueryLength} characters."
+            values={{ minQueryLength }}
+          />
+        ) : (
+          <FormattedMessage
+            id="CreateGameView.PlaylistSelector.SearchModal.searchResults.noResults"
+            defaultMessage="No playlists found."
+          />
+        ))
+      }
+      onSelectedItemsChange={onSelectedItemsChange}
+    />
+  );
+};
+
+SearchResultsList.propTypes = {
+  items: PropTypes.arrayOf(PlaylistType),
+  error: ErrorType,
+  loading: PropTypes.bool,
+  queryLength: PropTypes.number,
+  minQueryLength: PropTypes.number,
+  selectedItems: PropTypes.arrayOf(PlaylistType),
+  onSelectedItemsChange: PropTypes.func,
 };
 
 const SearchModal = ({
@@ -78,13 +148,13 @@ const SearchModal = ({
         layout="fullscreen"
         sx={{ display: "flex", flexDirection: "column" }}
       >
-        <ModalClose />
-        <Typography>
+        <DialogTitle>
           <FormattedMessage
             id="CreateGameView.PlaylistSelector.SearchModal.modalHeader"
             defaultMessage="Select playlists"
           />
-        </Typography>
+        </DialogTitle>
+        <ModalClose />
 
         <FormattedMessage
           id="CreateGameView.PlaylistSelector.SearchModal.search.placeholder"
@@ -111,6 +181,27 @@ const SearchModal = ({
           )}
         </FormattedMessage>
 
+        <Typography
+          sx={{
+            fontSize: "xs",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            color: "text.secondary",
+          }}
+        >
+          {query.length === 0 ? (
+            <FormattedMessage
+              id="CreateGameView.PlaylistSelector.SearchModal.recommendations.header"
+              defaultMessage="Recommendations"
+            />
+          ) : (
+            <FormattedMessage
+              id="CreateGameView.PlaylistSelector.SearchModal.searchResults.header"
+              defaultMessage="Search results"
+            />
+          )}
+        </Typography>
+
         <Box
           ref={listContainerRef}
           sx={{
@@ -120,78 +211,24 @@ const SearchModal = ({
             flexGrow: 1,
           }}
         >
-          <List
-            sx={{
-              "padding": 0,
-              "--List-item-paddingY": "0px",
-              "--List-item-paddingX": "0px",
-            }}
-          >
-            {query.length === 0 ? (
-              <ListItem nested>
-                <ListSubheader sticky>
-                  <FormattedMessage
-                    id="CreateGameView.PlaylistSelector.SearchModal.recommendations.header"
-                    defaultMessage="Recommendations"
-                  />
-                </ListSubheader>
-                {recommendationsError ? (
-                  <ListError>
-                    <FormattedMessage
-                      id="CreateGameView.PlaylistSelector.SearchModal.recommendations.error"
-                      defaultMessage="Failed to retrieve recommended playlists."
-                    />
-                  </ListError>
-                ) : (
-                  <PlaylistList
-                    selection
-                    items={recommendations}
-                    selectedItems={newSelection}
-                    onSelectedItemsChange={setNewSelection}
-                  />
-                )}
-              </ListItem>
-            ) : (
-              <ListItem nested>
-                <ListSubheader sticky>
-                  <FormattedMessage
-                    id="CreateGameView.PlaylistSelector.SearchModal.searchResults.header"
-                    defaultMessage="Search results"
-                  />
-                </ListSubheader>
-                {searchError ? (
-                  <ListError>
-                    <FormattedMessage
-                      id="CreateGameView.PlaylistSelector.SearchModal.searchResults.error"
-                      defaultMessage="Failed to search playlists."
-                    />
-                  </ListError>
-                ) : (
-                  <PlaylistList
-                    selection
-                    items={searchResults}
-                    selectedItems={newSelection}
-                    emptyText={
-                      !showLoader &&
-                      (query.length < minQueryLength ? (
-                        <FormattedMessage
-                          id="CreateGameView.PlaylistSelector.SearchModal.searchResults.shortQuery"
-                          defaultMessage="Please enter at least {minQueryLength} characters."
-                          values={{ minQueryLength }}
-                        />
-                      ) : (
-                        <FormattedMessage
-                          id="CreateGameView.PlaylistSelector.SearchModal.searchResults.noResults"
-                          defaultMessage="No playlists found."
-                        />
-                      ))
-                    }
-                    onSelectedItemsChange={setNewSelection}
-                  />
-                )}
-              </ListItem>
-            )}
-          </List>
+          {query.length === 0 ? (
+            <RecommendationsList
+              items={recommendations}
+              error={recommendationsError}
+              selectedItems={newSelection}
+              onSelectedItemsChange={setNewSelection}
+            />
+          ) : (
+            <SearchResultsList
+              items={searchResults}
+              error={searchError}
+              loading={showLoader}
+              queryLength={query.length}
+              minQueryLength={minQueryLength}
+              selectedItems={newSelection}
+              onSelectedItemsChange={setNewSelection}
+            />
+          )}
 
           {showLoader && (
             <Box
@@ -202,14 +239,19 @@ const SearchModal = ({
           )}
         </Box>
 
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            mt: 2,
-          }}
-        >
+        <DialogActions>
+          <Button onClick={handleConfirm}>
+            <FormattedMessage
+              id="CreateGameView.PlaylistSelector.SearchModal.select"
+              defaultMessage="Select"
+            />
+          </Button>
+          <Button variant="plain" color="neutral" onClick={handleCancel}>
+            <FormattedMessage
+              id="CreateGameView.PlaylistSelector.SearchModal.cancel"
+              defaultMessage="Cancel"
+            />
+          </Button>
           <Typography level="body-sm" sx={{ flexGrow: 1 }}>
             <FormattedMessage
               id="CreateGameView.PlaylistSelector.SearchModal.selectionSummary"
@@ -217,19 +259,7 @@ const SearchModal = ({
               values={{ count: newSelection.length }}
             />
           </Typography>
-          <Button variant="soft" color="neutral" onClick={handleCancel}>
-            <FormattedMessage
-              id="CreateGameView.PlaylistSelector.SearchModal.cancel"
-              defaultMessage="Cancel"
-            />
-          </Button>
-          <Button onClick={handleConfirm}>
-            <FormattedMessage
-              id="CreateGameView.PlaylistSelector.SearchModal.select"
-              defaultMessage="Select"
-            />
-          </Button>
-        </Box>
+        </DialogActions>
       </ModalDialog>
     </Modal>
   );
