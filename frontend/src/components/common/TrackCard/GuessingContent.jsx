@@ -8,13 +8,13 @@ import CircularCountdown from "~/components/common/CircularCountdown";
 
 const pulseEffect = keyframes`
   from {
-    transform: scale(1);
+    transform: scale(0.9);
   }
   50% {
-    transform: scale(1.1);
+    transform: scale(1);
   }
   to {
-    transform: scale(1);
+    transform: scale(0.9);
   }
 `;
 
@@ -25,11 +25,8 @@ const GuessingContent = ({ timeoutStart, timeoutEnd }) => (
     {timeoutStart == null || timeoutEnd == null ? (
       <AudiotrackIcon
         sx={{
-          fontSize: {
-            xs: "96px",
-            md: "125px",
-            lg: "150px",
-          },
+          flexGrow: 1,
+          width: "auto",
           color: "var(--TrackCard-color-primary)",
           animation: `${pulseEffect} 3500ms ease-in-out infinite`,
         }}
