@@ -136,7 +136,7 @@ const reducer = createReducer(initialState, (builder) => {
         const player = state.game.players.find(
           (p) => p.userId === guess.userId,
         );
-        player.tokens += guess.tokenCost;
+        player.tokens -= guess.tokenCost;
       },
     )
 
@@ -152,7 +152,7 @@ const reducer = createReducer(initialState, (builder) => {
         const player = state.game.players.find(
           (p) => p.userId === guess.userId,
         );
-        player.tokens += guess.tokenCost;
+        player.tokens -= guess.tokenCost;
       },
     )
 
