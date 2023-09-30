@@ -3,17 +3,6 @@ import { forwardRef, useState } from "react";
 
 import { Autocomplete } from "@mui/joy";
 
-const OVERWRITTEN_PROPS = [
-  "freeSolo",
-  "multiple",
-  "options",
-  "value",
-  "inputValue",
-  "onChange",
-  "onInputChange",
-  "onBlur",
-];
-
 const ChipInput = forwardRef(function ChipInput(
   { placeholder, value, onChange, onBlur, ...remainingProps },
   ref,
@@ -46,13 +35,10 @@ const ChipInput = forwardRef(function ChipInput(
 });
 
 ChipInput.propTypes = {
-  ...Object.fromEntries(
-    Object.entries(Autocomplete.propTypes).filter(
-      ([key]) => !OVERWRITTEN_PROPS.includes(key),
-    ),
-  ),
+  placeholder: PropTypes.string,
   value: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChange: PropTypes.func.isRequired,
+  onBlur: PropTypes.func,
 };
 
 export default ChipInput;
