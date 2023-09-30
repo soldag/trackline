@@ -34,7 +34,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v3
         with:
-          node-version: 19.2.0
+          node-version: 19.8.0
 
       - name: Cache dependencies
         id: cache-dependencies
