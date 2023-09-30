@@ -1,7 +1,7 @@
 {
   "name": "Trackline",
   "short_name": "Trackline",
-  "theme_color": "#ddf1ff",
+  "theme_color": "#e3effb",
   "background_color": "#ffffff",
   "display": "standalone",
   "orientation": "any",
