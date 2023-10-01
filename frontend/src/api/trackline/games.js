@@ -134,8 +134,8 @@ export const buyTrack = async ({ gameId, userId }) => {
 
 export const exchangeTrack = async ({ gameId, turnId }) => {
   const {
-    data: { data: track },
+    data: { data: exchange },
   } = await instance.post(`games/${gameId}/turns/${turnId}/track/exchange`);
 
-  return track;
+  return exchange;
 };

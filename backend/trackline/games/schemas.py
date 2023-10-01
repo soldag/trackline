@@ -116,6 +116,11 @@ class TurnGuessesOut(BaseModel):
         )
 
 
+class TrackExchangeOut(BaseModel):
+    track: TrackOut
+    token_delta: Mapping[ResourceId, int]
+
+
 class TurnPassOut(BaseModel):
     user_id: ResourceId
     creation_time: datetime
@@ -280,6 +285,7 @@ class NewTurn(Notification):
 
 class TrackExchanged(Notification):
     track: TrackOut
+    token_delta: Mapping[ResourceId, int]
 
 
 class ReleaseYearGuessCreated(Notification):

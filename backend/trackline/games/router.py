@@ -19,7 +19,7 @@ from trackline.games.schemas import (
     CreditsGuessOut,
     GameOut,
     ReleaseYearGuessOut,
-    TrackOut,
+    TrackExchangeOut,
     TrackPurchaseReceiptOut,
     TurnCompletionOut,
     TurnOut,
@@ -235,9 +235,9 @@ async def exchange_track(
     auth_user_id: AuthUserId,
     use_case: Annotated[ExchangeTrack, Depends()],
     handler: Annotated[ExchangeTrack.Handler, Injected(ExchangeTrack.Handler)],
-) -> EntityResponse[TrackOut]:
-    track_out = await handler.execute(auth_user_id, use_case)
-    return EntityResponse(data=track_out)
+) -> EntityResponse[TrackExchangeOut]:
+    track_exchange_out = await handler.execute(auth_user_id, use_case)
+    return EntityResponse(data=track_exchange_out)
 
 
 @router.websocket("/{game_id}/notifications")

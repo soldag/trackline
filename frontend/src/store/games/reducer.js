@@ -1,10 +1,6 @@
 import { createReducer, isAnyOf } from "@reduxjs/toolkit";
 
-import {
-  GAME_STATES,
-  TOKEN_COST_BUY_TRACK,
-  TOKEN_COST_EXCHANGE_TRACK,
-} from "~/constants";
+import { GAME_STATES, TOKEN_COST_BUY_TRACK } from "~/constants";
 import { resetState } from "~/store/common/actions";
 import { isSuccess } from "~/store/utils/matchers";
 import { getTotalTokenGain } from "~/utils/games";
@@ -231,7 +227,7 @@ const reducer = createReducer(initialState, (builder) => {
 
     .addMatcher(
       isAnyOf(isSuccess(exchangeTrack), trackExchanged),
-      (state, { payload: { track } }) => {
+      (state, { payload: { track, tokenDelta } }) => {
         const turn = state.game.turns.at(-1);
         turn.track = track;
         turn.passes = [];
@@ -239,11 +235,8 @@ const reducer = createReducer(initialState, (builder) => {
           turn.guesses[key] = [];
         }
 
-        const activePlayer = state.game.players.find(
-          (p) => p.userId === turn.activeUserId,
-        );
-        if (activePlayer) {
-          activePlayer.tokens -= TOKEN_COST_EXCHANGE_TRACK;
+        for (const player of state.game.players) {
+          player.tokens += tokenDelta[player.userId] || 0;
         }
       },
     );

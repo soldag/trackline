@@ -181,11 +181,11 @@ function* handleBuyTrack({ gameId, userId }) {
 }
 
 function* handleExchangeTrack({ gameId, turnId }) {
-  const track = yield call(tracklineApi.games.exchangeTrack, {
+  const exchange = yield call(tracklineApi.games.exchangeTrack, {
     gameId,
     turnId,
   });
-  return { track };
+  return exchange;
 }
 
 function* handleListenNotifications({ gameId }) {
