@@ -20,6 +20,7 @@ class TrackProvider:
         r" - [^-]+ Version(.*)$",
         r" - [^-]+ Anniversary Edition(.*)$",
         r" \([^\)]+ Edit(.*)\)",
+        r" \([^\)]+ Mix(.*)\)",
         r" \([^\)]+ Remix(.*)\)",
         r" \([^\)]+ Version(.*)\)",
         r" [\(\[]feat\. [^)]+[\)\]]",
