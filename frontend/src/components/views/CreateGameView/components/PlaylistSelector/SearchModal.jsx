@@ -255,8 +255,8 @@ const SearchModal = ({
           <Typography level="body-sm" sx={{ flexGrow: 1 }}>
             <FormattedMessage
               id="CreateGameView.PlaylistSelector.SearchModal.selectionSummary"
-              defaultMessage="{count, plural, =0 {No playlists} =1 {# playlist} other {# playlists}} selected"
-              values={{ count: newSelection.length }}
+              defaultMessage="{count, plural, =0 {No playlists} =1 {#{nbsp}playlist} other {#{nbsp}playlists}} selected"
+              values={{ count: newSelection.length, nbsp: <>&nbsp;</> }}
             />
           </Typography>
         </DialogActions>

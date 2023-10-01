@@ -55,8 +55,8 @@ const SettingsForm = ({
         <FormHelperText>
           <FormattedMessage
             id="CreateGameView.SettingsForm.initialTokens.helpText"
-            defaultMessage="Each player starts the game {value, plural, =0 {without any tokens} =1 {with#&#160;token} other {with#&#160;tokens}}."
-            values={{ value: initialTokens }}
+            defaultMessage="Each player starts the game {value, plural, =0 {without any tokens} =1 {with #{nbsp}token} other {with #{nbsp}tokens}}."
+            values={{ value: initialTokens, nbsp: <>&nbsp;</> }}
           />
         </FormHelperText>
       </FormControl>
@@ -88,8 +88,8 @@ const SettingsForm = ({
         <FormHelperText>
           <FormattedMessage
             id="CreateGameView.SettingsForm.timelineLength.helpText"
-            defaultMessage="The game ends when a single player has at least {value}&#160;tracks in their trackline."
-            values={{ value: timelineLength }}
+            defaultMessage="The game ends when a single player has at least {value}{nbsp}tracks in their trackline."
+            values={{ value: timelineLength, nbsp: <>&nbsp;</> }}
           />
         </FormHelperText>
       </FormControl>
