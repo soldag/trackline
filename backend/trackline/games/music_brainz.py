@@ -1,4 +1,5 @@
 from collections.abc import Collection
+from functools import reduce
 
 from httpx import AsyncClient, HTTPError
 from injector import Inject
@@ -24,9 +25,11 @@ class MusicBrainzClient:
     async def get_release_year(
         self, artists: Collection[str], title: str
     ) -> int | None:
-        query = Q("recording", title)
-        for artist in artists:
-            query &= Q("artist", artist)
+        sub_queries = (
+            *(Q("artist", artist) for artist in artists),
+            Q("recording", title),
+        )
+        query = reduce(lambda q1, q2: q1 & q2, sub_queries)
 
         try:
             response = await self._client.get(
