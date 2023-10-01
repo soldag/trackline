@@ -1,11 +1,11 @@
 import string
 
-from jaro import jaro_winkler_metric
+from Levenshtein import ratio
 from unidecode import unidecode
 
 
 def compare_strings(value1: str, value2: str) -> float:
-    return jaro_winkler_metric(normalize_string(value1), normalize_string(value2))
+    return ratio(value1, value2, processor=normalize_string)
 
 
 def normalize_string(value: str) -> str:
