@@ -27,7 +27,7 @@ const SideMenu = ({
     <Stack
       direction="column"
       justifyContent="space-between"
-      sx={{
+      sx={(theme) => ({
         height: {
           xs: 230,
           md: 300,
@@ -40,9 +40,9 @@ const SideMenu = ({
         borderStyle: "solid",
         borderWidth: "1px 1px 1px 0px",
         borderRadius: "0px 5px 5px 0px",
-        boxShadow: "lg",
+        boxShadow: theme.shadow.lg,
         zIndex: 1100,
-      }}
+      })}
     >
       <List sx={{ whiteSpace: "nowrap" }}>
         <ExpandableMenuItem
