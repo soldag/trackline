@@ -10,6 +10,7 @@ import {
   ReleaseYearGuessType,
   TrackType,
 } from "~/types/games";
+import { useBreakpoint } from "~/utils/hooks";
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -34,6 +35,8 @@ const Timeline = ({
   onGuessReleaseYear,
   onGuessCredits,
 }) => {
+  const isScreenXs = useBreakpoint((breakpoints) => breakpoints.only("xs"));
+
   const [isSelectingPosition, setIsSelectingPosition] = useState(false);
 
   const index = tracks.findIndex((t) => t.spotifyId === activeTrackId);
@@ -70,13 +73,23 @@ const Timeline = ({
 
   return (
     <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <Droppable droppableId="droppable" direction="horizontal">
+      <Droppable
+        droppableId="droppable"
+        direction={isScreenXs ? "vertical" : "horizontal"}
+      >
         {(provided) => (
           <Stack
             ref={provided.innerRef}
-            direction="row"
+            direction={{
+              xs: "column",
+              sm: "row",
+            }}
             alignItems="center"
             spacing={1}
+            sx={{
+              py: { xs: 2, sm: 0 },
+              px: { sm: 2 },
+            }}
             {...provided.droppableProps}
           >
             {tracks.map((track, i) => (

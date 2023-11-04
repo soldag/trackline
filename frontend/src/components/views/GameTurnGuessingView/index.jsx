@@ -17,8 +17,14 @@ import {
   scoreTurn,
 } from "~/store/games/actions";
 import { play } from "~/store/spotify/actions";
-import { useErrorToast, useInterval, useLoadingSelector } from "~/utils/hooks";
+import {
+  useBreakpoint,
+  useErrorToast,
+  useInterval,
+  useLoadingSelector,
+} from "~/utils/hooks";
 
+import BottomMenu from "./components/BottomMenu";
 import ExchangeTrackModal from "./components/ExchangeTrackModal";
 import GuessCreditsModal from "./components/GuessCreditsModal";
 import GuessReleaseYearModal from "./components/GuessReleaseYearModal";
@@ -50,6 +56,8 @@ const getTimeout = (game, turn, timeDeviation) => {
 };
 
 const GameTurnGuessingView = () => {
+  const isScreenXs = useBreakpoint((breakpoints) => breakpoints.only("xs"));
+
   const [tracks, setTracks] = useState([]);
   const [releaseYearModalOpen, setReleaseYearModalOpen] = useState(false);
   const [creditsModalOpen, setCreditsModalOpen] = useState(false);
@@ -230,57 +238,74 @@ const GameTurnGuessingView = () => {
       <Box
         sx={{
           display: "flex",
-          py: 1,
+          flex: "1 1 0",
+          overflow: "hidden",
         }}
       >
-        <SideMenu
-          showExchangeTrack={isActivePlayer}
-          canExchangeTrack={canExchangeTrack}
-          canPassTurn={!hasPassed}
-          loadingPassTurn={loadingPassTurn}
-          loadingExchangeTrack={loadingExchangeTrack}
-          onExchangeTrack={() => setExchangeTrackModalOpen(true)}
-          onPassTurn={() => setPassTurnModalOpen(true)}
-        />
+        {!isScreenXs && (
+          <SideMenu
+            showExchangeTrack={isActivePlayer}
+            canExchangeTrack={canExchangeTrack}
+            canPassTurn={!hasPassed}
+            loadingPassTurn={loadingPassTurn}
+            loadingExchangeTrack={loadingExchangeTrack}
+            onExchangeTrack={() => setExchangeTrackModalOpen(true)}
+            onPassTurn={() => setPassTurnModalOpen(true)}
+          />
+        )}
+
         <Box
           sx={{
             "display": "flex",
-            "ml": "-5px",
-            "pl": (theme) => `calc(${theme.spacing(1)} + 5px)`,
-            "pr": 2,
-            "overflowX": "auto",
+            "flexGrow": 1,
+            "justifyContent": { xs: "center", sm: "unset" },
+            "alignItems": { sm: "center" },
+            "overflow": "auto",
             "WebkitOverflowScrolling": "touch",
             "msOverflowStyle": "none",
             "scrollbarWidth": "none",
             "&::-webkit-scrollbar": { display: "none" },
           }}
         >
-          <Timeline
-            tracks={tracks}
-            activeTrackId={turn?.track?.spotifyId}
-            releaseYearGuess={releaseYearGuess}
-            creditsGuess={creditsGuess}
-            canGuessReleaseYear={canGuessReleaseYear}
-            canGuessCredits={canGuessCredits}
-            loadingReleaseYearGuess={loadingReleaseYearGuess}
-            loadingCreditsGuess={loadingCreditsGuess}
-            timeoutStart={timeoutStart}
-            timeoutEnd={timeoutEnd}
-            onTracksChange={setTracks}
-            onGuessReleaseYear={() => setReleaseYearModalOpen(true)}
-            onGuessCredits={() => setCreditsModalOpen(true)}
-          />
+          <Box sx={{ ml: -1 }}>
+            <Timeline
+              tracks={tracks}
+              activeTrackId={turn?.track?.spotifyId}
+              releaseYearGuess={releaseYearGuess}
+              creditsGuess={creditsGuess}
+              canGuessReleaseYear={canGuessReleaseYear}
+              canGuessCredits={canGuessCredits}
+              loadingReleaseYearGuess={loadingReleaseYearGuess}
+              loadingCreditsGuess={loadingCreditsGuess}
+              timeoutStart={timeoutStart}
+              timeoutEnd={timeoutEnd}
+              onTracksChange={setTracks}
+              onGuessReleaseYear={() => setReleaseYearModalOpen(true)}
+              onGuessCredits={() => setCreditsModalOpen(true)}
+            />
+          </Box>
         </Box>
       </Box>
 
-      <Box
-        sx={{
-          flexGrow: 0,
-          px: 2,
-          pb: 1,
-        }}
-      >
-        <StatusBar game={game} users={users} currentUserId={user?.id} />
+      <Box sx={{ flexGrow: 0 }}>
+        {isScreenXs ? (
+          <BottomMenu
+            game={game}
+            users={users}
+            currentUserId={user?.id}
+            showExchangeTrack={isActivePlayer}
+            canExchangeTrack={canExchangeTrack}
+            canPassTurn={!hasPassed}
+            loadingPassTurn={loadingPassTurn}
+            loadingExchangeTrack={loadingExchangeTrack}
+            onExchangeTrack={() => setExchangeTrackModalOpen(true)}
+            onPassTurn={() => setPassTurnModalOpen(true)}
+          />
+        ) : (
+          <Box sx={{ px: 2, pb: 1 }}>
+            <StatusBar game={game} users={users} currentUserId={user?.id} />
+          </Box>
+        )}
       </Box>
     </View>
   );

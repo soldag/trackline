@@ -2,7 +2,10 @@ import { camelizeKeys } from "humps";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
+import { useMediaQuery } from "react-responsive";
 import { toast } from "sonner";
+
+import { useTheme } from "@mui/joy";
 
 import api from "~/api/trackline";
 import SpotifyContext from "~/components/contexts/SpotifyContext";
@@ -78,6 +81,12 @@ export const useErrorSelector = (...actions) => {
         .map((prefix) => state.errors.byRoutine[prefix])
         .filter((error) => error)[0],
   );
+};
+
+export const useBreakpoint = (querySelector) => {
+  const theme = useTheme();
+  const query = querySelector(theme.breakpoints)?.replace("@media", "");
+  return useMediaQuery({ query });
 };
 
 export const useLoadingSelector = (...actions) => {

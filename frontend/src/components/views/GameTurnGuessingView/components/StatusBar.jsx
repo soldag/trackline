@@ -26,7 +26,7 @@ const StatusBar = ({ game, users, currentUserId }) => {
     <Stack
       direction="row"
       justifyContent="space-between"
-      sx={{ "& > *": { flex: 1 } }}
+      sx={{ "alignItems": "flex-end", "& > *": { flex: 1 } }}
     >
       <Stack direction={{ xs: "column", sm: "row" }}>
         <Typography level="body-sm" sx={{ fontWeight: "lg" }}>
