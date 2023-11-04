@@ -260,6 +260,8 @@ const GameTurnGuessingView = () => {
             "flexGrow": 1,
             "justifyContent": { xs: "center", sm: "unset" },
             "alignItems": { sm: "center" },
+            "ml": { sm: "-5px" },
+            "pl": { sm: "5px" },
             "overflow": "auto",
             "WebkitOverflowScrolling": "touch",
             "msOverflowStyle": "none",
