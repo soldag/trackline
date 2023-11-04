@@ -26,7 +26,8 @@ const GuessingContent = ({ timeoutStart, timeoutEnd }) => (
       <AudiotrackIcon
         sx={{
           flexGrow: 1,
-          width: "auto",
+          width: "100%",
+          maxWidth: "175px",
           color: "var(--TrackCard-color-primary)",
           animation: `${pulseEffect} 3500ms ease-in-out infinite`,
         }}
