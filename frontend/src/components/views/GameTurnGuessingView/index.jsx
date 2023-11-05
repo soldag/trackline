@@ -127,18 +127,6 @@ const GameTurnGuessingView = () => {
     }
   }, [releaseYearGuess, turn.track, activePlayer.timeline]);
 
-  useInterval(() => {
-    if (
-      !scoringTriggered &&
-      isActivePlayer &&
-      timeoutEnd != null &&
-      timeoutEnd < Date.now()
-    ) {
-      setScoringTriggered(true);
-      dispatch(scoreTurn({ gameId, turnId }));
-    }
-  }, 1000);
-
   useEffect(() => {
     if (!hasPassed && !canGuessReleaseYear && !canGuessCredits) {
       dispatch(passTurn({ gameId, turnId }));
@@ -151,6 +139,25 @@ const GameTurnGuessingView = () => {
     gameId,
     turnId,
   ]);
+
+  useEffect(() => {
+    // Abort any attempts to guess or pass when a track has been exchanged
+    setReleaseYearModalOpen(false);
+    setCreditsModalOpen(false);
+    setPassTurnModalOpen(false);
+  }, [turn.track.spotifyId]);
+
+  useInterval(() => {
+    if (
+      !scoringTriggered &&
+      isActivePlayer &&
+      timeoutEnd != null &&
+      timeoutEnd < Date.now()
+    ) {
+      setScoringTriggered(true);
+      dispatch(scoreTurn({ gameId, turnId }));
+    }
+  }, 1000);
 
   useEffect(() => {
     if (!isActivePlayer || scoringTriggered) return;
