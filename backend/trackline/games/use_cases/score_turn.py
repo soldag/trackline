@@ -224,7 +224,7 @@ class ScoreTurn(BaseModel):
                     self._get_credits_similarity(turn.track, guess, game.settings)
                     for guess in seen_guesses
                 ]
-                is_duplicate = (
+                is_duplicate = any(
                     similarity >= game.settings.credits_similarity_threshold
                     for similarity in seen_guesses_similarities
                 )
