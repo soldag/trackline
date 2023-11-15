@@ -71,6 +71,12 @@ const Timeline = ({
     }
   }, [isSelectingPosition, releaseYearGuess]);
 
+  useEffect(() => {
+    if (!canGuessReleaseYear && isSelectingPosition) {
+      setIsSelectingPosition(false);
+    }
+  }, [canGuessReleaseYear, isSelectingPosition]);
+
   return (
     <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <Droppable
