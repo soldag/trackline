@@ -37,6 +37,17 @@ const GuessingContent = ({ timeoutStart, timeoutEnd }) => (
         defaultColor="success"
         start={timeoutStart}
         timeout={timeoutEnd}
+        sx={{
+          "--CircularProgress-size": "calc(0.5 * var(--TrackCard-size))",
+          "--CircularProgress-trackThickness": {
+            xs: "6px",
+            md: "8px",
+          },
+          "--CircularProgress-progressThickness": {
+            xs: "6px",
+            md: "8px",
+          },
+        }}
       />
     )}
   </CardContent>

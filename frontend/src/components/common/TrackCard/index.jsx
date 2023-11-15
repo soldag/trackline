@@ -93,16 +93,13 @@ const TrackCard = ({
       variant={track == null ? "outlined" : "plain"}
       sx={(theme) => ({
         ...sx,
-        "height": {
-          xs: 230,
-          md: 300,
-          lg: 350,
+        "--TrackCard-size": {
+          xs: "230px",
+          md: "300px",
+          lg: "350px",
         },
-        "width": {
-          xs: 230,
-          md: 300,
-          lg: 350,
-        },
+        "height": "var(--TrackCard-size)",
+        "width": "var(--TrackCard-size)",
         "flexShrink": 0,
         "justifyContent": "space-between",
         "textAlign": "center",

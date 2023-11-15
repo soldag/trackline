@@ -4,6 +4,7 @@ import { FormattedMessage } from "react-intl";
 
 import { CircularProgress } from "@mui/joy";
 
+import SxType from "~/types/mui";
 import { useInterval } from "~/utils/hooks";
 
 const DANGER_THRESHOLD = 0.75;
@@ -25,6 +26,7 @@ const CircularCountdown = ({
   timeout,
   defaultColor,
   updateInterval = 100,
+  sx,
 }) => {
   const [progress, setProgress] = useState(0);
   const [remaining, setRemaining] = useState(timeout - start);
@@ -45,11 +47,12 @@ const CircularCountdown = ({
       value={progress * 100}
       sx={{
         "--CircularProgress-size": "96px",
-        "--CircularProgress-track-thickness": "10px",
-        "--CircularProgress-progress-thickness": "10px",
+        "--CircularProgress-trackThickness": "6px",
+        "--CircularProgress-progressThickness": "6px",
         "& *": {
           transition: "stroke 1000ms, color 1000ms",
         },
+        ...sx,
       }}
     >
       <FormattedMessage
@@ -66,6 +69,7 @@ CircularCountdown.propTypes = {
   timeout: PropTypes.number.isRequired,
   defaultColor: PropTypes.string,
   updateInterval: PropTypes.number,
+  sx: SxType,
 };
 
 export default CircularCountdown;
