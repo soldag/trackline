@@ -6,9 +6,16 @@ from trackline.constants import (
     DEFAULT_GUESS_TIMEOUT,
     DEFAULT_INITIAL_TOKENS,
     DEFAULT_TIMELINE_LENGTH,
+    DEFAULT_TITLE_MATCH_MODE,
 )
 from trackline.core.fields import Fraction, ResourceId
-from trackline.games.models import ArtistsMatchMode, Game, GameSettings, Player
+from trackline.games.models import (
+    ArtistsMatchMode,
+    Game,
+    GameSettings,
+    Player,
+    TitleMatchMode,
+)
 from trackline.games.schemas import GameOut
 from trackline.games.use_cases.base import BaseHandler
 
@@ -20,6 +27,7 @@ class CreateGame(BaseModel):
     timeline_length: int = DEFAULT_TIMELINE_LENGTH
     guess_timeout: int = DEFAULT_GUESS_TIMEOUT
     artists_match_mode: ArtistsMatchMode = DEFAULT_ARTISTS_MATCH_MODE
+    title_match_mode: TitleMatchMode = DEFAULT_TITLE_MATCH_MODE
     credits_similarity_threshold: Fraction = DEFAULT_CREDITS_SIMILARITY_THRESHOLD
 
     class Handler(BaseHandler):
@@ -32,6 +40,7 @@ class CreateGame(BaseModel):
                     timeline_length=use_case.timeline_length,
                     guess_timeout=use_case.guess_timeout,
                     artists_match_mode=use_case.artists_match_mode,
+                    title_match_mode=use_case.title_match_mode,
                     credits_similarity_threshold=use_case.credits_similarity_threshold,
                 ),
                 players=[

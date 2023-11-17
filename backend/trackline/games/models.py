@@ -23,6 +23,11 @@ class ArtistsMatchMode(str, Enum):
     ONE = "one"
 
 
+class TitleMatchMode(str, Enum):
+    FULL = "full"
+    MAIN = "main"
+
+
 class Track(BaseModel):
     spotify_id: str
     title: str
@@ -99,6 +104,7 @@ class GameSettings(BaseModel):
     timeline_length: int
     guess_timeout: int
     artists_match_mode: ArtistsMatchMode
+    title_match_mode: TitleMatchMode
     credits_similarity_threshold: float
 
 

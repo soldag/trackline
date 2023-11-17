@@ -47,6 +47,11 @@ export const ARTIST_MATCH_MODES = {
   ONE: "one",
 };
 
+export const TITLE_MATCH_MODE = {
+  FULL: "full",
+  MAIN: "main",
+};
+
 export const CREDITS_STRICTNESS = {
   EXACT: "exact",
   STRICT: "strict",
@@ -57,27 +62,24 @@ export const CREDITS_STRICTNESS = {
 export const CREDITS_STRICTNESS_VALUES = {
   [CREDITS_STRICTNESS.EXACT]: {
     artistsMatchMode: ARTIST_MATCH_MODES.ALL,
+    titleMatchMode: TITLE_MATCH_MODE.FULL,
     creditsSimilarityThreshold: 1.0,
   },
   [CREDITS_STRICTNESS.STRICT]: {
     artistsMatchMode: ARTIST_MATCH_MODES.ALL,
+    titleMatchMode: TITLE_MATCH_MODE.FULL,
     creditsSimilarityThreshold: 0.9,
   },
   [CREDITS_STRICTNESS.MODERATE]: {
     artistsMatchMode: ARTIST_MATCH_MODES.ONE,
+    titleMatchMode: TITLE_MATCH_MODE.MAIN,
     creditsSimilarityThreshold: 0.9,
   },
   [CREDITS_STRICTNESS.RELAXED]: {
     artistsMatchMode: ARTIST_MATCH_MODES.ONE,
+    titleMatchMode: TITLE_MATCH_MODE.MAIN,
     creditsSimilarityThreshold: 0.8,
   },
-};
-
-export const DEFAULT_GAME_SETTINGS = {
-  initialTokens: 2,
-  timelineLength: 10,
-  artistsMatchMode: ARTIST_MATCH_MODES.ONE,
-  creditsSimilarityThreshold: 0.9,
 };
 
 export const REQUIRED_SPOTIFY_SCOPES = [

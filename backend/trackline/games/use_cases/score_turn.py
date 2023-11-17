@@ -1,4 +1,5 @@
 from collections import defaultdict
+import re
 from typing import TypeVar
 
 from injector import Inject
@@ -19,6 +20,7 @@ from trackline.games.models import (
     ReleaseYearGuess,
     ReleaseYearScoring,
     Scoring,
+    TitleMatchMode,
     Track,
     Turn,
     TurnScoring,
@@ -264,8 +266,20 @@ class ScoreTurn(BaseModel):
                 case ArtistsMatchMode.ONE:
                     sim_artists = max(sim_all_artists)
 
-            sim_title = compare_strings(track.title, guess.title)
+            sim_title = compare_strings(
+                self._transform_title(track.title, settings.title_match_mode),
+                self._transform_title(guess.title, settings.title_match_mode),
+            )
             return (sim_artists + sim_title) / 2
+
+        def _transform_title(
+            self, original_title: str, match_mode: TitleMatchMode
+        ) -> str:
+            match match_mode:
+                case TitleMatchMode.FULL:
+                    return original_title
+                case TitleMatchMode.MAIN:
+                    return re.sub(r"\([^\)]+\)", "", original_title).strip()
 
         def _merge_token_gain(
             self, *deltas: dict[ResourceId, int]

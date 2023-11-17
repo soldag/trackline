@@ -83,6 +83,7 @@ function* handleCreateGame({
   initialTokens,
   timelineLength,
   artistsMatchMode,
+  titleMatchMode,
   creditsSimilarityThreshold,
 }) {
   const game = yield call(tracklineApi.games.create, {
@@ -91,6 +92,7 @@ function* handleCreateGame({
     initialTokens,
     timelineLength,
     artistsMatchMode,
+    titleMatchMode,
     creditsSimilarityThreshold,
   });
   return { game };

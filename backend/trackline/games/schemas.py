@@ -16,6 +16,7 @@ from trackline.games.models import (
     ReleaseYearGuess,
     ReleaseYearScoring,
     Scoring,
+    TitleMatchMode,
     Track,
     Turn,
     TurnGuesses,
@@ -216,6 +217,7 @@ class GameSettingsOut(BaseModel):
     timeline_length: int
     guess_timeout: int
     artists_match_mode: ArtistsMatchMode
+    title_match_mode: TitleMatchMode
     credits_similarity_threshold: float
 
     @staticmethod
@@ -227,6 +229,7 @@ class GameSettingsOut(BaseModel):
             timeline_length=model.timeline_length,
             guess_timeout=model.guess_timeout,
             artists_match_mode=model.artists_match_mode,
+            title_match_mode=model.title_match_mode,
             credits_similarity_threshold=model.credits_similarity_threshold,
         )
 

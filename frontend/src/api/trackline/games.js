@@ -6,6 +6,7 @@ export const create = async ({
   initialTokens,
   timelineLength,
   artistsMatchMode,
+  titleMatchMode,
   creditsSimilarityThreshold,
 }) => {
   const {
@@ -16,6 +17,7 @@ export const create = async ({
     initialTokens,
     timelineLength,
     artistsMatchMode,
+    titleMatchMode,
     creditsSimilarityThreshold,
   });
 

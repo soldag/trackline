@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from trackline.games.models import ArtistsMatchMode
+from trackline.games.models import ArtistsMatchMode, TitleMatchMode
 
 
 APP_NAME = "trackline"
@@ -15,6 +15,7 @@ DEFAULT_TIMELINE_LENGTH = 10
 DEFAULT_GUESS_TIMEOUT = 30000
 DEFAULT_CREDITS_SIMILARITY_THRESHOLD = 0.9
 DEFAULT_ARTISTS_MATCH_MODE = ArtistsMatchMode.ONE
+DEFAULT_TITLE_MATCH_MODE = TitleMatchMode.MAIN
 
 TOKEN_COST_POSITION_GUESS = 1
 TOKEN_COST_YEAR_GUESS = 1
