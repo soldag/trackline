@@ -1,9 +1,10 @@
-const fs = require("fs");
-const path = require("path");
-const globSync = require("glob").sync;
-require("colors");
+import "colors";
+import fs from "fs";
+import { globSync } from "glob";
+import path from "path";
+import * as url from "url";
 
-const ROOT_DIR = path.resolve(__dirname, "..");
+const ROOT_DIR = path.resolve(url.fileURLToPath(import.meta.url), "..");
 const TRANSLATIONS_DIR = path.resolve(ROOT_DIR, "src/translations");
 const FILE_GLOB = path.resolve(TRANSLATIONS_DIR, "*.json");
 const DEFAULT_LOCALE_FILE_PATH = path.resolve(TRANSLATIONS_DIR, "en.json");

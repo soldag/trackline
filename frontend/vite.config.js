@@ -1,17 +1,15 @@
-import path from "path";
-import { defineConfig } from "vite";
+/* eslint-env node */
 import react from "@vitejs/plugin-react";
+import path from "path";
 
-export default defineConfig(() => {
-  return {
-    resolve: {
-      alias: {
-        "~": path.resolve(__dirname, "./src"),
-      },
+export default {
+  resolve: {
+    alias: {
+      "~": path.resolve(__dirname, "./src"),
     },
-    build: {
-      outDir: "build",
-    },
-    plugins: [react()],
-  };
-});
+  },
+  build: {
+    outDir: "build",
+  },
+  plugins: [react()],
+};
