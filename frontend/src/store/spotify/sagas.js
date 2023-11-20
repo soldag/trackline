@@ -1,4 +1,13 @@
-import { all, call, delay, fork, put, race, take } from "redux-saga/effects";
+import {
+  all,
+  call,
+  delay,
+  fork,
+  put,
+  race,
+  select,
+  take,
+} from "redux-saga/effects";
 
 import spotifyApi from "~/api/spotify";
 import tracklineApi from "~/api/trackline";
@@ -67,7 +76,12 @@ function* handleFetchRecommendedPlaylists() {
 }
 
 function* handleSearchPlaylists({ query, limit }) {
-  const playlists = yield call(spotifyApi.playlists.search, { query, limit });
+  const userId = yield select((state) => state.spotify.user?.id);
+  const playlists = yield call(spotifyApi.playlists.search, {
+    userId,
+    query,
+    limit,
+  });
 
   return { playlists };
 }

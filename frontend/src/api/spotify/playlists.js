@@ -1,11 +1,15 @@
 import instance from "./instance";
 
-export const get = async ({ id }) => {
-  const { data: playlist } = await instance.get(`playlists/${id}`);
+export const get = async ({ id, fields }) => {
+  const { data: playlist } = await instance.get(`playlists/${id}`, {
+    params: {
+      fields: fields?.join(","),
+    },
+  });
   return playlist;
 };
 
-export const search = async ({ query, limit, offset = 0 }) => {
+export const search = async ({ userId, query, limit, offset = 0 }) => {
   const {
     data: {
       playlists: { items },
@@ -18,5 +22,21 @@ export const search = async ({ query, limit, offset = 0 }) => {
       offset,
     },
   });
-  return items;
+
+  // Search endpoint will always return public = null
+  const privatePlaylistIds = [];
+  const ownedPlaylistIds = items
+    .filter((p) => p.owner.id === userId)
+    .map((p) => p.id);
+  for (const playlistId of ownedPlaylistIds) {
+    const playlist = await get({ id: playlistId, fields: ["public"] });
+    if (!playlist.public) {
+      privatePlaylistIds.push(playlistId);
+    }
+  }
+
+  return items.map((p) => ({
+    ...p,
+    public: p.public || !privatePlaylistIds.includes(p.id),
+  }));
 };

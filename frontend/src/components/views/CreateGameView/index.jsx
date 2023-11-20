@@ -62,6 +62,10 @@ const CreateGameView = () => {
     (state) => state.spotify.playlists.searchResults,
   );
 
+  const publicPlaylistSearchResults = playlistSearchResults.filter(
+    (p) => p.public,
+  );
+
   const [expandPlaylists, setExpandPlaylists] = useState(true);
   const [playlists, setPlaylists] = useState([]);
   const [initialTokens, setInitialTokens] = useState(2);
@@ -141,7 +145,7 @@ const CreateGameView = () => {
       error={errorSpotify}
       loading={loadingSpotify}
       recommendations={playlistRecommendations}
-      searchResults={playlistSearchResults}
+      searchResults={publicPlaylistSearchResults}
       onSearch={handleSearchPlaylists}
       onClearSearchResults={handleClearPlaylistSearchResults}
     />
