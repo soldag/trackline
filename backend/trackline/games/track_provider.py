@@ -16,6 +16,7 @@ class TrackProvider:
         r" - The Original$",
         r" - [^-]*Remaster(ed)?(.*)$",
         r" - [^-]+ Edit(.*)$",
+        r" - [^-]+ Mix(.*)$",
         r" - [^-]+ Remix(.*)$",
         r" - [^-]+ Version(.*)$",
         r" - [^-]+ Anniversary Edition(.*)$",
