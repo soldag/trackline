@@ -9,6 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from injector import Injector
 from pymongo.errors import OperationFailure
+from sentry_sdk import capture_exception
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
@@ -79,6 +80,7 @@ class ExceptionHandlingMiddleware:
         try:
             await self.app(scope, receive, send)
         except RequestValidationError as exc:
+            capture_exception()
             await self._create_response(
                 code="VALIDATION_ERROR",
                 message="The request is invalid.",
@@ -91,12 +93,14 @@ class ExceptionHandlingMiddleware:
                 status_code=400,
             )(scope, receive, send)
         except RequestException as exc:
+            capture_exception()
             await self._create_response(
                 code=exc.code,
                 message=exc.message,
                 status_code=exc.status_code,
             )(scope, receive, send)
         except Exception:
+            capture_exception()
             log.exception("Unhandled exception", exc_info=True)
             await self._create_response(
                 code="UNEXPECTED_ERROR",
@@ -111,10 +115,13 @@ class ExceptionHandlingMiddleware:
         try:
             await self.app(scope, receive, send)
         except RequestValidationError:
+            capture_exception()
             await ws.close(code=1008, reason="VALIDATION_ERROR")
         except RequestException as exc:
+            capture_exception()
             await ws.close(code=1008, reason=exc.code)
         except Exception:
+            capture_exception()
             log.exception("Unhandled exception", exc_info=True)
             await ws.close(code=1008)
 

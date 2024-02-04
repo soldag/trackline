@@ -9,6 +9,7 @@ from injector import Injector
 from trackline.auth.router import router as auth_router
 from trackline.core.deps import websocket_logger
 from trackline.core.di import CoreModule
+from trackline.core.logging import initialize_sentry
 from trackline.core.middleware import (
     DatabaseTransactionMiddleware,
     ExceptionHandlingMiddleware,
@@ -17,6 +18,7 @@ from trackline.core.middleware import (
     ServerTimeMiddleware,
 )
 from trackline.core.schemas import ErrorResponse
+from trackline.core.settings import Settings
 from trackline.games.di import GamesModule
 from trackline.games.router import router as games_router
 from trackline.spotify.client import SpotifyClient
@@ -38,6 +40,8 @@ app = FastAPI(
 
 injector = Injector([CoreModule(), GamesModule(), SpotifyModule()])
 attach_injector(app, injector)
+
+initialize_sentry(injector.get(Settings))
 
 app.add_middleware(DatabaseTransactionMiddleware, injector=injector)
 app.add_middleware(InjectorMiddleware, injector=injector)

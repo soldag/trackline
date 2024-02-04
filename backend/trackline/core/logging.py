@@ -1,3 +1,5 @@
+import sentry_sdk
+
 from trackline.core.settings import Settings
 
 
@@ -27,3 +29,11 @@ def get_log_config(settings: Settings) -> dict:
             },
         },
     }
+
+
+def initialize_sentry(settings: Settings):
+    if settings.sentry_dsn:
+        sentry_sdk.init(
+            dsn=settings.sentry_dsn,
+            enable_tracing=True,
+        )

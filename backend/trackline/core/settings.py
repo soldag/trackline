@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     spotify_client_secret: str
     spotify_redirect_url: str
 
+    sentry_dsn: str | None = None
+
 
 def get_settings() -> Settings:
     environment = os.getenv("ENVIRONMENT", "production").lower()
