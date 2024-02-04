@@ -1,3 +1,5 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 import logging
 
 from fastapi import Depends, FastAPI, WebSocket
@@ -30,18 +32,39 @@ from trackline.users.router import router as users_router
 log = logging.getLogger(__name__)
 
 
+injector = Injector([CoreModule(), GamesModule(), SpotifyModule()])
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator:
+    log.info("Waiting for application startup.")
+
+    initialize_sentry(injector.get(Settings))
+
+    spotify_client = injector.get(SpotifyClient)
+    await spotify_client.initialize()
+
+    log.info("Application startup complete.")
+
+    yield
+
+    log.info("Waiting for application shutdown.")
+
+    spotify_client = injector.get(SpotifyClient)
+    await spotify_client.close()
+
+    log.info("Application shutdown complete.")
+
+
 app = FastAPI(
     title="Trackline",
     dependencies=[Depends(websocket_logger)],
+    lifespan=lifespan,
     responses={
         422: {"description": "Validation Error", "model": ErrorResponse},
     },
 )
-
-injector = Injector([CoreModule(), GamesModule(), SpotifyModule()])
 attach_injector(app, injector)
-
-initialize_sentry(injector.get(Settings))
 
 app.add_middleware(DatabaseTransactionMiddleware, injector=injector)
 app.add_middleware(InjectorMiddleware, injector=injector)
@@ -62,26 +85,6 @@ app.include_router(auth_router)
 app.include_router(games_router)
 app.include_router(spotify_router)
 app.include_router(users_router)
-
-
-@app.on_event("startup")
-async def on_startup():
-    log.info("Waiting for application startup.")
-
-    spotify_client = injector.get(SpotifyClient)
-    await spotify_client.initialize()
-
-    log.info("Application startup complete.")
-
-
-@app.on_event("shutdown")
-async def on_shutdown():
-    log.info("Waiting for application shutdown.")
-
-    spotify_client = injector.get(SpotifyClient)
-    await spotify_client.close()
-
-    log.info("Application shutdown complete.")
 
 
 @app.exception_handler(RequestValidationError)
