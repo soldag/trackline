@@ -80,7 +80,6 @@ class ExceptionHandlingMiddleware:
         try:
             await self.app(scope, receive, send)
         except RequestValidationError as exc:
-            capture_exception()
             await self._create_response(
                 code="VALIDATION_ERROR",
                 message="The request is invalid.",
@@ -93,7 +92,6 @@ class ExceptionHandlingMiddleware:
                 status_code=400,
             )(scope, receive, send)
         except RequestException as exc:
-            capture_exception()
             await self._create_response(
                 code=exc.code,
                 message=exc.message,
