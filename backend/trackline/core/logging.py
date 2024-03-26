@@ -38,6 +38,8 @@ def initialize_sentry(settings: Settings):
         sentry_sdk.init(
             dsn=settings.sentry_dsn,
             enable_tracing=True,
+            traces_sample_rate=1.0,
+            profiles_sample_rate=1.0,
             integrations=[
                 AioHttpIntegration(),
                 PyMongoIntegration(),
