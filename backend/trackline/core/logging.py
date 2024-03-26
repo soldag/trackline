@@ -1,4 +1,6 @@
 import sentry_sdk
+from sentry_sdk.integrations.aiohttp import AioHttpIntegration
+from sentry_sdk.integrations.pymongo import PyMongoIntegration
 
 from trackline.core.settings import Settings
 
@@ -36,4 +38,8 @@ def initialize_sentry(settings: Settings):
         sentry_sdk.init(
             dsn=settings.sentry_dsn,
             enable_tracing=True,
+            integrations=[
+                AioHttpIntegration(),
+                PyMongoIntegration(),
+            ],
         )
