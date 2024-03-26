@@ -1,5 +1,6 @@
 import sentry_sdk
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
+from sentry_sdk.integrations.asyncio import AsyncioIntegration
 from sentry_sdk.integrations.pymongo import PyMongoIntegration
 
 from trackline.core.settings import Settings
@@ -42,6 +43,7 @@ def initialize_sentry(settings: Settings):
             profiles_sample_rate=1.0,
             integrations=[
                 AioHttpIntegration(),
+                AsyncioIntegration(),
                 PyMongoIntegration(),
             ],
         )
