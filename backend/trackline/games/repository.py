@@ -1,5 +1,7 @@
 from collections.abc import Mapping
 
+from pymongo import UpdateOne
+
 from trackline.core.db.repository import Repository
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
@@ -164,15 +166,14 @@ class GameRepository(Repository[Game]):
     async def inc_tokens(
         self, game_id: ResourceId, amounts: Mapping[ResourceId, int]
     ) -> int:
-        count = 0
-        for user_id, amount in amounts.items():
-            if amount == 0:
-                continue
-
-            count += await self._update_one(
-                self._id_query(game_id),
-                {"$inc": {"players.$[player].tokens": amount}},
-                array_filters=[{"player.user_id": user_id}],
-            )
-
-        return count
+        return await self._update_bulk(
+            [
+                UpdateOne(
+                    self._id_query(game_id),
+                    {"$inc": {"players.$[player].tokens": amount}},
+                    array_filters=[{"player.user_id": user_id}],
+                )
+                for user_id, amount in amounts.items()
+                if amount != 0
+            ]
+        )

@@ -1,4 +1,4 @@
-from collections.abc import Collection, Mapping
+from collections.abc import Collection, Mapping, Sequence
 from typing import (
     Any,
     Generic,
@@ -8,6 +8,7 @@ from typing import (
 
 from injector import Inject
 from pydantic import BaseModel
+from pymongo import UpdateOne
 
 from trackline.core.db.client import DatabaseClient
 from trackline.core.db.models import IdentifiableModel
@@ -78,6 +79,16 @@ class Repository(Generic[T]):
             filter=self._transform_query(query),
             update=update,
             array_filters=array_filters,
+            session=self._session,
+        )
+        return result.modified_count
+
+    async def _update_bulk(self, requests: Sequence[UpdateOne]) -> int:
+        if not requests:
+            return 0
+
+        result = await self._collection.bulk_write(
+            requests,
             session=self._session,
         )
         return result.modified_count
