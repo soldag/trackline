@@ -4,7 +4,7 @@
 #
 
 app = "trackline-api"
-primary_region = "cdg"
+primary_region = "fra"
 kill_signal = "SIGINT"
 kill_timeout = "5s"
 
@@ -13,7 +13,7 @@ auto_rollback = true
 
 [env]
 DB_NAME = "trackline"
-PRIMARY_REGION = "cdg"
+PRIMARY_REGION = "fra"
 SPOTIFY_REDIRECT_URL = "https://trackline.fly.dev/spotify/callback"
 UVICORN_WORKERS = "3"
 

@@ -4,7 +4,7 @@
 #
 
 app = "trackline"
-primary_region = "cdg"
+primary_region = "fra"
 kill_signal = "SIGINT"
 kill_timeout = "5s"
 
@@ -13,7 +13,7 @@ auto_rollback = true
 
 [env]
 BACKEND_URL = "https://trackline-api.fly.dev"
-PRIMARY_REGION = "cdg"
+PRIMARY_REGION = "fra"
 
 [[services]]
 protocol = "tcp"
