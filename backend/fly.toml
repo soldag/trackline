@@ -15,6 +15,7 @@ auto_rollback = true
 DB_NAME = "trackline"
 PRIMARY_REGION = "cdg"
 SPOTIFY_REDIRECT_URL = "https://trackline.fly.dev/spotify/callback"
+UVICORN_WORKERS = "3"
 
 [[services]]
 protocol = "tcp"
