@@ -1,0 +1,48 @@
+version: "3.8"
+volumes:
+  mongo_data:
+  mongo_config:
+services:
+  mongo:
+    image: mongo:7.0.7
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_DATABASE=trackline
+    volumes:
+      - "mongo_data:/data/db"
+      - "mongo_config:/data/configdb"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017'}]}) }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      start_period: 0s
+      start_interval: 1s
+      retries: 30
+  backend:
+    build:
+      context: backend
+    ports:
+      - 8000:80
+    environment:
+      DB_URI: mongodb://trackline:trackline@mongo:27017
+      DB_NAME: trackline
+      SPOTIFY_REDIRECT_URL: http://localhost:8001/spotify/callback
+    env_file:
+      - ./docker-compose.env
+    depends_on:
+      - mongo
+  frontend:
+    build:
+      context: frontend
+    ports:
+      - 8001:80
+    environment:
+      BACKEND_URL: http://localhost:8000
+    env_file:
+      - ./docker-compose.env
+    depends_on:
+      - backend
