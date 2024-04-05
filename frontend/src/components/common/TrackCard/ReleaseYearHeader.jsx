@@ -9,7 +9,6 @@ const ReleaseYearHeader = ({ loading, year, minYear, maxYear }) => (
     sx={{
       flexGrow: 0,
       justifyContent: "flex-start",
-      minHeight: "2.25rem",
     }}
   >
     {loading ? (
