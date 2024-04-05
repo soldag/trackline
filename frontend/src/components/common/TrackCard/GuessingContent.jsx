@@ -20,7 +20,12 @@ const pulseEffect = keyframes`
 
 const GuessingContent = ({ timeoutStart, timeoutEnd }) => (
   <CardContent
-    sx={{ flexGrow: 1, justifyContent: "center", alignItems: "center" }}
+    sx={{
+      justifyContent: "center",
+      alignItems: "center",
+      overflow: "hidden",
+      maxHeight: "calc(0.5 * var(--TrackCard-size))",
+    }}
   >
     {timeoutStart == null || timeoutEnd == null ? (
       <AudiotrackIcon
@@ -37,17 +42,6 @@ const GuessingContent = ({ timeoutStart, timeoutEnd }) => (
         defaultColor="success"
         start={timeoutStart}
         timeout={timeoutEnd}
-        sx={{
-          "--CircularProgress-size": "calc(0.5 * var(--TrackCard-size))",
-          "--CircularProgress-trackThickness": {
-            xs: "6px",
-            md: "8px",
-          },
-          "--CircularProgress-progressThickness": {
-            xs: "6px",
-            md: "8px",
-          },
-        }}
       />
     )}
   </CardContent>
