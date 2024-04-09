@@ -55,10 +55,14 @@ const reducer = createReducer(initialState, (builder) => {
       state.users = [];
     })
 
-    .addCase(playerJoined, (state, { payload: { user, player } }) => {
+    .addCase(playerJoined, (state, { payload: { user, player, position } }) => {
+      const players = state.game.players.filter(
+        (p) => p.userId !== player.userId,
+      );
       state.game.players = [
-        ...state.game.players.filter((p) => p.userId !== player.userId),
+        ...players.slice(0, position),
         player,
+        ...players.slice(position),
       ];
       state.users = [...state.users.filter((u) => u.id !== user.id), user];
     })

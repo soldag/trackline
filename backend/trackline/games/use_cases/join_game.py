@@ -1,3 +1,5 @@
+import random
+
 from injector import Inject
 from pydantic import BaseModel
 
@@ -48,7 +50,11 @@ class JoinGame(BaseModel):
                 is_game_master=False,
                 tokens=game.settings.initial_tokens,
             )
-            await self._game_repository.add_player(game.id, player)
+
+            # The player is inserted at a random position to prevent the
+            # game master from always being the start player
+            position = random.randint(0, len(game.players))
+            await self._game_repository.add_player(game.id, player, position)
 
             user = await self._user_repository.find_by_id(user_id)
             assert user
@@ -58,7 +64,7 @@ class JoinGame(BaseModel):
             await self._notifier.notify(
                 user_id,
                 game,
-                PlayerJoined(user=user_out, player=player_out),
+                PlayerJoined(user=user_out, player=player_out, position=position),
             )
 
             return player_out

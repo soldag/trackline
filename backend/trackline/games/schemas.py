@@ -267,6 +267,7 @@ class TrackPurchaseReceiptOut(BaseModel):
 class PlayerJoined(Notification):
     user: UserOut
     player: PlayerOut
+    position: int
 
 
 class PlayerLeft(Notification):

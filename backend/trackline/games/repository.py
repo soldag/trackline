@@ -21,10 +21,19 @@ class GameRepository(Repository[Game]):
     class Meta:
         collection_name = "games"
 
-    async def add_player(self, game_id: ResourceId, player: Player) -> int:
+    async def add_player(
+        self, game_id: ResourceId, player: Player, position: int | None = None
+    ) -> int:
         return await self._update_one(
             self._id_query(game_id),
-            {"$push": {"players": self._to_document(player, root=False)}},
+            {
+                "$push": {
+                    "players": {
+                        "$each": [self._to_document(player, root=False)],
+                        "$position": position,
+                    }
+                }
+            },
         )
 
     async def remove_player(self, game_id: ResourceId, user_id: ResourceId) -> int:
