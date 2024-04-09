@@ -1,5 +1,5 @@
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
 
 from async_spotify import SpotifyApiClient
 from async_spotify.authentification.authorization_flows import (

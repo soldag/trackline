@@ -1,4 +1,4 @@
-from typing import Annotated, Any, Type
+from typing import Annotated, Any
 
 from bson import ObjectId
 from pydantic import Field, GetCoreSchemaHandler, GetJsonSchemaHandler
@@ -13,7 +13,7 @@ class ResourceId(ObjectId):
     @classmethod
     def __get_pydantic_core_schema__(
         cls,
-        source: Type[Any],
+        source: type[Any],
         handler: GetCoreSchemaHandler,
     ) -> core_schema.CoreSchema:
         from_str_schema = core_schema.chain_schema(

@@ -667,6 +667,24 @@ pycodestyle = "*"
 setuptools = "*"
 
 [[package]]
+name = "flake8-modern-annotations"
+version = "1.6.0"
+description = "Flake8 modern annotations validation"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "flake8-modern-annotations-1.6.0.tar.gz", hash = "sha256:879a370b1ba51a7b86bbba1b48393640a12565538b56fc0994630e74f89d9343"},
+    {file = "flake8_modern_annotations-1.6.0-py3-none-any.whl", hash = "sha256:40342ddf684f12a8882719913adb94a8d4bb4e83e217ec7fe5b03df18acd0ecf"},
+]
+
+[package.dependencies]
+flake8 = ">=3.8.0,<8.0"
+typing-extensions = ">=3.7.4.2"
+
+[package.extras]
+dev = ["flake8 (>=3.8.0,<6.0.0)", "flake8-annotations", "flake8-bandit", "flake8-bugbear", "flake8-commas", "flake8-comprehensions", "flake8-continuation", "flake8-datetimez", "flake8-docstrings", "flake8-import-order", "flake8-literal", "flake8-modern-annotations", "flake8-noqa", "flake8-polyfill", "flake8-pyproject", "flake8-requirements", "flake8-typechecking-import", "flake8-use-fstring", "mypy", "pep8-naming"]
+
+[[package]]
 name = "flake8-warnings"
 version = "0.4.1"
 description = "Linter (flake8, pylint, custom CLI) for finding usage of deprecated functions."
@@ -2057,4 +2075,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "108a365ef106c4184ce8190d16274ef3da43da1a26a803a601fced13a6fb8a5d"
+content-hash = "6a3f8cf9dc365d534a6e7a44457335500b93ac7a3eb67e21a482193c66378758"

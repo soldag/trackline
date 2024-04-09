@@ -1,6 +1,5 @@
 import abc
-from collections.abc import Collection, Sequence
-from typing import Mapping
+from collections.abc import Collection, Mapping, Sequence
 
 from injector import Inject
 
