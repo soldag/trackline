@@ -60,11 +60,11 @@ class StartGame(BaseModel):
                 GameStarted(initial_tracks=player_tracks_out),
             )
 
-            game = game.copy(
+            game = game.model_copy(
                 update={
                     "state": GameState.STARTED,
                     "players": [
-                        p.copy(update={"timeline": [player_tracks[p.user_id]]})
+                        p.model_copy(update={"timeline": [player_tracks[p.user_id]]})
                         for p in game.players
                     ],
                 }
