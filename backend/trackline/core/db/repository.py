@@ -73,7 +73,7 @@ class Repository(Generic[T]):
         self,
         query: Mapping[str, Any],
         update: Mapping[str, Any],
-        array_filters: Collection[Mapping[str, Any]] | None = None,
+        array_filters: Sequence[Mapping[str, Any]] | None = None,
     ) -> int:
         result = await self._collection.update_one(
             filter=self._transform_query(query),
