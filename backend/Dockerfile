@@ -1,4 +1,4 @@
-FROM python:3.11-alpine AS poetry
+FROM python:3.12-alpine AS poetry
 
 WORKDIR /tmp
 
