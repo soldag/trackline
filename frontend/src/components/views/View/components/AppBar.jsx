@@ -112,9 +112,9 @@ const AppBar = ({
         width: "100vw",
         padding: "10px",
         backgroundColor: "primary.softBg",
-        borderColor: "primary.softColor",
         borderBottom: "1px solid",
-        boxShadow: (theme) => theme.shadow.lg,
+        borderBottomColor: "primary.softColor",
+        boxShadow: "lg",
       }}
     >
       <LogoutModal
