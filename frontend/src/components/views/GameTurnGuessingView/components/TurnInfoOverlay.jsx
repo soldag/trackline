@@ -15,6 +15,7 @@ import {
 
 import { GameType } from "~/types/games";
 import { UserType } from "~/types/users";
+import { getRoundNumber } from "~/utils/games";
 
 const HIDE_DURATION = 3000;
 const TRANSITION_DURATION = 500;
@@ -23,10 +24,10 @@ const TurnInfoOverlay = ({ game, users, currentUserId }) => {
   const modelRef = useRef();
   const [isOpen, setIsOpen] = useState(false);
 
+  const roundNumber = getRoundNumber(game);
   const turn = game.turns.at(-1);
   const activeUser = users.find((u) => u.id === turn?.activeUserId);
   const isActivePlayer = activeUser != null && activeUser.id === currentUserId;
-  const roundNumber = Math.floor(game.turns.length / game.players.length) + 1;
 
   useEffect(() => {
     if (turn?.activeUserId) {
@@ -103,8 +104,8 @@ const TurnInfoOverlay = ({ game, users, currentUserId }) => {
             >
               <FormattedMessage
                 id="GameTurnGuessingView.TurnInfoOverlay.round"
-                defaultMessage="Round {roundNumber}"
-                values={{ roundNumber }}
+                defaultMessage="Round {number}"
+                values={{ number: roundNumber }}
               />
             </Typography>
 

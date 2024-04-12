@@ -1,4 +1,3 @@
-import _ from "lodash";
 import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
@@ -6,12 +5,10 @@ import { Stack, Typography } from "@mui/joy";
 
 import { GameType } from "~/types/games";
 import { UserType } from "~/types/users";
+import { getRoundNumber } from "~/utils/games";
 
 const StatusBar = ({ game, users, currentUserId }) => {
-  const round = Math.max(
-    ...Object.values(_.countBy(game.turns, (t) => t.activeUserId)),
-  );
-
+  const roundNumber = getRoundNumber(game);
   const turn = game.turns.at(-1);
   const activeUser = users.find((u) => u.id === turn?.activeUserId);
   const isActivePlayer = activeUser != null && activeUser.id === currentUserId;
@@ -33,7 +30,7 @@ const StatusBar = ({ game, users, currentUserId }) => {
           <FormattedMessage
             id="GameTurnGuessingView.StatusBar.round"
             defaultMessage="Round {number}"
-            values={{ number: round }}
+            values={{ number: roundNumber }}
           />
         </Typography>
 

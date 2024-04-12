@@ -100,7 +100,7 @@
   "GameTurnGuessingView.StatusBar.round": "Runde {number}",
   "GameTurnGuessingView.TurnInfoOverlay.activeUser.active": "Du bist am Zug.",
   "GameTurnGuessingView.TurnInfoOverlay.activeUser.passive": "{username} ist am Zug.",
-  "GameTurnGuessingView.TurnInfoOverlay.round": "Runde {roundNumber}",
+  "GameTurnGuessingView.TurnInfoOverlay.round": "Runde {number}",
   "GameTurnScoringView.BuyTrackModal.confirm": "Song kaufen",
   "GameTurnScoringView.BuyTrackModal.header": "Song kaufen",
   "GameTurnScoringView.BuyTrackModal.message": "Möchtest du {cost, plural, =1 {#{nbsp}Token} other {#{nbsp}Tokens}} ausgeben, um einen Extra-Song für deinen Zeitstrahl zu kaufen?",
