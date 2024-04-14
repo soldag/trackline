@@ -21,3 +21,7 @@ indent_size = 2
 
 [Caddyfile]
 indent_style = tab
+
+# These files are auto-generated
+[frontend/src/translations/*.json]
+insert_final_newline = false
