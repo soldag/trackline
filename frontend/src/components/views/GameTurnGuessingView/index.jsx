@@ -25,6 +25,7 @@ import {
 } from "~/utils/hooks";
 
 import BottomMenu from "./components/BottomMenu";
+import CountdownSnackbar from "./components/CountdownSnackbar";
 import ExchangeTrackModal from "./components/ExchangeTrackModal";
 import GuessCreditsModal from "./components/GuessCreditsModal";
 import GuessReleaseYearModal from "./components/GuessReleaseYearModal";
@@ -64,6 +65,8 @@ const GameTurnGuessingView = () => {
   const [creditsModalOpen, setCreditsModalOpen] = useState(false);
   const [passTurnModalOpen, setPassTurnModalOpen] = useState(false);
   const [exchangeTrackModalOpen, setExchangeTrackModalOpen] = useState(false);
+  const [wasCountdownToastDismissed, setWasCountdownToastDismissed] =
+    useState(false);
   const [scoringTriggered, setScoringTriggered] = useState(false);
 
   const dispatch = useDispatch();
@@ -115,6 +118,21 @@ const GameTurnGuessingView = () => {
     !hasPassed && activePlayer?.tokens >= TOKEN_COST_EXCHANGE_TRACK;
 
   const { timeoutStart, timeoutEnd } = getTimeout(game, turn, timeDeviation);
+  const hasTimeout = timeoutStart != null && timeoutEnd != null;
+
+  const isAnyModalOpen =
+    releaseYearModalOpen ||
+    creditsModalOpen ||
+    passTurnModalOpen ||
+    exchangeTrackModalOpen;
+  const showCountdownToast =
+    isAnyModalOpen && hasTimeout && !wasCountdownToastDismissed;
+
+  useEffect(() => {
+    if (hasTimeout && !isActivePlayer && !hasPassed) {
+      window.navigator.vibrate?.([100, 100]);
+    }
+  }, [hasTimeout, isActivePlayer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (releaseYearGuess == null) {
@@ -219,6 +237,7 @@ const GameTurnGuessingView = () => {
       disableScrolling
     >
       <TurnInfoOverlay game={game} users={users} currentUserId={user?.id} />
+
       <GuessReleaseYearModal
         open={releaseYearModalOpen}
         tracks={tracks}
@@ -242,6 +261,13 @@ const GameTurnGuessingView = () => {
         canGuessCredits={canGuessCredits}
         onConfirm={handlePassTurn}
         onClose={() => setPassTurnModalOpen(false)}
+      />
+
+      <CountdownSnackbar
+        open={showCountdownToast}
+        timeoutStart={timeoutStart}
+        timeoutEnd={timeoutEnd}
+        onClose={() => setWasCountdownToastDismissed(true)}
       />
 
       <Box

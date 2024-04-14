@@ -78,6 +78,8 @@
   "GameScoringTable.header.tracks": "Tracks",
   "GameTurnGuessingView.BottomMenu.exchange": "Exchange track",
   "GameTurnGuessingView.BottomMenu.passTurn": "Pass turn",
+  "GameTurnGuessingView.CountdownSnackbar.header": "Your time is running out",
+  "GameTurnGuessingView.CountdownSnackbar.remainingTime": "You only have {seconds}s left to guess.",
   "GameTurnGuessingView.ExchangeTrackModal.content": "Do you want to exchange the current track by paying {cost, plural, =1 {#{nbsp}token} other {#{nbsp}tokens}}?",
   "GameTurnGuessingView.ExchangeTrackModal.header": "Exchange current track",
   "GameTurnGuessingView.GuessCreditsModal.artists.label": "Artists",

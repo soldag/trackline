@@ -78,6 +78,8 @@
   "GameScoringTable.header.tracks": "Songs",
   "GameTurnGuessingView.BottomMenu.exchange": "Song tauschen",
   "GameTurnGuessingView.BottomMenu.passTurn": "Passen",
+  "GameTurnGuessingView.CountdownSnackbar.header": "Deine Zeit läuft ab",
+  "GameTurnGuessingView.CountdownSnackbar.remainingTime": "Du hast nur noch {seconds}s um zu raten.",
   "GameTurnGuessingView.GuessCreditsModal.artists.label": "Interpreten",
   "GameTurnGuessingView.GuessCreditsModal.header": "Titel & Interpret raten",
   "GameTurnGuessingView.GuessCreditsModal.title.label": "Titel",

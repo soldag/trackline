@@ -1,5 +1,12 @@
 import { camelizeKeys } from "humps";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { useIntl } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
@@ -58,19 +65,53 @@ export const useEventListener = (target, type, listener, options) => {
   });
 };
 
-export const useInterval = (callback, delay) => {
+export const useInterval = (callback, delay, { autoStart = true } = {}) => {
   const savedCallback = useRef(callback);
+  const [isActive, setIsActive] = useState(autoStart);
 
   useEffect(() => {
     savedCallback.current = callback;
   }, [callback]);
 
   useEffect(() => {
-    if (!delay && delay !== 0) return;
+    if (!isActive || delay == null) return;
 
     const id = setInterval(() => savedCallback.current(), delay);
     return () => clearInterval(id);
-  }, [delay]);
+  }, [delay, isActive]);
+
+  const start = useCallback(() => setIsActive(true), []);
+  const stop = useCallback(() => setIsActive(false), []);
+
+  return { isActive, start, stop };
+};
+
+export const useCountdown = ({ start, end, updateInterval = 100 }) => {
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+
+  const { start: startInterval, stop: stopInterval } = useInterval(
+    () => forceUpdate(),
+    updateInterval,
+    { autoStart: false },
+  );
+
+  useEffect(() => {
+    if (start == null || end == null || end <= Date.now()) {
+      stopInterval();
+    } else {
+      startInterval();
+    }
+  }, [start, end, startInterval, stopInterval]);
+
+  let remaining = 0;
+  let progress = 0;
+  if (start != null && end != null) {
+    const total = end - start;
+    remaining = Math.max(0, end - Date.now());
+    progress = total === 0 ? 1 : (total - remaining) / total;
+  }
+
+  return { progress, remaining };
 };
 
 export const useErrorSelector = (...actions) => {

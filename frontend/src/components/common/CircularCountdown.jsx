@@ -1,9 +1,8 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 import ResponsiveCircularProgress from "~/components/common/ResponsiveCircularProgress";
-import { useInterval } from "~/utils/hooks";
+import { useCountdown } from "~/utils/hooks";
 
 const DANGER_THRESHOLD = 0.75;
 const WARNING_THRESHOLD = 0.5;
@@ -19,23 +18,9 @@ const getColor = (progress, defaultColor) => {
   return defaultColor;
 };
 
-const CircularCountdown = ({
-  start,
-  timeout,
-  defaultColor,
-  updateInterval = 100,
-}) => {
-  const [progress, setProgress] = useState(0);
-  const [remaining, setRemaining] = useState(timeout - start);
-
+const CircularCountdown = ({ start, end, defaultColor }) => {
+  const { progress, remaining } = useCountdown({ start, end });
   const color = getColor(progress, defaultColor);
-
-  useInterval(() => {
-    const total = timeout - start;
-    const newRemaining = Math.max(0, timeout - Date.now());
-    setProgress((total - newRemaining) / total);
-    setRemaining(newRemaining);
-  }, updateInterval);
 
   return (
     <ResponsiveCircularProgress
@@ -59,9 +44,8 @@ const CircularCountdown = ({
 
 CircularCountdown.propTypes = {
   start: PropTypes.number.isRequired,
-  timeout: PropTypes.number.isRequired,
+  end: PropTypes.number.isRequired,
   defaultColor: PropTypes.string,
-  updateInterval: PropTypes.number,
 };
 
 export default CircularCountdown;

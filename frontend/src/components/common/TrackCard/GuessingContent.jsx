@@ -41,7 +41,7 @@ const GuessingContent = ({ timeoutStart, timeoutEnd }) => (
       <CircularCountdown
         defaultColor="success"
         start={timeoutStart}
-        timeout={timeoutEnd}
+        end={timeoutEnd}
       />
     )}
   </CardContent>
