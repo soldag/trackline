@@ -136,7 +136,20 @@ const GameTurnGuessingView = () => {
 
   useEffect(() => {
     if (releaseYearGuess == null) {
-      setTracks([turn.track, ...activePlayer.timeline]);
+      setTracks((oldTracks) => {
+        const oldIndex = oldTracks.findIndex(
+          (t) => t.spotifyId === turn.track.spotifyId,
+        );
+        if (oldIndex === -1) {
+          return [turn.track, ...activePlayer.timeline];
+        } else {
+          return [
+            ...activePlayer.timeline.slice(0, oldIndex),
+            turn.track,
+            ...activePlayer.timeline.slice(oldIndex),
+          ];
+        }
+      });
     } else if (releaseYearGuess.position != null) {
       setTracks([
         ...activePlayer.timeline.slice(0, releaseYearGuess.position),
