@@ -44,9 +44,8 @@ const Timeline = ({
   const maxYear = tracks[index + 1]?.releaseYear;
 
   const handleDragStart = () => {
-    if (window.navigator.vibrate) {
-      window.navigator.vibrate(100);
-    }
+    window.navigator.vibrate?.(100);
+    setIsSelectingPosition(true);
   };
 
   const handleDragEnd = (result) => {
@@ -104,7 +103,9 @@ const Timeline = ({
                 draggableId={track.spotifyId}
                 index={i}
                 isDragDisabled={
-                  !isSelectingPosition || track.spotifyId !== activeTrackId
+                  !canGuessReleaseYear ||
+                  loadingReleaseYearGuess ||
+                  track.spotifyId !== activeTrackId
                 }
               >
                 {(provided) => (
