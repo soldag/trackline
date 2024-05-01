@@ -1,6 +1,7 @@
 import asyncio
 from collections import defaultdict
 from collections.abc import Collection
+import logging
 from typing import Any, Generic, Protocol, runtime_checkable, TypeVar
 
 from fastapi.encoders import jsonable_encoder
@@ -9,6 +10,9 @@ from pydantic import BaseModel
 from trackline.core.fields import ResourceId
 from trackline.core.utils import to_snake_case
 from trackline.games.models import Game
+
+
+log = logging.getLogger(__name__)
 
 
 class Notification(BaseModel):
@@ -89,7 +93,10 @@ class Notifier:
     ):
         channels = self._channels.get((game_id, player_id))
         if not channels:
-            raise ConnectionError(f"User {player_id} is not connected")
+            log.warning(
+                f"Failed to send notification as user {player_id} is not connected"
+            )
+            return
 
         await asyncio.gather(
             *(channel.send_json(jsonable_encoder(envelope)) for channel in channels)
