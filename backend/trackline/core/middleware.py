@@ -113,10 +113,8 @@ class ExceptionHandlingMiddleware:
         try:
             await self.app(scope, receive, send)
         except RequestValidationError:
-            capture_exception()
             await ws.close(code=1008, reason="VALIDATION_ERROR")
         except RequestException as exc:
-            capture_exception()
             await ws.close(code=1008, reason=exc.code)
         except Exception:
             capture_exception()
