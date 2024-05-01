@@ -46,4 +46,5 @@ def initialize_sentry(settings: Settings):
                 AsyncioIntegration(),
                 PyMongoIntegration(),
             ],
+            ignore_errors=[KeyboardInterrupt],
         )
