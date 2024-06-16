@@ -3,10 +3,10 @@ from pydantic import BaseModel
 
 from trackline.core.fields import ResourceId
 from trackline.games.models import Turn
-from trackline.games.notifier import Notifier
-from trackline.games.repository import GameRepository
 from trackline.games.schemas import GameState, NewTurn, TurnOut
-from trackline.games.track_provider import TrackProvider
+from trackline.games.services.notifier import Notifier
+from trackline.games.services.repository import GameRepository
+from trackline.games.services.track_provider import TrackProvider
 from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
 

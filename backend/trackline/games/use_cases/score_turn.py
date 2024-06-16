@@ -25,9 +25,9 @@ from trackline.games.models import (
     Turn,
     TurnScoring,
 )
-from trackline.games.notifier import Notifier
-from trackline.games.repository import GameRepository
 from trackline.games.schemas import GameState, TurnScored, TurnScoringOut
+from trackline.games.services.notifier import Notifier
+from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
 from trackline.games.utils import compare_strings, is_valid_release_year
 

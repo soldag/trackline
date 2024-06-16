@@ -1,8 +1,8 @@
 from injector import Inject
 from pydantic import BaseModel, ConfigDict
 
-from trackline.games.notifier import NotificationChannel, Notifier
-from trackline.games.repository import GameRepository
+from trackline.games.services.notifier import NotificationChannel, Notifier
+from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
 
 

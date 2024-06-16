@@ -23,7 +23,7 @@ from trackline.games.models import (
     TurnPass,
     TurnScoring,
 )
-from trackline.games.notifier import Notification
+from trackline.games.services.notifier import Notification
 from trackline.users.schemas import UserOut
 
 

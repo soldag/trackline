@@ -3,8 +3,8 @@ from pydantic import BaseModel
 
 from trackline.constants import SPOTIFY_PRODUCT_PREMIUM
 from trackline.core.exceptions import UseCaseException
-from trackline.spotify.client import InvalidTokenException, SpotifyClient
 from trackline.spotify.schemas import SpotifyAccessToken
+from trackline.spotify.services.client import InvalidTokenException, SpotifyClient
 
 
 class GetAccessToken(BaseModel):

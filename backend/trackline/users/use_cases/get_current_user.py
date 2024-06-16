@@ -3,8 +3,8 @@ from pydantic import BaseModel
 
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
-from trackline.users.repository import UserRepository
 from trackline.users.schemas import UserOut
+from trackline.users.services.repository import UserRepository
 
 
 class GetCurrentUser(BaseModel):

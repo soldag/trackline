@@ -8,13 +8,13 @@ from trackline.core.fields import ResourceId
 from trackline.games.models import (
     Game,
 )
-from trackline.games.notifier import Notifier
-from trackline.games.repository import GameRepository
 from trackline.games.schemas import (
     GameState,
     TurnCompleted,
     TurnCompletionOut,
 )
+from trackline.games.services.notifier import Notifier
+from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
 
 

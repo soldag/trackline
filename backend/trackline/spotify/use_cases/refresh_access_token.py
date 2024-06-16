@@ -2,8 +2,8 @@ from injector import Inject
 from pydantic import BaseModel
 
 from trackline.core.exceptions import UseCaseException
-from trackline.spotify.client import InvalidTokenException, SpotifyClient
 from trackline.spotify.schemas import SpotifyAccessToken
+from trackline.spotify.services.client import InvalidTokenException, SpotifyClient
 
 
 class RefreshAccessToken(BaseModel):

@@ -6,8 +6,8 @@ from injector import Inject
 
 from trackline.core.utils import shuffle
 from trackline.games.models import Track
-from trackline.games.music_brainz import MusicBrainzClient
-from trackline.spotify.client import PlaylistNotFoundException, SpotifyClient
+from trackline.games.services.music_brainz import MusicBrainzClient
+from trackline.spotify.services.client import PlaylistNotFoundException, SpotifyClient
 
 
 class TrackProvider:

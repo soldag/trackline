@@ -2,11 +2,11 @@ from injector import Inject
 from pydantic import BaseModel
 
 from trackline.auth.models import Session
-from trackline.auth.repository import SessionRepository
 from trackline.auth.schemas import SessionOut
+from trackline.auth.services.repository import SessionRepository
 from trackline.core.exceptions import UseCaseException
 from trackline.core.utils.security import verify_password
-from trackline.users.repository import UserRepository
+from trackline.users.services.repository import UserRepository
 
 
 class CreateSession(BaseModel):

@@ -23,9 +23,9 @@ from trackline.core.schemas import ErrorResponse
 from trackline.core.settings import Settings
 from trackline.games.di import GamesModule
 from trackline.games.router import router as games_router
-from trackline.spotify.client import SpotifyClient
 from trackline.spotify.di import SpotifyModule
 from trackline.spotify.router import router as spotify_router
+from trackline.spotify.services.client import SpotifyClient
 from trackline.users.router import router as users_router
 
 

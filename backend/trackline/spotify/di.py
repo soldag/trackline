@@ -1,6 +1,6 @@
 from injector import Binder, Module, singleton
 
-from trackline.spotify.client import SpotifyClient
+from trackline.spotify.services.client import SpotifyClient
 
 
 class SpotifyModule(Module):

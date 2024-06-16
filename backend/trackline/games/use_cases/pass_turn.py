@@ -4,9 +4,9 @@ from pydantic import BaseModel
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.models import GameState, TurnPass
-from trackline.games.notifier import Notifier
-from trackline.games.repository import GameRepository
 from trackline.games.schemas import TurnPassed, TurnPassOut
+from trackline.games.services.notifier import Notifier
+from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
 
 

@@ -1,7 +1,7 @@
 from injector import Binder, Module, singleton
 
-from trackline.games.music_brainz import MusicBrainzClient
-from trackline.games.notifier import Notifier
+from trackline.games.services.music_brainz import MusicBrainzClient
+from trackline.games.services.notifier import Notifier
 
 
 class GamesModule(Module):

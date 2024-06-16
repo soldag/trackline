@@ -6,12 +6,12 @@ from pydantic import BaseModel
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.models import GameState, Player
-from trackline.games.notifier import Notifier
-from trackline.games.repository import GameRepository
 from trackline.games.schemas import PlayerJoined, PlayerOut
+from trackline.games.services.notifier import Notifier
+from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
-from trackline.users.repository import UserRepository
 from trackline.users.schemas import UserOut
+from trackline.users.services.repository import UserRepository
 
 
 class JoinGame(BaseModel):

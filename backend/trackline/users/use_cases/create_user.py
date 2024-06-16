@@ -4,8 +4,8 @@ from pydantic import BaseModel
 from trackline.core.exceptions import UseCaseException
 from trackline.core.utils.security import hash_password
 from trackline.users.models import User
-from trackline.users.repository import UsernameExistsError, UserRepository
 from trackline.users.schemas import UserOut
+from trackline.users.services.repository import UsernameExistsError, UserRepository
 
 
 class CreateUser(BaseModel):

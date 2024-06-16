@@ -5,7 +5,7 @@ from fastapi import Depends, Query, Request
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_injector import Injected
 
-from trackline.auth.repository import SessionRepository
+from trackline.auth.services.repository import SessionRepository
 from trackline.auth.use_cases import GetSessionUser
 from trackline.core.exceptions import RequestException
 from trackline.core.fields import ResourceId

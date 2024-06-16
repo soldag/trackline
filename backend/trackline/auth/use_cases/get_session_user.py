@@ -1,7 +1,7 @@
 from injector import Inject
 from pydantic import BaseModel
 
-from trackline.auth.repository import SessionRepository
+from trackline.auth.services.repository import SessionRepository
 from trackline.core.fields import ResourceId
 
 
