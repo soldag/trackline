@@ -28,9 +28,8 @@ from trackline.games.models import (
 from trackline.games.notifier import Notifier
 from trackline.games.repository import GameRepository
 from trackline.games.schemas import GameState, TurnScored, TurnScoringOut
-from trackline.games.string_similarity import compare_strings
 from trackline.games.use_cases.base import BaseHandler
-from trackline.games.utils import is_valid_release_year
+from trackline.games.utils import compare_strings, is_valid_release_year
 
 
 GuessT = TypeVar("GuessT", bound=Guess)
