@@ -1,5 +1,6 @@
 from collections.abc import Collection
 from functools import reduce
+import logging
 
 from httpx import AsyncClient, HTTPError
 from injector import Inject
@@ -8,6 +9,8 @@ from lucenequerybuilder import Q
 from trackline.constants import APP_NAME, MUSICBRAINZ_MIN_SCORE
 from trackline.core.settings import Settings
 from trackline.core.utils.version import get_version
+
+log = logging.getLogger(__name__)
 
 
 class MusicBrainzClient:
@@ -37,9 +40,18 @@ class MusicBrainzClient:
                 params={"query": str(query), "limit": 100, "fmt": "json"},
             )
         except HTTPError:
+            log.exception(
+                "MusicBrainz request failed due to HTTP error",
+                exc_info=True,
+            )
             return None
 
         if response.status_code != 200:
+            log.exception(
+                "MusicBrainz request failed with status code %s",
+                response.status_code,
+                exc_info=True,
+            )
             return None
 
         release_years: list[int] = []
@@ -49,7 +61,13 @@ class MusicBrainzClient:
 
             try:
                 release_year = int(recording["first-release-date"][:4])
-            except (KeyError, TypeError, ValueError):
+            except KeyError:
+                continue
+            except (TypeError, ValueError):
+                log.warning(
+                    "Failed to parse release year from MusicBrainz response",
+                    exc_info=True,
+                )
                 continue
 
             release_years.append(release_year)
