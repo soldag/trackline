@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -29,6 +30,9 @@ class PlaylistNotFoundException(Exception):
 
 
 class SpotifyClient:
+    MAX_LIMIT = 50
+    REQUEST_THROTTLE_TIME = 0.2
+
     def __init__(self, settings: Inject[Settings]) -> None:
         self._settings = settings
 
@@ -86,47 +90,72 @@ class SpotifyClient:
 
         return playlist["tracks"]["total"]
 
+    async def get_playlist_tracks(
+        self,
+        playlist_id: str,
+        offset: int = 0,
+        limit: int | None = None,
+        market: str | None = None,
+    ) -> list[SpotifyTrack]:
+        await self._get_auth_token_if_needed()
+
+        tracks: list[SpotifyTrack] = []
+        while True:
+            params = {
+                "fields": "items(track(id,is_playable,name,artists(name),album(release_date,images))),total",
+                "offset": offset,
+                "limit": limit - len(tracks) if limit else self.MAX_LIMIT,
+            }
+            if market:
+                params["market"] = market
+            response = await self._client.playlists.get_tracks(playlist_id, **params)
+
+            items = response["items"]
+            if not items:
+                break
+
+            for item in items:
+                track = item["track"]
+                release_date = track["album"]["release_date"]
+                is_playable = track.get("is_playable", True)
+
+                try:
+                    release_year = int(release_date[:4])
+                except (TypeError, IndexError, ValueError):
+                    release_year = None
+
+                images = sorted(
+                    track["album"]["images"],
+                    key=lambda x: x["height"] * x["width"],
+                    reverse=True,
+                )
+
+                tracks.append(
+                    SpotifyTrack(
+                        id=track["id"],
+                        title=track["name"],
+                        artists=[a["name"] for a in track["artists"]],
+                        release_year=release_year,
+                        is_playable=is_playable,
+                        image_url=images[0]["url"] if images else None,
+                    )
+                )
+
+            offset += len(items)
+            if response["total"] <= len(tracks) or (limit and limit <= len(tracks)):
+                break
+
+            await asyncio.sleep(self.REQUEST_THROTTLE_TIME)
+
+        return tracks
+
     async def get_playlist_track(
         self, playlist_id: str, index: int, market: str | None = None
     ) -> SpotifyTrack | None:
-        await self._get_auth_token_if_needed()
-
-        params = {
-            "fields": "items(track(id,is_playable,name,artists(name),album(release_date,images)))",
-            "offset": index,
-            "limit": 1,
-        }
-        if market:
-            params["market"] = market
-        response = await self._client.playlists.get_tracks(playlist_id, **params)
-
-        items = response["items"]
-        if not items:
-            return None
-
-        track = items[0]["track"]
-        release_date = track["album"]["release_date"]
-        is_playable = track.get("is_playable", True)
-
-        try:
-            release_year = int(release_date[:4])
-        except (TypeError, IndexError, ValueError):
-            release_year = None
-
-        images = sorted(
-            track["album"]["images"],
-            key=lambda x: x["height"] * x["width"],
-            reverse=True,
+        tracks = await self.get_playlist_tracks(
+            playlist_id, offset=index, limit=1, market=market
         )
-
-        return SpotifyTrack(
-            id=track["id"],
-            title=track["name"],
-            artists=[a["name"] for a in track["artists"]],
-            release_year=release_year,
-            is_playable=is_playable,
-            image_url=images[0]["url"] if images else None,
-        )
+        return tracks[0] if tracks else None
 
     def _get_auth_client(
         self, auth_token: SpotifyAuthorisationToken | None = None
