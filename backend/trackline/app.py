@@ -6,11 +6,9 @@ from fastapi import Depends, FastAPI, WebSocket
 from fastapi.exceptions import RequestValidationError, WebSocketRequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_injector import attach_injector, InjectorMiddleware
-from injector import Injector
 
 from trackline.auth.router import router as auth_router
 from trackline.core.deps import websocket_logger
-from trackline.core.di import CoreModule
 from trackline.core.logging import initialize_sentry
 from trackline.core.middleware import (
     DatabaseTransactionMiddleware,
@@ -21,18 +19,14 @@ from trackline.core.middleware import (
 )
 from trackline.core.schemas import ErrorResponse
 from trackline.core.settings import Settings
-from trackline.games.di import GamesModule
+from trackline.di import injector
 from trackline.games.router import router as games_router
-from trackline.spotify.di import SpotifyModule
 from trackline.spotify.router import router as spotify_router
 from trackline.spotify.services.client import SpotifyClient
 from trackline.users.router import router as users_router
 
 
 log = logging.getLogger(__name__)
-
-
-injector = Injector([CoreModule(), GamesModule(), SpotifyModule()])
 
 
 @asynccontextmanager
