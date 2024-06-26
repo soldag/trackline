@@ -1,40 +1,25 @@
 from collections.abc import Collection, Sequence
 import random
-import re
 
 from injector import Inject
 
 from trackline.core.utils import shuffle
 from trackline.games.models import Track
 from trackline.games.services.music_brainz import MusicBrainzClient
+from trackline.games.services.track_cleaner import TrackCleaner
 from trackline.spotify.services.client import PlaylistNotFoundException, SpotifyClient
 
 
 class TrackProvider:
-    TITLE_CLEANUP_PATTERNS = (
-        r" - From (.*)$",
-        r" - The Original$",
-        r" - [^-]*Remaster(ed)?(.*)$",
-        r" - [^-]+Edit(.*)$",
-        r" - [^-]+Mix(.*)$",
-        r" - [^-]+Remix(.*)$",
-        r" - [^-]+Version(.*)$",
-        r" - [^-]+Anniversary Edition(.*)$",
-        r" \([^\)]+Edit(.*)\)",
-        r" \([^\)]+Mix(.*)\)",
-        r" \([^\)]+Remix(.*)\)",
-        r" \([^\)]+Version(.*)\)",
-        r" \(From[^\)]+\)",
-        r" [\(\[]feat\. [^)]+[\)\]]",
-    )
-
     def __init__(
         self,
         spotify_client: Inject[SpotifyClient],
         music_brainz_client: Inject[MusicBrainzClient],
+        track_cleaner: Inject[TrackCleaner],
     ) -> None:
         self._spotify_client = spotify_client
         self._music_brainz_client = music_brainz_client
+        self._track_cleaner = track_cleaner
 
     async def get_random_tracks(
         self,
@@ -85,7 +70,7 @@ class TrackProvider:
                 ):
                     continue
 
-                clean_title = self._cleanup_title(track.title)
+                clean_title = self._track_cleaner.cleanup_title(track.title)
 
                 mb_release_year = await self._music_brainz_client.get_release_year(
                     track.artists,
@@ -105,9 +90,3 @@ class TrackProvider:
                 )
 
         return None
-
-    def _cleanup_title(self, title: str) -> str:
-        for pattern in self.TITLE_CLEANUP_PATTERNS:
-            title = re.sub(pattern, "", title, flags=re.IGNORECASE)
-
-        return title.strip()
