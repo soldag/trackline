@@ -231,8 +231,9 @@ const reducer = createReducer(initialState, (builder) => {
 
     .addMatcher(
       isAnyOf(isSuccess(exchangeTrack), trackExchanged),
-      (state, { payload: { track, tokenDelta } }) => {
+      (state, { payload: { turnRevisionId, track, tokenDelta } }) => {
         const turn = state.game.turns.at(-1);
+        turn.revisionId = turnRevisionId;
         turn.track = track;
         turn.passes = [];
         for (const key of Object.keys(turn.guesses)) {

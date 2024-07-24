@@ -1,4 +1,5 @@
 from collections import defaultdict
+from uuid import uuid4
 
 from injector import Inject
 from pydantic import BaseModel
@@ -56,15 +57,28 @@ class ExchangeTrack(BaseModel):
             await self._game_repository.inc_tokens(game.id, token_delta)
 
             new_track = await self._get_new_track(game)
+            new_revision_id = str(uuid4())
             await self._game_repository.exchange_track(
-                game.id, use_case.turn_id, turn.track.spotify_id, new_track
+                game.id,
+                use_case.turn_id,
+                new_revision_id,
+                turn.track.spotify_id,
+                new_track,
             )
 
             new_track_out = TrackOut.from_model(new_track)
             await self._notifier.notify(
                 user_id,
                 game,
-                TrackExchanged(track=new_track_out, token_delta=token_delta),
+                TrackExchanged(
+                    turn_revision_id=new_revision_id,
+                    track=new_track_out,
+                    token_delta=token_delta,
+                ),
             )
 
-            return TrackExchangeOut(track=new_track_out, token_delta=token_delta)
+            return TrackExchangeOut(
+                turn_revision_id=new_revision_id,
+                track=new_track_out,
+                token_delta=token_delta,
+            )

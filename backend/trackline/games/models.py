@@ -1,6 +1,7 @@
 import abc
 from datetime import datetime
 from enum import Enum
+from uuid import uuid4
 
 from pydantic import Field
 
@@ -88,6 +89,7 @@ class TurnGuesses(BaseModel):
 
 
 class Turn(BaseModel):
+    revision_id: str = Field(default_factory=lambda: str(uuid4()))
     creation_time: datetime = Field(default_factory=utcnow)
     active_user_id: ResourceId
     track: Track

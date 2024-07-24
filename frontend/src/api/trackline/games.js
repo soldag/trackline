@@ -70,6 +70,7 @@ export const createTurn = async ({ gameId }) => {
 export const createReleaseYearGuess = async ({
   gameId,
   turnId,
+  turnRevisionId,
   position,
   year,
 }) => {
@@ -78,6 +79,7 @@ export const createReleaseYearGuess = async ({
   } = await instance.post(
     `games/${gameId}/turns/${turnId}/guesses/release-year`,
     {
+      turnRevisionId,
       position,
       year,
     },
@@ -89,12 +91,14 @@ export const createReleaseYearGuess = async ({
 export const createCreditsGuess = async ({
   gameId,
   turnId,
+  turnRevisionId,
   artists,
   title,
 }) => {
   const {
     data: { data: guess },
   } = await instance.post(`games/${gameId}/turns/${turnId}/guesses/credits`, {
+    turnRevisionId,
     artists,
     title,
   });

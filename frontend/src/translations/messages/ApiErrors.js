@@ -70,6 +70,11 @@ export default defineMessages({
     id: "ApiErrors.turnPassed",
     defaultMessage: "You have already passed this turn.",
   },
+  TURN_REVISION_MISMATCH: {
+    id: "ApiErrors.turnRevisionMismatch",
+    defaultMessage:
+      "Your guess was ignored because the current track was exchanged by another player.",
+  },
   UNEXPECTED_STATE: {
     id: "ApiErrors.unexpectedState",
     defaultMessage:

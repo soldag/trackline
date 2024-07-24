@@ -13,6 +13,7 @@
   "ApiErrors.turnGuessed": "You can only guess once per turn.",
   "ApiErrors.turnNotFound": "The turn does not exist.",
   "ApiErrors.turnPassed": "You have already passed this turn.",
+  "ApiErrors.turnRevisionMismatch": "Your guess was ignored because the current track was exchanged by another player.",
   "ApiErrors.unexpectedError": "An unexpected error occurred.",
   "ApiErrors.unexpectedState": "The game is not in the correct state to perform this operation.",
   "ApiErrors.unsupportedSpotifyProduct": "Spotify Premium is required to create a game.",

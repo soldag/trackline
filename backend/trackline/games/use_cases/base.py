@@ -189,13 +189,24 @@ class CreateGuessBaseHandler(BaseHandler, abc.ABC):
         return base_cost
 
     def _assert_can_guess(
-        self, user_id: ResourceId, game: Game, turn_id: int, token_cost: int
+        self,
+        user_id: ResourceId,
+        game: Game,
+        turn_id: int,
+        turn_revision: str,
+        token_cost: int,
     ) -> None:
         self._assert_is_player(game, user_id)
         self._assert_has_state(game, GameState.GUESSING)
         self._assert_is_active_turn(game, turn_id)
 
         turn = game.turns[turn_id]
+        if turn.revision_id != turn_revision:
+            raise UseCaseException(
+                code="TURN_REVISION_MISMATCH",
+                message="The turn revision is outdated.",
+                status_code=429,
+            )
         if user_id in self._get_guesses(turn):
             raise UseCaseException(
                 code="TURN_GUESSED",

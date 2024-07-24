@@ -12,6 +12,7 @@ from trackline.games.use_cases.base import CreateGuessBaseHandler
 class CreateCreditsGuess(BaseModel):
     game_id: ResourceId
     turn_id: int
+    turn_revision_id: str
     artists: list[str]
     title: str
 
@@ -24,7 +25,9 @@ class CreateCreditsGuess(BaseModel):
         ) -> CreditsGuessOut:
             game = await self._get_game(use_case.game_id)
             token_cost = self._get_token_cost(user_id, game, TOKEN_COST_CREDITS_GUESS)
-            self._assert_can_guess(user_id, game, use_case.turn_id, token_cost)
+            self._assert_can_guess(
+                user_id, game, use_case.turn_id, use_case.turn_revision_id, token_cost
+            )
 
             guess = CreditsGuess(
                 token_cost=token_cost,

@@ -55,13 +55,19 @@ class GameRepository(Repository[Game]):
         )
 
     async def exchange_track(
-        self, game_id: ResourceId, turn_id: int, old_track_id: str, track: Track
+        self,
+        game_id: ResourceId,
+        turn_id: int,
+        turn_revision_id: str,
+        old_track_id: str,
+        track: Track,
     ) -> int:
         return await self._update_one(
             self._id_query(game_id),
             {
                 "$set": {
                     f"turns.{turn_id}.track": self._to_document(track, root=False),
+                    f"turns.{turn_id}.revision": turn_revision_id,
                     f"turns.{turn_id}.guesses.releaseYear": {},
                     f"turns.{turn_id}.guesses.credits": {},
                     f"turns.{turn_id}.passes": {},

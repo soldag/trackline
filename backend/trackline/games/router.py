@@ -144,6 +144,7 @@ async def create_turn(
 class CreateReleaseYearGuessParams:
     game_id: Annotated[ResourceId, Path()]
     turn_id: Annotated[int, Path()]
+    turn_revision_id: Annotated[str, Body()]
     position: Annotated[int, Body()]
     year: Annotated[int, Body()]
 
@@ -167,6 +168,7 @@ async def create_release_year_guess(
 class CreateCreditsGuessParams:
     game_id: Annotated[ResourceId, Path()]
     turn_id: Annotated[int, Path()]
+    turn_revision_id: Annotated[str, Body()]
     artists: Annotated[list[str], Body()]
     title: Annotated[str, Body()]
 

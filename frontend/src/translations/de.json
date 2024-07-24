@@ -13,6 +13,7 @@
   "ApiErrors.turnGuessed": "Du kannst nur einen Tipp pro Runde abgeben.",
   "ApiErrors.turnNotFound": "Diese Runde existiert nicht.",
   "ApiErrors.turnPassed": "Du hast diese Runde bereits gepasst.",
+  "ApiErrors.turnRevisionMismatch": "Dein Tipp wurde ignoriert, da ein anderer Spieler in der Zwischenzeit den aktuellen ausgetauscht hat.",
   "ApiErrors.unexpectedError": "Es ist ein unerwarteter Fehler aufgetreten.",
   "ApiErrors.unexpectedState": "Diese Aktion kann im aktuellen Zustand des Spiels nicht ausgeführt werden.",
   "ApiErrors.unsupportedSpotifyProduct": "Spotify Premium wird benötigt um ein Spiel zu erstellen.",

@@ -130,10 +130,17 @@ function* handleCreateTurn({ gameId }) {
   return { turn };
 }
 
-function* handleGuessTrackReleaseYear({ gameId, turnId, position, year }) {
+function* handleGuessTrackReleaseYear({
+  gameId,
+  turnId,
+  turnRevisionId,
+  position,
+  year,
+}) {
   const guess = yield call(tracklineApi.games.createReleaseYearGuess, {
     gameId,
     turnId,
+    turnRevisionId,
     position,
     year,
   });
@@ -141,10 +148,17 @@ function* handleGuessTrackReleaseYear({ gameId, turnId, position, year }) {
   return { guess };
 }
 
-function* handleGuessTrackCredits({ gameId, turnId, artists, title }) {
+function* handleGuessTrackCredits({
+  gameId,
+  turnId,
+  turnRevisionId,
+  artists,
+  title,
+}) {
   const guess = yield call(tracklineApi.games.createCreditsGuess, {
     gameId,
     turnId,
+    turnRevisionId,
     artists,
     title,
   });

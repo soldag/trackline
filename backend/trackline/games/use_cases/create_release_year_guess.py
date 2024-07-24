@@ -14,6 +14,7 @@ from trackline.games.utils import is_valid_release_year
 class CreateReleaseYearGuess(BaseModel):
     game_id: ResourceId
     turn_id: int
+    turn_revision_id: str
     position: int
     year: int
 
@@ -26,7 +27,9 @@ class CreateReleaseYearGuess(BaseModel):
         ) -> ReleaseYearGuessOut:
             game = await self._get_game(use_case.game_id)
             token_cost = self._get_token_cost(user_id, game, TOKEN_COST_YEAR_GUESS)
-            self._assert_can_guess(user_id, game, use_case.turn_id, token_cost)
+            self._assert_can_guess(
+                user_id, game, use_case.turn_id, use_case.turn_revision_id, token_cost
+            )
 
             active_player = game.get_active_player()
             if active_player and use_case.position > len(active_player.timeline):

@@ -93,18 +93,24 @@ const GameTurnGuessingView = () => {
   const gameId = game?.id;
   const turnId = game.turns.length - 1;
   const turn = game.turns[turnId];
+  const {
+    revisionId: turnRevisionId,
+    activeUserId,
+    track,
+    guesses,
+    passes,
+  } = turn;
+
   const currentPlayer = game?.players.find((p) => p.userId === user?.id);
   const { isGameMaster = false } = currentPlayer || {};
-  const activePlayer = game?.players.find(
-    (p) => p.userId === turn.activeUserId,
-  );
-  const isActivePlayer = user?.id === turn?.activeUserId;
-  const hasPassed = turn?.passes?.some((p) => p.userId === user?.id);
+  const activePlayer = game?.players.find((p) => p.userId === activeUserId);
+  const isActivePlayer = user?.id === activeUserId;
+  const hasPassed = passes?.some((p) => p.userId === user?.id);
 
-  const releaseYearGuess = turn.guesses.releaseYear.find(
+  const releaseYearGuess = guesses.releaseYear.find(
     (g) => g.userId === user?.id,
   );
-  const creditsGuess = turn.guesses.credits.find((g) => g.userId === user?.id);
+  const creditsGuess = guesses.credits.find((g) => g.userId === user?.id);
 
   const canGuessReleaseYear =
     !hasPassed &&
@@ -138,14 +144,14 @@ const GameTurnGuessingView = () => {
     if (releaseYearGuess == null) {
       setTracks((oldTracks) => {
         const oldIndex = oldTracks.findIndex(
-          (t) => t.spotifyId === turn.track.spotifyId,
+          (t) => t.spotifyId === track.spotifyId,
         );
         if (oldIndex === -1) {
-          return [turn.track, ...activePlayer.timeline];
+          return [track, ...activePlayer.timeline];
         } else {
           return [
             ...activePlayer.timeline.slice(0, oldIndex),
-            turn.track,
+            track,
             ...activePlayer.timeline.slice(oldIndex),
           ];
         }
@@ -153,11 +159,11 @@ const GameTurnGuessingView = () => {
     } else if (releaseYearGuess.position != null) {
       setTracks([
         ...activePlayer.timeline.slice(0, releaseYearGuess.position),
-        turn.track,
+        track,
         ...activePlayer.timeline.slice(releaseYearGuess.position),
       ]);
     }
-  }, [releaseYearGuess, turn.track, activePlayer.timeline]);
+  }, [releaseYearGuess, track, activePlayer.timeline]);
 
   useEffect(() => {
     if (!hasPassed && !canGuessReleaseYear && !canGuessCredits) {
@@ -177,7 +183,7 @@ const GameTurnGuessingView = () => {
     setReleaseYearModalOpen(false);
     setCreditsModalOpen(false);
     setPassTurnModalOpen(false);
-  }, [turn.track.spotifyId]);
+  }, [turnRevisionId]);
 
   useInterval(() => {
     if (
@@ -195,25 +201,34 @@ const GameTurnGuessingView = () => {
     if (!isActivePlayer || scoringTriggered) return;
 
     const haveAllPlayersPassed = game.players.every(({ userId }) =>
-      turn.passes.some((p) => p.userId === userId),
+      passes.some((p) => p.userId === userId),
     );
     if (haveAllPlayersPassed) {
       setScoringTriggered(true);
       dispatch(scoreTurn({ gameId, turnId }));
     }
-  }, [dispatch, isActivePlayer, scoringTriggered, game, turn, gameId, turnId]);
+  }, [
+    dispatch,
+    isActivePlayer,
+    scoringTriggered,
+    game,
+    passes,
+    gameId,
+    turnId,
+  ]);
 
   useEffect(() => {
     if (isGameMaster) {
-      dispatch(play({ trackId: turn.track.spotifyId }));
+      dispatch(play({ trackId: track.spotifyId }));
     }
-  }, [dispatch, turn.track.spotifyId, isGameMaster]);
+  }, [dispatch, track.spotifyId, isGameMaster]);
 
   const handleGuessReleaseYear = ({ position, year }) => {
     dispatch(
       guessTrackReleaseYear({
         gameId,
         turnId,
+        turnRevisionId,
         position,
         year,
       }),
@@ -225,6 +240,7 @@ const GameTurnGuessingView = () => {
       guessTrackCredits({
         gameId,
         turnId,
+        turnRevisionId,
         artists,
         title,
       }),

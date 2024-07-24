@@ -118,6 +118,7 @@ class TurnGuessesOut(BaseModel):
 
 
 class TrackExchangeOut(BaseModel):
+    turn_revision_id: str
     track: TrackOut
     token_delta: Mapping[ResourceId, int]
 
@@ -186,6 +187,7 @@ class TurnScoringOut(BaseModel):
 
 
 class TurnOut(BaseModel):
+    revision_id: str
     creation_time: datetime
     active_user_id: ResourceId
     track: TrackOut
@@ -197,6 +199,7 @@ class TurnOut(BaseModel):
     @staticmethod
     def from_model(model: Turn) -> "TurnOut":
         return TurnOut(
+            revision_id=model.revision_id,
             creation_time=model.creation_time,
             active_user_id=model.active_user_id,
             track=TrackOut.from_model(model.track),
@@ -288,6 +291,7 @@ class NewTurn(Notification):
 
 
 class TrackExchanged(Notification):
+    turn_revision_id: str
     track: TrackOut
     token_delta: Mapping[ResourceId, int]
 
