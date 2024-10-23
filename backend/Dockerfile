@@ -1,4 +1,4 @@
-FROM python:3.12-alpine AS poetry
+FROM python:3.13-alpine AS poetry
 
 WORKDIR /tmp
 
@@ -8,7 +8,7 @@ ADD pyproject.toml poetry.lock /tmp/
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 
-FROM python:3.12-alpine
+FROM python:3.13-alpine
 
 ENV PORT=80
 
