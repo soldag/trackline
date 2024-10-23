@@ -1,4 +1,4 @@
-/* eslint-env node */
+// eslint-disable-next-line import/default
 import react from "@vitejs/plugin-react";
 import path from "path";
 

@@ -1,4 +1,4 @@
-FROM node:20.12-alpine AS base
+FROM node:20.18-alpine AS base
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ ENV WATCHPACK_POLLING=true
 CMD ["npm", "run", "start"]
 
 
-FROM caddy:2.6-alpine
+FROM caddy:2.8-alpine
 
 WORKDIR /app
 
