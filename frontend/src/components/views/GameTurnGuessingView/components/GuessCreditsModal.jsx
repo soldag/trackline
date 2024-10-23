@@ -79,12 +79,12 @@ const GuessCreditsModal = ({ open, onConfirm, onClose }) => {
                     renderTags={(tags, getTagProps) =>
                       tags.map((item, index) => (
                         <Chip
+                          {...getTagProps({ index })}
                           key={index}
                           size="sm"
                           variant="solid"
                           color="primary"
                           endDecorator={<CloseIcon fontSize="sm" />}
-                          {...getTagProps({ index })}
                         >
                           {item}
                         </Chip>
