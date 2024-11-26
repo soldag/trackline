@@ -21,6 +21,12 @@ const VALUES = {
 };
 
 const HEADERS = {
+  [VALUES.GAME]: (
+    <FormattedMessage
+      id="GameTurnScoringView.ScoringTabs.headers.game"
+      defaultMessage="Game Scoring"
+    />
+  ),
   [VALUES.RELEASE_YEAR]: (
     <FormattedMessage
       id="GameTurnScoringView.ScoringTabs.headers.releaseYear"
@@ -33,18 +39,12 @@ const HEADERS = {
       defaultMessage="Credits"
     />
   ),
-  [VALUES.GAME]: (
-    <FormattedMessage
-      id="GameTurnScoringView.ScoringTabs.headers.game"
-      defaultMessage="Game Scoring"
-    />
-  ),
 };
 
 const ScoringTabs = ({ players, users, turn }) => {
   const isScreenXs = useBreakpoint((breakpoints) => breakpoints.only("xs"));
 
-  const [value, setValue] = useState(VALUES.RELEASE_YEAR);
+  const [value, setValue] = useState(VALUES.GAME);
 
   return (
     <Tabs
