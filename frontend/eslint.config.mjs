@@ -16,6 +16,9 @@ export default [
   eslintConfigPrettier,
   prettierPlugin,
   {
+    ignores: ["build/"],
+  },
+  {
     files: ["**/*.{js,jsx,mjs,cjs}"],
     languageOptions: {
       ecmaVersion: "latest",
@@ -57,7 +60,7 @@ export default [
   },
   {
     files: ["**/*.{js,jsx,mjs,cjs}"],
-    ignores: ["src/*"],
+    ignores: ["src/"],
     languageOptions: {
       globals: {
         ...globals.node,
