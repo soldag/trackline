@@ -23,9 +23,12 @@ export const search = async ({ userId, query, limit, offset = 0 }) => {
     },
   });
 
+  // Spotify API might return null for playlists not accessible via API
+  const playlists = items.filter((p) => p != null);
+
   // Search endpoint will always return public = null
   const privatePlaylistIds = [];
-  const ownedPlaylistIds = items
+  const ownedPlaylistIds = playlists
     .filter((p) => p.owner.id === userId)
     .map((p) => p.id);
   for (const playlistId of ownedPlaylistIds) {
@@ -35,7 +38,7 @@ export const search = async ({ userId, query, limit, offset = 0 }) => {
     }
   }
 
-  return items.map((p) => ({
+  return playlists.map((p) => ({
     ...p,
     public: p.public || !privatePlaylistIds.includes(p.id),
   }));
