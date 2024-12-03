@@ -1,6 +1,6 @@
 from collections import defaultdict
 import re
-from typing import TypeVar
+from typing import Protocol, TypeVar
 
 from injector import Inject
 from pydantic import BaseModel
@@ -21,7 +21,6 @@ from trackline.games.models import (
     ReleaseYearScoring,
     Scoring,
     TitleMatchMode,
-    Track,
     Turn,
     TurnScoring,
 )
@@ -33,6 +32,14 @@ from trackline.games.utils import compare_strings, is_valid_release_year
 
 
 GuessT = TypeVar("GuessT", bound=Guess)
+
+
+class Credits(Protocol):
+    @property
+    def artists(self) -> list[str]: ...
+
+    @property
+    def title(self) -> str: ...
 
 
 class ScoreTurn(BaseModel):
@@ -205,7 +212,7 @@ class ScoreTurn(BaseModel):
 
             winner: ResourceId | None = None
             similarity_scores = {
-                user_id: self._get_credits_similarity(turn.track, guess, game.settings)
+                user_id: self._get_credits_similarity(guess, turn.track, game.settings)
                 for user_id, guess in guesses.items()
             }
             correct_credits = [
@@ -222,8 +229,8 @@ class ScoreTurn(BaseModel):
 
                 is_correct = user_id in correct_credits
                 seen_guesses_similarities = [
-                    self._get_credits_similarity(turn.track, guess, game.settings)
-                    for guess in seen_guesses
+                    self._get_credits_similarity(guess, seen_guess, game.settings)
+                    for seen_guess in seen_guesses
                 ]
                 is_duplicate = any(
                     similarity >= game.settings.credits_similarity_threshold
@@ -250,24 +257,24 @@ class ScoreTurn(BaseModel):
             )
 
         def _get_credits_similarity(
-            self, track: Track, guess: CreditsGuess, settings: GameSettings
+            self, candidate: Credits, reference: Credits, settings: GameSettings
         ) -> float:
             sim_all_artists = [
                 max(
-                    compare_strings(track_artist, guess_artist)
-                    for guess_artist in guess.artists
+                    compare_strings(candidate_artist, reference_artist)
+                    for candidate_artist in candidate.artists
                 )
-                for track_artist in track.artists
+                for reference_artist in reference.artists
             ]
             match settings.artists_match_mode:
                 case ArtistsMatchMode.ALL:
-                    sim_artists = sum(sim_all_artists) / len(track.artists)
+                    sim_artists = sum(sim_all_artists) / len(reference.artists)
                 case ArtistsMatchMode.ONE:
                     sim_artists = max(sim_all_artists)
 
             sim_title = compare_strings(
-                self._transform_title(track.title, settings.title_match_mode),
-                self._transform_title(guess.title, settings.title_match_mode),
+                self._transform_title(reference.title, settings.title_match_mode),
+                self._transform_title(candidate.title, settings.title_match_mode),
             )
             return (sim_artists + sim_title) / 2
 
