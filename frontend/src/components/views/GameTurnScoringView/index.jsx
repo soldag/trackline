@@ -13,10 +13,12 @@ import { useConfetti, useStars } from "~/utils/confetti";
 import { useErrorToast, useLoadingSelector } from "~/utils/hooks";
 
 import BuyTrackModal from "./components/BuyTrackModal";
+import MaxTokenWarningSnackbar from "./components/MaxTokenWarningSnackbar";
 import ScoringTabs from "./components/ScoringTabs";
 
 const GameTurnScoringView = () => {
   const [buyTrackModalOpen, setBuyTrackModelOpen] = useState(false);
+  const [showMaxTokenSnackbar, setShowMaxTokenSnackbar] = useState(false);
 
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
@@ -36,6 +38,11 @@ const GameTurnScoringView = () => {
   const hasCompletedTurn = turn.completedBy.includes(userId);
   const canBuyTrack =
     !hasCompletedTurn && currentPlayer?.tokens >= TOKEN_COST_BUY_TRACK;
+
+  const hasMaxTokens = currentPlayer?.tokens >= game.settings.maxTokens;
+  useEffect(() => {
+    setShowMaxTokenSnackbar(hasMaxTokens);
+  }, [hasMaxTokens]);
 
   const showStars = turn?.scoring?.releaseYear?.position?.winner === userId;
   const { start: startStars } = useStars();
@@ -67,6 +74,12 @@ const GameTurnScoringView = () => {
         open={buyTrackModalOpen}
         onConfirm={() => dispatch(buyTrack({ gameId, userId }))}
         onClose={() => setBuyTrackModelOpen(false)}
+      />
+
+      <MaxTokenWarningSnackbar
+        limit={game.settings.maxTokens}
+        open={showMaxTokenSnackbar}
+        onClose={() => setShowMaxTokenSnackbar(false)}
       />
 
       <Stack

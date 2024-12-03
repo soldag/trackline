@@ -19,7 +19,13 @@ import {
 
 import ButtonFooter from "~/components/common/ButtonFooter";
 import View from "~/components/views/View";
-import { CREDITS_STRICTNESS, CREDITS_STRICTNESS_VALUES } from "~/constants";
+import {
+  CREDITS_STRICTNESS_VALUES,
+  DEFAULT_CREDITS_STRICTNESS,
+  DEFAULT_INITIAL_TOKENS,
+  DEFAULT_MAX_TOKENS,
+  DEFAULT_TIMELINE_LENGTH,
+} from "~/constants";
 import { dismissAllErrors } from "~/store/errors/actions";
 import { createGame } from "~/store/games/actions";
 import {
@@ -68,10 +74,11 @@ const CreateGameView = () => {
 
   const [expandPlaylists, setExpandPlaylists] = useState(true);
   const [playlists, setPlaylists] = useState([]);
-  const [initialTokens, setInitialTokens] = useState(2);
-  const [timelineLength, setTimelineLength] = useState(10);
+  const [initialTokens, setInitialTokens] = useState(DEFAULT_INITIAL_TOKENS);
+  const [maxTokens, setMaxTokens] = useState(DEFAULT_MAX_TOKENS);
+  const [timelineLength, setTimelineLength] = useState(DEFAULT_TIMELINE_LENGTH);
   const [creditsStrictness, setCreditsStrictness] = useState(
-    CREDITS_STRICTNESS.MODERATE,
+    DEFAULT_CREDITS_STRICTNESS,
   );
 
   useErrorToast(createGame);
@@ -105,6 +112,7 @@ const CreateGameView = () => {
         playlistIds: playlists.map(({ id }) => id),
         spotifyMarket: spotifyUser.country,
         initialTokens,
+        maxTokens,
         timelineLength,
         ...CREDITS_STRICTNESS_VALUES[creditsStrictness],
       }),
@@ -114,6 +122,7 @@ const CreateGameView = () => {
     playlists,
     spotifyUser,
     initialTokens,
+    maxTokens,
     timelineLength,
     creditsStrictness,
   ]);
@@ -172,9 +181,11 @@ const CreateGameView = () => {
   const settingsSection = (
     <SettingsForm
       initialTokens={initialTokens}
+      maxTokens={maxTokens}
       timelineLength={timelineLength}
       creditsStrictness={creditsStrictness}
       onInitialTokensChange={setInitialTokens}
+      onMaxTokensChange={setMaxTokens}
       onTimelineLengthChange={setTimelineLength}
       onCreditsStrictnessChange={setCreditsStrictness}
     />

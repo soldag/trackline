@@ -6,11 +6,11 @@ import TokenIcon from "@mui/icons-material/Token";
 import WebStoriesIcon from "@mui/icons-material/WebStories";
 import { Box, Typography } from "@mui/joy";
 
-import NumericDelta from "~/components/common/NumericDelta";
+import ScoringResult from "~/components/common/ScoringResult";
 import ShadowTable from "~/components/common/ShadowTable";
 import { PlayerType, TurnType } from "~/types/games";
 import { UserType } from "~/types/users";
-import { getTotalTokenGain } from "~/utils/games";
+import { aggregateTokenGains } from "~/utils/games";
 
 const getTracksDelta = (userId, turn) => {
   if (!turn?.scoring) {
@@ -20,19 +20,24 @@ const getTracksDelta = (userId, turn) => {
   return turn.scoring.releaseYear.position.winner === userId ? 1 : 0;
 };
 
-const getTokensDelta = (userId, turn) => {
+const getTokenCost = (userId, turn) => {
   if (!turn?.scoring) {
     return 0;
   }
 
-  const tokenGain = getTotalTokenGain(userId, turn.scoring);
-  const tokenCost = Object.values(turn.guesses)
+  return Object.values(turn.guesses)
     .flat()
     .filter((g) => g.userId === userId)
     .map((g) => g.tokenCost)
     .reduce((acc, curr) => acc + curr, 0);
+};
 
-  return tokenGain - tokenCost;
+const getTokenGain = (userId, turn) => {
+  if (!turn?.scoring) {
+    return null;
+  }
+
+  return aggregateTokenGains(userId, turn.scoring);
 };
 
 const getPosition = (player, players) =>
@@ -48,7 +53,8 @@ const GameScoringTable = ({ players, users, turn }) => {
     username: users.find((u) => u.id === p.userId)?.username,
     position: getPosition(p, players),
     tracksDelta: getTracksDelta(p.userId, turn),
-    tokensDelta: getTokensDelta(p.userId, turn),
+    tokenCost: getTokenCost(p.userId, turn),
+    tokenGain: getTokenGain(p.userId, turn),
   }));
   const sortedPlayers = _.sortBy(mergedPlayers, ["position"]);
 
@@ -98,42 +104,21 @@ const GameScoringTable = ({ players, users, turn }) => {
             <td>{player.position}.</td>
             <td>{player.username}</td>
             <td>
-              <Typography
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  columnGap: 1,
-                }}
-              >
+              <ScoringResult tracksDelta={player.tracksDelta}>
                 <Typography endDecorator={<WebStoriesIcon />}>
                   {player.timeline.length}
                 </Typography>
-                {player.tracksDelta > 0 && (
-                  <NumericDelta
-                    value={player.tracksDelta}
-                    icon={<WebStoriesIcon />}
-                  />
-                )}
-              </Typography>
+              </ScoringResult>
             </td>
             <td>
-              <Typography
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  columnGap: 1,
-                }}
+              <ScoringResult
+                tokenCost={player.tokenCost}
+                tokenGain={player.tokenGain}
               >
                 <Typography endDecorator={<TokenIcon />}>
                   {player.tokens}
                 </Typography>
-                {player.tokensDelta !== 0 && (
-                  <NumericDelta
-                    value={player.tokensDelta}
-                    icon={<TokenIcon />}
-                  />
-                )}
-              </Typography>
+              </ScoringResult>
             </td>
           </Box>
         ))}
