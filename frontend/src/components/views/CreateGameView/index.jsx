@@ -82,7 +82,7 @@ const CreateGameView = () => {
     if (spotifyUser && playlistRecommendations.length === 0) {
       dispatch(fetchRecommendedPlaylists());
     }
-  }, [spotifyUser, playlistRecommendations, dispatch]);
+  }, [spotifyUser, playlistRecommendations.length, dispatch]);
 
   const handleStartSpotifyAuth = useCallback(
     () => dispatch(startAuth()),
