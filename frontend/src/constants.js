@@ -90,13 +90,16 @@ export const REQUIRED_SPOTIFY_SCOPES = [
 ];
 
 export const RECOMMENDED_PLAYLIST_IDS = [
-  "37i9dQZF1DWSV3Tk4GO2fq", // 50s
-  "37i9dQZF1DWYfQ0uxBYM90", // 60s
-  "37i9dQZF1DWWUPe5aPjWhG", // 70s
-  "37i9dQZF1DXdCc7Q1hwtuv", // 80s
-  "37i9dQZF1DWTWEW1zqSeEj", // 90s
-  "37i9dQZF1DWXeOurMWUII5", // 00s
-  "37i9dQZF1DX8bHrtXvaJhx", // 10s
+  "3eDWy05e10gmu9hXlKiDhC", // 1950s
+  "4oWkHPbwjafNpMTOtvVGub", // 1960s
+  "5CpMCrXELUzHpIzSPSs5fb", // 1970s
+  "37qjtYGaWJhnIGa0lDg6Tq", // 1980s
+  "2Ma2qMbyiTeOYjgaXAKlbW", // 1990s
+  "2Mh68CM4k6yYNsu2DlzTbS", // 2000s
+  "4Vvh40a9NGsjrKUmzD8pWU", // 2010s
+  "5qVjOg9MTzJSJSPA6WwTtV", // 2020s
+  "5hJtFBDrJWohthyHb83zce", // Billboard charts
+  "1dDls1kVQqj17WJNwB3GZ9", // German charts
 ];
 
 export const LOBBY_TRACK_ID = "5WIHTBujvgqKbbOp1mWQiz";
