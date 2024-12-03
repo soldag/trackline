@@ -1,11 +1,13 @@
 import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
+import { Typography } from "@mui/joy";
+
+import ScoringResult from "~/components/common/ScoringResult";
 import YearRange from "~/components/common/YearRange";
 import { GuessType, PlayerType, TrackType, TurnType } from "~/types/games";
 import { UserType } from "~/types/users";
 
-import ScoringResult from "./ScoringResult";
 import TurnScoringTable from "./TurnScoringTable";
 
 const PositionResult = ({ turn, guess, timeline }) => {
@@ -17,15 +19,15 @@ const PositionResult = ({ turn, guess, timeline }) => {
     track,
     scoring: {
       releaseYear: {
-        position: { winner, correctGuesses, tokenGain },
+        position: { winner, correctGuesses, tokenGains },
       },
     },
   } = turn;
 
   const isCorrect = correctGuesses.includes(guess.userId);
+
   const isWinner = winner == guess.userId;
   const tracksDelta = isWinner ? 1 : 0;
-  const tokensDelta = (tokenGain[guess.userId] || 0) - guess.tokenCost;
 
   const originalTimeline = timeline.filter(
     (t) => t.spotifyId !== track.spotifyId,
@@ -35,11 +37,13 @@ const PositionResult = ({ turn, guess, timeline }) => {
 
   return (
     <ScoringResult
-      isCorrect={isCorrect}
       tracksDelta={tracksDelta}
-      tokensDelta={tokensDelta}
+      tokenCost={guess.tokenCost}
+      tokenGain={tokenGains[guess.userId]}
     >
-      <YearRange min={minYear} max={maxYear} />
+      <Typography color={isCorrect ? "success" : "danger"}>
+        <YearRange min={minYear} max={maxYear} />
+      </Typography>
     </ScoringResult>
   );
 };
@@ -58,17 +62,18 @@ const ReleaseYearResult = ({ turn, guess }) => {
   const {
     scoring: {
       releaseYear: {
-        year: { correctGuesses, tokenGain },
+        year: { correctGuesses, tokenGains },
       },
     },
   } = turn;
 
   const isCorrect = correctGuesses.includes(guess.userId);
-  const tokensDelta = tokenGain[guess.userId] || 0;
 
   return (
-    <ScoringResult isCorrect={isCorrect} tokensDelta={tokensDelta}>
-      {guess.year}
+    <ScoringResult tokenGain={tokenGains[guess.userId]}>
+      <Typography color={isCorrect ? "success" : "danger"}>
+        {guess.year}
+      </Typography>
     </ScoringResult>
   );
 };

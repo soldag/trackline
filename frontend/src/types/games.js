@@ -41,10 +41,16 @@ export const TurnPassType = PropTypes.shape({
   creationTime: PropTypes.string.isRequired,
 });
 
+export const TokenGainType = PropTypes.shape({
+  refund: PropTypes.number.isRequired,
+  rewardTheoretical: PropTypes.number.isRequired,
+  rewardEffective: PropTypes.number.isRequired,
+});
+
 const ScoringProps = {
   winner: PropTypes.string,
   correctGuesses: PropTypes.arrayOf(PropTypes.string).isRequired,
-  tokenGain: PropTypes.objectOf(PropTypes.number).isRequired,
+  tokenGains: PropTypes.objectOf(TokenGainType).isRequired,
 };
 export const ScoringType = PropTypes.shape(ScoringProps);
 

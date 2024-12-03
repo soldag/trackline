@@ -12,18 +12,36 @@ import {
   Stack,
 } from "@mui/joy";
 
-import { CREDITS_STRICTNESS } from "~/constants";
+import {
+  CREDITS_STRICTNESS,
+  MAX_INITIAL_TOKENS,
+  MAX_MAX_TOKENS,
+  MAX_TIMELINE_LENGTH,
+  MIN_INITIAL_TOKENS,
+  MIN_MAX_TOKENS,
+  MIN_TIMELINE_LENGTH,
+} from "~/constants";
 import CreditsStrictnessMessages from "~/translations/messages/CreditsStrictness";
 
 const SettingsForm = ({
   initialTokens,
+  maxTokens,
   timelineLength,
   creditsStrictness,
   onInitialTokensChange,
+  onMaxTokensChange,
   onTimelineLengthChange,
   onCreditsStrictnessChange,
 }) => {
   const intl = useIntl();
+
+  const handleMaxTokensChange = (value) => {
+    onMaxTokensChange(value);
+
+    if (value < initialTokens) {
+      onInitialTokensChange(value);
+    }
+  };
 
   return (
     <Stack spacing={2} sx={{ overflow: "auto" }}>
@@ -44,8 +62,8 @@ const SettingsForm = ({
           <Slider
             marks
             variant="soft"
-            min={0}
-            max={5}
+            min={MIN_INITIAL_TOKENS}
+            max={Math.min(maxTokens, MAX_INITIAL_TOKENS)}
             step={1}
             valueLabelDisplay="on"
             value={initialTokens}
@@ -57,6 +75,39 @@ const SettingsForm = ({
             id="CreateGameView.SettingsForm.initialTokens.helpText"
             defaultMessage="Each player starts the game {value, plural, =0 {without any tokens} =1 {with #{nbsp}token} other {with #{nbsp}tokens}}."
             values={{ value: initialTokens, nbsp: <>&nbsp;</> }}
+          />
+        </FormHelperText>
+      </FormControl>
+      <FormControl>
+        <FormLabel>
+          <FormattedMessage
+            id="CreateGameView.SettingsForm.maxTokens.label"
+            defaultMessage="Token limit"
+          />
+        </FormLabel>
+        <Box
+          sx={{
+            px: "15px",
+            pt: "17px",
+            mb: "-12px",
+          }}
+        >
+          <Slider
+            marks
+            variant="soft"
+            min={MIN_MAX_TOKENS}
+            max={MAX_MAX_TOKENS}
+            step={1}
+            valueLabelDisplay="on"
+            value={maxTokens}
+            onChange={(e, value) => handleMaxTokensChange(value)}
+          />
+        </Box>
+        <FormHelperText>
+          <FormattedMessage
+            id="CreateGameView.SettingsForm.maxTokens.helpText"
+            defaultMessage="Players cannot have more than {value, plural, =1 {with #{nbsp}token} other {with #{nbsp}tokens}}."
+            values={{ value: maxTokens, nbsp: <>&nbsp;</> }}
           />
         </FormHelperText>
       </FormControl>
@@ -77,8 +128,8 @@ const SettingsForm = ({
           <Slider
             marks
             variant="soft"
-            min={5}
-            max={20}
+            min={MIN_TIMELINE_LENGTH}
+            max={MAX_TIMELINE_LENGTH}
             step={1}
             valueLabelDisplay="on"
             value={timelineLength}
@@ -128,10 +179,12 @@ const SettingsForm = ({
 
 SettingsForm.propTypes = {
   initialTokens: PropTypes.number.isRequired,
+  maxTokens: PropTypes.number.isRequired,
   timelineLength: PropTypes.number.isRequired,
   creditsStrictness: PropTypes.oneOf(Object.values(CREDITS_STRICTNESS))
     .isRequired,
   onInitialTokensChange: PropTypes.func.isRequired,
+  onMaxTokensChange: PropTypes.func.isRequired,
   onTimelineLengthChange: PropTypes.func.isRequired,
   onCreditsStrictnessChange: PropTypes.func.isRequired,
 };
