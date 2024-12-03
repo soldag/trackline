@@ -42,6 +42,18 @@ export const GAME_STATES = {
 };
 export const TURN_GAME_STATES = [GAME_STATES.GUESSING, GAME_STATES.SCORING];
 
+export const MIN_INITIAL_TOKENS = 0;
+export const MAX_INITIAL_TOKENS = 5;
+export const DEFAULT_INITIAL_TOKENS = 2;
+
+export const MIN_MAX_TOKENS = TOKEN_COST_BUY_TRACK;
+export const MAX_MAX_TOKENS = 10;
+export const DEFAULT_MAX_TOKENS = 5;
+
+export const MIN_TIMELINE_LENGTH = 5;
+export const MAX_TIMELINE_LENGTH = 20;
+export const DEFAULT_TIMELINE_LENGTH = 10;
+
 export const ARTIST_MATCH_MODES = {
   ALL: "all",
   ONE: "one",
@@ -81,6 +93,8 @@ export const CREDITS_STRICTNESS_VALUES = {
     creditsSimilarityThreshold: 0.8,
   },
 };
+
+export const DEFAULT_CREDITS_STRICTNESS = CREDITS_STRICTNESS.MODERATE;
 
 export const REQUIRED_SPOTIFY_SCOPES = [
   "playlist-read-private",

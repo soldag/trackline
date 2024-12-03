@@ -3,10 +3,10 @@ import { FormattedMessage } from "react-intl";
 
 import { Typography } from "@mui/joy";
 
+import ScoringResult from "~/components/common/ScoringResult";
 import { GuessType, PlayerType, TurnType } from "~/types/games";
 import { UserType } from "~/types/users";
 
-import ScoringResult from "./ScoringResult";
 import TurnScoringTable from "./TurnScoringTable";
 
 const CreditsResult = ({ turn, guess }) => {
@@ -16,18 +16,22 @@ const CreditsResult = ({ turn, guess }) => {
 
   const {
     scoring: {
-      credits: { correctGuesses, tokenGain },
+      credits: { correctGuesses, tokenGains },
     },
   } = turn;
 
   const isCorrect = correctGuesses.includes(guess.userId);
-  const tokensDelta = (tokenGain[guess.userId] || 0) - guess.tokenCost;
 
   return (
-    <ScoringResult isCorrect={isCorrect} tokensDelta={tokensDelta}>
-      <Typography sx={{ display: "block" }}>{guess.title}</Typography>
-      <Typography sx={{ display: "block" }}>
-        {guess.artists.join(", ")}
+    <ScoringResult
+      tokenCost={guess.tokenCost}
+      tokenGain={tokenGains[guess.userId]}
+    >
+      <Typography color={isCorrect ? "success" : "danger"}>
+        <Typography sx={{ display: "block" }}>{guess.title}</Typography>
+        <Typography sx={{ display: "block" }}>
+          {guess.artists.join(", ")}
+        </Typography>
       </Typography>
     </ScoringResult>
   );

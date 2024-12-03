@@ -1,6 +1,8 @@
 import abc
+from collections.abc import Mapping
 from datetime import datetime
 from enum import Enum
+from typing import Self
 from uuid import uuid4
 
 from pydantic import Field
@@ -63,10 +65,19 @@ class TurnPass(BaseModel):
     creation_time: datetime = Field(default_factory=utcnow)
 
 
+class TokenGain(BaseModel):
+    refund: int = 0
+    reward_theoretical: int = 0
+    reward_effective: int = 0
+
+
 class Scoring(BaseModel):
     winner: ResourceId | None
     correct_guesses: list[ResourceId]
-    token_gain: dict[ResourceId, int]
+    token_gains: dict[ResourceId, TokenGain]
+
+    def with_token_gains(self, token_gains: Mapping[ResourceId, TokenGain]) -> Self:
+        return self.model_copy(update=dict(token_gains=dict(token_gains)))
 
 
 class ReleaseYearScoring(BaseModel):
@@ -103,6 +114,7 @@ class GameSettings(BaseModel):
     spotify_market: str
     playlist_ids: list[str]
     initial_tokens: int
+    max_tokens: int
     timeline_length: int
     guess_timeout: int
     artists_match_mode: ArtistsMatchMode

@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections.abc import Mapping
 import re
 from typing import Protocol, TypeVar
 
@@ -17,10 +17,10 @@ from trackline.games.models import (
     Game,
     GameSettings,
     Guess,
-    ReleaseYearGuess,
     ReleaseYearScoring,
     Scoring,
     TitleMatchMode,
+    TokenGain,
     Turn,
     TurnScoring,
 )
@@ -32,6 +32,7 @@ from trackline.games.utils import compare_strings, is_valid_release_year
 
 
 GuessT = TypeVar("GuessT", bound=Guess)
+ScoringT = TypeVar("ScoringT", bound=Scoring)
 
 
 class Credits(Protocol):
@@ -68,20 +69,9 @@ class ScoreTurn(BaseModel):
             assert current_player
 
             turn = game.turns[use_case.turn_id]
-            release_year_scoring = await self._score_release_year(game, turn)
-            credits_scoring = self._score_credits(game, turn)
+            scoring, player_tokens = await self._score_game(game, turn)
 
-            token_gain = self._merge_token_gain(
-                release_year_scoring.position.token_gain,
-                release_year_scoring.year.token_gain,
-                credits_scoring.token_gain,
-            )
-            await self._game_repository.inc_tokens(game.id, token_gain)
-
-            scoring = TurnScoring(
-                release_year=release_year_scoring,
-                credits=credits_scoring,
-            )
+            await self._game_repository.set_tokens(game.id, player_tokens)
             await self._game_repository.set_turn_scoring(
                 game.id, use_case.turn_id, scoring
             )
@@ -98,6 +88,23 @@ class ScoreTurn(BaseModel):
 
             return scoring_out
 
+        async def _score_game(
+            self, game: Game, turn: Turn
+        ) -> tuple[TurnScoring, Mapping[ResourceId, int]]:
+            position_scoring = await self._score_position(game, turn)
+            release_year_scoring = self._score_release_year(turn)
+            credits_scoring = self._score_credits(game, turn)
+
+            turn_scoring = TurnScoring(
+                release_year=ReleaseYearScoring(
+                    position=position_scoring,
+                    year=release_year_scoring,
+                ),
+                credits=credits_scoring,
+            )
+
+            return self._apply_token_limit(game, turn_scoring)
+
         def _sort_guesses(
             self,
             guesses: dict[ResourceId, GuessT],
@@ -110,33 +117,16 @@ class ScoreTurn(BaseModel):
                 )
             )
 
-        async def _score_release_year(
-            self,
-            game: Game,
-            turn: Turn,
-        ) -> ReleaseYearScoring:
-            guesses = turn.guesses.release_year
-            sorted_guesses = self._sort_guesses(guesses, turn.active_user_id)
-
-            position_scoring = await self._score_release_year_position(
-                game, turn, sorted_guesses
-            )
-            year_scoring = self._score_release_year_year(turn, sorted_guesses)
-
-            return ReleaseYearScoring(position=position_scoring, year=year_scoring)
-
-        async def _score_release_year_position(
-            self,
-            game: Game,
-            turn: Turn,
-            sorted_guesses: dict[ResourceId, ReleaseYearGuess],
-        ) -> Scoring:
+        async def _score_position(self, game: Game, turn: Turn) -> Scoring:
             active_player = game.get_active_player()
             assert active_player
 
+            guesses = turn.guesses.release_year
+            sorted_guesses = self._sort_guesses(guesses, turn.active_user_id)
+
             seen_positions: set[int] = set()
             winner: ResourceId | None = None
-            token_gain: dict[ResourceId, int] = {}
+            token_gains: dict[ResourceId, TokenGain] = {}
 
             correct_guesses = [
                 user_id
@@ -162,23 +152,22 @@ class ScoreTurn(BaseModel):
                     # Duplicate guesses are ignored and these players get
                     # their spent token back. There might be multiple correct
                     # positions that's why we also need to check for is_correct.
-                    token_gain[user_id] = guess.token_cost
+                    token_gains[user_id] = TokenGain(refund=guess.token_cost)
 
                 seen_positions.add(guess.position)
 
             return Scoring(
                 winner=winner,
                 correct_guesses=correct_guesses,
-                token_gain=token_gain,
+                token_gains=token_gains,
             )
 
-        def _score_release_year_year(
-            self,
-            turn: Turn,
-            sorted_guesses: dict[ResourceId, ReleaseYearGuess],
-        ) -> Scoring:
+        def _score_release_year(self, turn: Turn) -> Scoring:
             winner: ResourceId | None = None
-            token_gain: dict[ResourceId, int] = {}
+            token_gains: dict[ResourceId, TokenGain] = {}
+
+            guesses = turn.guesses.release_year
+            sorted_guesses = self._sort_guesses(guesses, turn.active_user_id)
 
             correct_guesses = [
                 user_id
@@ -188,21 +177,20 @@ class ScoreTurn(BaseModel):
             for user_id in sorted_guesses.keys():
                 if user_id in correct_guesses:
                     winner = user_id
-                    token_gain[user_id] = TOKEN_GAIN_YEAR_GUESS
+                    token_gains[user_id] = TokenGain(
+                        reward_effective=TOKEN_GAIN_YEAR_GUESS,
+                        reward_theoretical=TOKEN_GAIN_YEAR_GUESS,
+                    )
                     break
 
             return Scoring(
                 winner=winner,
                 correct_guesses=correct_guesses,
-                token_gain=token_gain,
+                token_gains=token_gains,
             )
 
-        def _score_credits(
-            self,
-            game: Game,
-            turn: Turn,
-        ) -> CreditsScoring:
-            token_gain: dict[ResourceId, int] = defaultdict(lambda: 0)
+        def _score_credits(self, game: Game, turn: Turn) -> CreditsScoring:
+            token_gains: dict[ResourceId, TokenGain] = {}
 
             active_player = game.get_active_player()
             assert active_player
@@ -238,21 +226,22 @@ class ScoreTurn(BaseModel):
                 )
                 if is_correct and not winner:
                     winner = user_id
-                    token_gain[user_id] = TOKEN_GAIN_CREDITS_GUESS
-                    if user_id != active_player.user_id:
-                        # Passive players get their stake back
-                        token_gain[user_id] += guess.token_cost
+                    token_gains[user_id] = TokenGain(
+                        refund=guess.token_cost,
+                        reward_effective=TOKEN_GAIN_CREDITS_GUESS,
+                        reward_theoretical=TOKEN_GAIN_CREDITS_GUESS,
+                    )
                 elif is_correct or is_duplicate:
                     # Duplicate guesses are ignored and these players get
                     # their spent token back
-                    token_gain[user_id] = guess.token_cost
+                    token_gains[user_id] = TokenGain(refund=guess.token_cost)
 
                 seen_guesses.append(guess)
 
             return CreditsScoring(
-                token_gain=token_gain,
                 winner=winner,
                 correct_guesses=correct_credits,
+                token_gains=token_gains,
                 similarity_scores=similarity_scores,
             )
 
@@ -287,12 +276,43 @@ class ScoreTurn(BaseModel):
                 case TitleMatchMode.MAIN:
                     return re.sub(r"\([^\)]+\)", "", original_title).strip()
 
-        def _merge_token_gain(
-            self, *deltas: dict[ResourceId, int]
-        ) -> dict[ResourceId, int]:
-            result: dict[ResourceId, int] = {}
-            for delta in deltas:
-                for user_id, token_delta in delta.items():
-                    result[user_id] = result.get(user_id, 0) + token_delta
+        def _apply_token_limit(
+            self, game: Game, turn_scoring: TurnScoring
+        ) -> tuple[TurnScoring, Mapping[ResourceId, int]]:
+            player_tokens = {p.user_id: p.tokens for p in game.players}
 
-            return result
+            scorings = (
+                turn_scoring.release_year.position,
+                turn_scoring.release_year.year,
+                turn_scoring.credits,
+            )
+            for scoring in scorings:
+                for user_id, token_gain in scoring.token_gains.items():
+                    player_tokens[user_id] += token_gain.refund
+
+            scoring_token_gains: list[dict[ResourceId, TokenGain]] = []
+            for scoring in scorings:
+                new_token_gains: dict[ResourceId, TokenGain] = {}
+                for user_id, token_gain in scoring.token_gains.items():
+                    tokens = player_tokens.get(user_id, 0)
+                    reward_effective = min(
+                        token_gain.reward_theoretical,
+                        max(0, game.settings.max_tokens - tokens),
+                    )
+                    player_tokens[user_id] += reward_effective
+
+                    new_token_gains[user_id] = token_gain.model_copy(
+                        update=dict(reward_effective=reward_effective),
+                    )
+
+                scoring_token_gains.append(new_token_gains)
+
+            turn_scoring = TurnScoring(
+                release_year=ReleaseYearScoring(
+                    position=scorings[0].with_token_gains(scoring_token_gains[0]),
+                    year=scorings[1].with_token_gains(scoring_token_gains[1]),
+                ),
+                credits=scorings[2].with_token_gains(scoring_token_gains[2]),
+            )
+
+            return turn_scoring, player_tokens

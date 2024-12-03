@@ -192,3 +192,17 @@ class GameRepository(Repository[Game]):
                 if amount != 0
             ]
         )
+
+    async def set_tokens(
+        self, game_id: ResourceId, values: Mapping[ResourceId, int]
+    ) -> int:
+        return await self._update_bulk(
+            [
+                UpdateOne(
+                    self._id_query(game_id),
+                    {"$set": {"players.$[player].tokens": value}},
+                    array_filters=[{"player.user_id": user_id}],
+                )
+                for user_id, value in values.items()
+            ]
+        )

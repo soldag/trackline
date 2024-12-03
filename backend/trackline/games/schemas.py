@@ -17,6 +17,7 @@ from trackline.games.models import (
     ReleaseYearScoring,
     Scoring,
     TitleMatchMode,
+    TokenGain,
     Track,
     Turn,
     TurnGuesses,
@@ -132,17 +133,34 @@ class TurnPassOut(BaseModel):
         return TurnPassOut(user_id=user_id, creation_time=model.creation_time)
 
 
+class TokenGainOut(BaseModel):
+    refund: int
+    reward_theoretical: int
+    reward_effective: int
+
+    @staticmethod
+    def from_model(model: TokenGain) -> "TokenGainOut":
+        return TokenGainOut(
+            refund=model.refund,
+            reward_theoretical=model.reward_theoretical,
+            reward_effective=model.reward_effective,
+        )
+
+
 class ScoringOut(BaseModel):
     winner: ResourceId | None
     correct_guesses: list[ResourceId]
-    token_gain: Mapping[ResourceId, int]
+    token_gains: Mapping[ResourceId, TokenGainOut]
 
     @staticmethod
     def from_model(model: Scoring) -> "ScoringOut":
         return ScoringOut(
             winner=model.winner,
             correct_guesses=model.correct_guesses,
-            token_gain=model.token_gain,
+            token_gains={
+                user_id: TokenGainOut.from_model(token_gain)
+                for user_id, token_gain in model.token_gains.items()
+            },
         )
 
 
@@ -161,7 +179,7 @@ class ReleaseYearScoringOut(BaseModel):
 class CreditsScoringOut(BaseModel):
     winner: ResourceId | None
     correct_guesses: list[ResourceId]
-    token_gain: Mapping[ResourceId, int]
+    token_gains: Mapping[ResourceId, TokenGainOut]
     similarity_scores: dict[ResourceId, float]
 
     @staticmethod
@@ -169,7 +187,10 @@ class CreditsScoringOut(BaseModel):
         return CreditsScoringOut(
             winner=model.winner,
             correct_guesses=model.correct_guesses,
-            token_gain=model.token_gain,
+            token_gains={
+                user_id: TokenGainOut.from_model(token_gain)
+                for user_id, token_gain in model.token_gains.items()
+            },
             similarity_scores=model.similarity_scores,
         )
 
@@ -217,6 +238,7 @@ class GameSettingsOut(BaseModel):
     spotify_market: str
     playlist_ids: list[str]
     initial_tokens: int
+    max_tokens: int
     timeline_length: int
     guess_timeout: int
     artists_match_mode: ArtistsMatchMode
@@ -229,6 +251,7 @@ class GameSettingsOut(BaseModel):
             spotify_market=model.spotify_market,
             playlist_ids=model.playlist_ids,
             initial_tokens=model.initial_tokens,
+            max_tokens=model.max_tokens,
             timeline_length=model.timeline_length,
             guess_timeout=model.guess_timeout,
             artists_match_mode=model.artists_match_mode,
