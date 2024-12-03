@@ -63,10 +63,16 @@ class TurnPass(BaseModel):
     creation_time: datetime = Field(default_factory=utcnow)
 
 
+class TokenGain(BaseModel):
+    refund: int = 0
+    reward_theoretical: int = 0
+    reward_effective: int = 0
+
+
 class Scoring(BaseModel):
     winner: ResourceId | None
     correct_guesses: list[ResourceId]
-    token_gain: dict[ResourceId, int]
+    token_gains: dict[ResourceId, TokenGain]
 
 
 class ReleaseYearScoring(BaseModel):
@@ -103,6 +109,7 @@ class GameSettings(BaseModel):
     spotify_market: str
     playlist_ids: list[str]
     initial_tokens: int
+    max_tokens: int
     timeline_length: int
     guess_timeout: int
     artists_match_mode: ArtistsMatchMode
