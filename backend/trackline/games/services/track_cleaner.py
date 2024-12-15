@@ -4,7 +4,7 @@ import re
 class TrackCleaner:
     TITLE_CLEANUP_PATTERNS = (
         r" - From (.*)$",
-        r" - The Original$",
+        r" - (The )?Original$",
         r" - [^-]*Remaster(ed)?(.*)$",
         r" - [^-]+Edit(.*)$",
         r" - [^-]+Mix(.*)$",
