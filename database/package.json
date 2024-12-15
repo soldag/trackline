@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "migrate-mongo": "^11.0.0",
-    "uuid": "^10.0.0"
+    "uuid": "^11.0.3"
   },
   "scripts": {
     "migrate": "migrate-mongo"
