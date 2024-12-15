@@ -9,7 +9,7 @@ export const getPlaybackState = async () => {
     item,
     device,
   } = playbackState || {};
-  const { durationMs: duration = null } = item || {};
+  const { id: trackId = null, durationMs: duration = null } = item || {};
   const { volumePercent } = device || {};
   const isActive = !!playbackState;
   const volume = volumePercent != null ? volumePercent / 100 : null;
@@ -17,6 +17,7 @@ export const getPlaybackState = async () => {
   return {
     isActive,
     isPlaying,
+    trackId,
     progress,
     duration,
     volume,

@@ -33,6 +33,7 @@ const initialState = {
   playback: {
     isActive: false,
     isPlaying: null,
+    trackId: null,
     progress: null,
     duration: null,
     volume: null,

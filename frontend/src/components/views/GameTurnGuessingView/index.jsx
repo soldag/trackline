@@ -76,6 +76,9 @@ const GameTurnGuessingView = () => {
   const timeDeviation = useSelector(
     (state) => state.timing.timeDeviation.trackline,
   );
+  const playbackTrackId = useSelector(
+    (state) => state.spotify.playback.trackId,
+  );
 
   const loadingReleaseYearGuess = useLoadingSelector(guessTrackReleaseYear);
   const loadingCreditsGuess = useLoadingSelector(guessTrackCredits);
@@ -218,10 +221,10 @@ const GameTurnGuessingView = () => {
   ]);
 
   useEffect(() => {
-    if (isGameMaster) {
+    if (isGameMaster && playbackTrackId !== track.spotifyId) {
       dispatch(play({ trackId: track.spotifyId }));
     }
-  }, [dispatch, track.spotifyId, isGameMaster]);
+  }, [dispatch, track.spotifyId, isGameMaster, playbackTrackId]);
 
   const handleGuessReleaseYear = ({ position, year }) => {
     dispatch(
