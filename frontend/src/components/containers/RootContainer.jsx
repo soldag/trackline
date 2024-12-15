@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import FullscreenContainer from "~/components/containers/FullscreenContainer";
 import RoutingContainer from "~/components/containers/RoutingContainer";
 import SpotifyContainer from "~/components/containers/SpotifyContainer";
 import LoadingView from "~/components/views/LoadingView";
@@ -40,11 +39,9 @@ const RootContainer = () => {
   }
 
   return (
-    <FullscreenContainer>
-      <SpotifyContainer>
-        <RoutingContainer />
-      </SpotifyContainer>
-    </FullscreenContainer>
+    <SpotifyContainer>
+      <RoutingContainer />
+    </SpotifyContainer>
   );
 };
 

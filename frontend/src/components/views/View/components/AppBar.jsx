@@ -1,16 +1,14 @@
 import PropTypes from "prop-types";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import AlbumIcon from "@mui/icons-material/Album";
 import ClearIcon from "@mui/icons-material/Clear";
-import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Box, IconButton, Stack, Typography } from "@mui/joy";
 
-import FullscreenContext from "~/components/contexts/FullscreenContext";
 import { TURN_GAME_STATES } from "~/constants";
 import { logout } from "~/store/auth/actions";
 import { abortGame, leaveGame } from "~/store/games/actions";
@@ -36,9 +34,6 @@ const AppBar = ({
   showLogout = false,
 }) => {
   const navigate = useNavigate();
-
-  const { isFullscreenEnabled, isFullscreenPreferred, requestFullscreen } =
-    useContext(FullscreenContext);
 
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [abortModalOpen, setAbortModalOpen] = useState(false);
@@ -161,12 +156,6 @@ const AppBar = ({
           onPause={() => dispatch(pause())}
           onVolumeChange={(volume) => dispatch(setVolume({ volume }))}
         />
-      )}
-
-      {isFullscreenPreferred && !isFullscreenEnabled && (
-        <IconButton color="primary" onClick={requestFullscreen}>
-          <FullscreenIcon />
-        </IconButton>
       )}
 
       {showExitGame && game && (
