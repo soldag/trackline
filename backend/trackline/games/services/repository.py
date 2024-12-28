@@ -67,8 +67,8 @@ class GameRepository(Repository[Game]):
             {
                 "$set": {
                     f"turns.{turn_id}.track": self._to_document(track, root=False),
-                    f"turns.{turn_id}.revision": turn_revision_id,
-                    f"turns.{turn_id}.guesses.releaseYear": {},
+                    f"turns.{turn_id}.revision_id": turn_revision_id,
+                    f"turns.{turn_id}.guesses.release_year": {},
                     f"turns.{turn_id}.guesses.credits": {},
                     f"turns.{turn_id}.passes": {},
                 },
