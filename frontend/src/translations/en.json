@@ -118,6 +118,7 @@
   "GameTurnScoringView.continue": "Continue",
   "GameTurnScoringView.waitingForPlayers": "Waiting for players...",
   "GlobalErrors.networkError": "Oops, something went wrong! It seems like there's a problem with your network connection.",
+  "GlobalErrors.timeoutError": "Oops, something went wrong! The server took too long to respond.",
   "GlobalErrors.unexpectedError": "An unexpected error occurred.",
   "Heading.tagline": "Guess your favorite songs!",
   "Heading.title": "Trackline",

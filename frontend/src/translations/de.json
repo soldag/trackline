@@ -118,6 +118,7 @@
   "GameTurnScoringView.continue": "Fortfahren",
   "GameTurnScoringView.waitingForPlayers": "Warte auf Spieler...",
   "GlobalErrors.networkError": "Ups, da ist etwas schief gelaufen. Scheinbar besteht ein Problem mit deiner Internetverbindung.",
+  "GlobalErrors.timeoutError": "Ups, da ist etwas schief gelaufen. Der Server hat nicht rechtzeitig geantwortet.",
   "GlobalErrors.unexpectedError": "Es ist ein unerwarteter Fehler aufgetreten.",
   "Heading.tagline": "Guess your favorite songs!",
   "Heading.title": "Trackline",
