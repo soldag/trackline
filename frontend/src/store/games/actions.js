@@ -1,6 +1,8 @@
 import { createAction } from "@reduxjs/toolkit";
 import { createRoutine } from "redux-saga-routines";
 
+export const stopRoutines = createAction("GAMES/STOP_ROUTINES");
+
 export const clearGame = createAction("GAMES/CLEAR_GAME");
 
 export const fetchGame = createRoutine("GAMES/FETCH");

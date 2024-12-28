@@ -25,7 +25,7 @@ export function* runWhileVisible(effect) {
 
       if (document.visibilityState === "hidden") {
         task.cancel();
-      } else if (task.isCancelled) {
+      } else if (task.wasCancelled) {
         task = yield fork(effect);
       }
     }
@@ -45,8 +45,11 @@ function* handleAction(saga, options = {}, action) {
   }
 
   try {
-    const { result } = yield race(tasks);
-    return result;
+    const { result, cancellation } = yield race(tasks);
+    return {
+      result,
+      wasCancelled: !!cancellation,
+    };
   } catch (e) {
     if (import.meta.env.DEV) {
       console.error(e);
@@ -57,8 +60,10 @@ function* handleAction(saga, options = {}, action) {
 
 function* handleRoutineTrigger(actionType, saga, options = {}, action) {
   try {
-    const result = yield handleAction(saga, options, action);
-    yield put(actionType.success(result));
+    const { result, wasCancelled } = yield handleAction(saga, options, action);
+    if (!wasCancelled) {
+      yield put(actionType.success(result));
+    }
   } catch ({ code, message, ...extra }) {
     const error = {
       code,
