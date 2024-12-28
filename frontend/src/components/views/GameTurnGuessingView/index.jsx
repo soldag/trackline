@@ -85,6 +85,11 @@ const GameTurnGuessingView = () => {
   const loadingCreditsGuess = useLoadingSelector(guessTrackCredits);
   const loadingPassTurn = useLoadingSelector(passTurn);
   const loadingExchangeTrack = useLoadingSelector(exchangeTrack);
+  const loading =
+    loadingReleaseYearGuess ||
+    loadingCreditsGuess ||
+    loadingPassTurn ||
+    loadingExchangeTrack;
 
   useErrorToast(
     exchangeTrack,
@@ -313,8 +318,8 @@ const GameTurnGuessingView = () => {
         {!isScreenXs && (
           <SideMenu
             showExchangeTrack={isActivePlayer}
-            canExchangeTrack={canExchangeTrack}
-            canPassTurn={!hasPassed}
+            canExchangeTrack={canExchangeTrack && !loading}
+            canPassTurn={!hasPassed && !loading}
             loadingPassTurn={loadingPassTurn}
             loadingExchangeTrack={loadingExchangeTrack}
             onExchangeTrack={() => setExchangeTrackModalOpen(true)}
@@ -353,8 +358,8 @@ const GameTurnGuessingView = () => {
             users={users}
             currentUserId={user?.id}
             showExchangeTrack={isActivePlayer}
-            canExchangeTrack={canExchangeTrack}
-            canPassTurn={!hasPassed}
+            canExchangeTrack={canExchangeTrack && !loading}
+            canPassTurn={!hasPassed && !loading}
             loadingPassTurn={loadingPassTurn}
             loadingExchangeTrack={loadingExchangeTrack}
             onExchangeTrack={() => setExchangeTrackModalOpen(true)}
