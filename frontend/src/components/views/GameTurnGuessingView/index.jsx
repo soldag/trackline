@@ -33,6 +33,7 @@ import PassTurnModal from "./components/PassTurnModal";
 import SideMenu from "./components/SideMenu";
 import StatusBar from "./components/StatusBar";
 import Timeline from "./components/Timeline";
+import TimelineContainer from "./components/TimelineContainer";
 import TurnInfoOverlay from "./components/TurnInfoOverlay";
 
 const hasTokensToGuess = (turn, player, cost) => {
@@ -321,39 +322,28 @@ const GameTurnGuessingView = () => {
           />
         )}
 
-        <Box
-          sx={{
-            "display": "flex",
-            "flexGrow": 1,
-            "justifyContent": { xs: "center", sm: "unset" },
-            "alignItems": { sm: "center" },
-            "ml": { sm: "-5px" },
-            "pl": { sm: "5px" },
-            "overflow": "auto",
-            "WebkitOverflowScrolling": "touch",
-            "msOverflowStyle": "none",
-            "scrollbarWidth": "none",
-            "&::-webkit-scrollbar": { display: "none" },
-          }}
+        <TimelineContainer
+          sx={(theme) => ({
+            ml: { sm: `calc(-5px - ${theme.spacing(1)})` },
+            pl: { sm: "5px" },
+          })}
         >
-          <Box sx={{ ml: -1 }}>
-            <Timeline
-              tracks={tracks}
-              activeTrackId={turn?.track?.spotifyId}
-              releaseYearGuess={releaseYearGuess}
-              creditsGuess={creditsGuess}
-              canGuessReleaseYear={canGuessReleaseYear}
-              canGuessCredits={canGuessCredits}
-              loadingReleaseYearGuess={loadingReleaseYearGuess}
-              loadingCreditsGuess={loadingCreditsGuess}
-              timeoutStart={timeoutStart}
-              timeoutEnd={timeoutEnd}
-              onTracksChange={setTracks}
-              onGuessReleaseYear={() => setReleaseYearModalOpen(true)}
-              onGuessCredits={() => setCreditsModalOpen(true)}
-            />
-          </Box>
-        </Box>
+          <Timeline
+            tracks={tracks}
+            activeTrackId={turn?.track?.spotifyId}
+            releaseYearGuess={releaseYearGuess}
+            creditsGuess={creditsGuess}
+            canGuessReleaseYear={canGuessReleaseYear}
+            canGuessCredits={canGuessCredits}
+            loadingReleaseYearGuess={loadingReleaseYearGuess}
+            loadingCreditsGuess={loadingCreditsGuess}
+            timeoutStart={timeoutStart}
+            timeoutEnd={timeoutEnd}
+            onTracksChange={setTracks}
+            onGuessReleaseYear={() => setReleaseYearModalOpen(true)}
+            onGuessCredits={() => setCreditsModalOpen(true)}
+          />
+        </TimelineContainer>
       </Box>
 
       <Box sx={{ flexGrow: 0 }}>
