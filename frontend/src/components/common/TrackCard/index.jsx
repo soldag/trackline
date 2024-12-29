@@ -92,7 +92,6 @@ const TrackCard = ({
     <Card
       variant={track == null ? "outlined" : "plain"}
       sx={(theme) => ({
-        ...sx,
         "--TrackCard-size": {
           xs: "230px",
           md: "300px",
@@ -106,7 +105,7 @@ const TrackCard = ({
         "userSelect": "none",
         "boxShadow": "sm",
         "borderColor": theme.vars.palette.primary.softColor,
-        "--Card-radius": "5px",
+        "--Card-radius": "var(--TrackCard-radius, 5px)",
         "--TrackCard-color-primary":
           track == null
             ? theme.vars.palette.neutral[800]
@@ -115,6 +114,7 @@ const TrackCard = ({
           track == null
             ? theme.vars.palette.neutral[400]
             : theme.vars.palette.neutral[300],
+        ...sx,
       })}
       onClick={onClick}
     >
