@@ -64,6 +64,7 @@ const GameTurnGuessingView = () => {
   const isScreenXs = useBreakpoint((breakpoints) => breakpoints.only("xs"));
 
   const [tracks, setTracks] = useState([]);
+  const [activeTrackId, setActiveTrackId] = useState();
   const [releaseYearModalOpen, setReleaseYearModalOpen] = useState(false);
   const [creditsModalOpen, setCreditsModalOpen] = useState(false);
   const [passTurnModalOpen, setPassTurnModalOpen] = useState(false);
@@ -156,6 +157,8 @@ const GameTurnGuessingView = () => {
   }, [hasTimeout, isActivePlayer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    setActiveTrackId(track.spotifyId);
+
     if (releaseYearGuess == null) {
       setTracks((oldTracks) => {
         const oldIndex = oldTracks.findIndex(
@@ -342,7 +345,7 @@ const GameTurnGuessingView = () => {
         >
           <Timeline
             tracks={tracks}
-            activeTrackId={turn?.track?.spotifyId}
+            activeTrackId={activeTrackId}
             releaseYearGuess={releaseYearGuess}
             creditsGuess={creditsGuess}
             canGuessReleaseYear={canGuessReleaseYear}
