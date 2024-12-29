@@ -49,12 +49,18 @@ export const usePrevious = (value) => {
   return ref.current;
 };
 
-export const useEventListener = (target, type, listener, options) => {
-  const savedListener = useRef(listener);
+export const useUpdatingRef = (value) => {
+  const ref = useRef(value);
 
   useEffect(() => {
-    savedListener.current = listener;
-  }, [listener]);
+    ref.current = value;
+  }, [value]);
+
+  return ref;
+};
+
+export const useEventListener = (target, type, listener, options) => {
+  const savedListener = useUpdatingRef(listener);
 
   useEffect(() => {
     if (!target) return;

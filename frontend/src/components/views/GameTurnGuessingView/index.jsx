@@ -35,7 +35,7 @@ import SideMenu from "./components/SideMenu";
 import StatusBar from "./components/StatusBar";
 import Timeline from "./components/Timeline";
 import TimelineContainer from "./components/TimelineContainer";
-import TurnInfoOverlay from "./components/TurnInfoOverlay";
+import TurnInfoPopup from "./components/TurnInfoPopup";
 
 const hasTokensToGuess = (turn, player, cost) => {
   const isActivePlayer = turn?.activeUserId === player?.userId;
@@ -279,7 +279,7 @@ const GameTurnGuessingView = () => {
       disablePadding
       disableScrolling
     >
-      <TurnInfoOverlay game={game} users={users} currentUserId={user?.id} />
+      <TurnInfoPopup game={game} users={users} currentUserId={user?.id} />
 
       <GuessReleaseYearModal
         open={releaseYearModalOpen}
