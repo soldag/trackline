@@ -23,7 +23,6 @@ const JoinGameView = () => {
   useErrorToast(joinGame);
 
   const handleJoin = ({ gameId }) => {
-    console.log({ gameId });
     navigate(`/games/join/${gameId}`, { replace: true });
   };
 
