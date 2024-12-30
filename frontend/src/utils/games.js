@@ -22,7 +22,7 @@ export const aggregateTokenGains = (userId, turnScoring) => {
       {
         refund: 0,
         rewardEffective: 0,
-        reward: 0,
+        rewardTheoretical: 0,
       },
     );
 };
