@@ -1,11 +1,8 @@
-from dataclasses import asdict, dataclass
 from typing import Annotated
 
 from fastapi import (
     APIRouter,
-    Body,
     Depends,
-    Path,
     WebSocket,
     WebSocketDisconnect,
 )
@@ -15,6 +12,7 @@ from trackline.auth.deps import AuthUserId
 from trackline.core.exceptions import RequestException
 from trackline.core.fields import ResourceId
 from trackline.core.schemas import EntityResponse, Response
+from trackline.core.utils.binding import Bind
 from trackline.games.schemas import (
     CreditsGuessOut,
     GameOut,
@@ -140,51 +138,33 @@ async def create_turn(
     return EntityResponse(data=turn_out)
 
 
-@dataclass
-class CreateReleaseYearGuessParams:
-    game_id: Annotated[ResourceId, Path()]
-    turn_id: Annotated[int, Path()]
-    turn_revision_id: Annotated[str, Body()]
-    position: Annotated[int, Body()]
-    year: Annotated[int, Body()]
-
-    def to_use_case(self) -> CreateReleaseYearGuess:
-        return CreateReleaseYearGuess(**asdict(self))
-
-
 @router.post("/{game_id}/turns/{turn_id}/guesses/release-year")
 async def create_release_year_guess(
     auth_user_id: AuthUserId,
-    params: Annotated[CreateReleaseYearGuessParams, Depends()],
+    use_case: Annotated[
+        CreateReleaseYearGuess,
+        Bind(CreateReleaseYearGuess, body=["turn_revision_id", "position", "year"]),
+    ],
     handler: Annotated[
         CreateReleaseYearGuess.Handler, Injected(CreateReleaseYearGuess.Handler)
     ],
 ) -> EntityResponse[ReleaseYearGuessOut]:
-    guess_out = await handler.execute(auth_user_id, params.to_use_case())
+    guess_out = await handler.execute(auth_user_id, use_case)
     return EntityResponse(data=guess_out)
-
-
-@dataclass
-class CreateCreditsGuessParams:
-    game_id: Annotated[ResourceId, Path()]
-    turn_id: Annotated[int, Path()]
-    turn_revision_id: Annotated[str, Body()]
-    artists: Annotated[list[str], Body()]
-    title: Annotated[str, Body()]
-
-    def to_use_case(self) -> CreateCreditsGuess:
-        return CreateCreditsGuess(**asdict(self))
 
 
 @router.post("/{game_id}/turns/{turn_id}/guesses/credits")
 async def create_credits_guess(
     auth_user_id: AuthUserId,
-    params: Annotated[CreateCreditsGuessParams, Depends()],
+    use_case: Annotated[
+        CreateCreditsGuess,
+        Bind(CreateCreditsGuess, body=["turn_revision_id", "artists", "title"]),
+    ],
     handler: Annotated[
         CreateCreditsGuess.Handler, Injected(CreateCreditsGuess.Handler)
     ],
 ) -> EntityResponse[CreditsGuessOut]:
-    guess_out = await handler.execute(auth_user_id, params.to_use_case())
+    guess_out = await handler.execute(auth_user_id, use_case)
     return EntityResponse(data=guess_out)
 
 
