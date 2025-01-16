@@ -117,6 +117,8 @@ export const RECOMMENDED_PLAYLIST_IDS = [
   "5qVjOg9MTzJSJSPA6WwTtV", // 2020s
   "5hJtFBDrJWohthyHb83zce", // Billboard charts
   "1dDls1kVQqj17WJNwB3GZ9", // German charts
+  "7kdffd5tyCGLTlrvYpK6Ue", // Trackline Super Mix
+  "1t5w9AS3kaImejMM2o4yf3", // Hitster
 ];
 
 export const LOBBY_TRACK_ID = "5WIHTBujvgqKbbOp1mWQiz";
