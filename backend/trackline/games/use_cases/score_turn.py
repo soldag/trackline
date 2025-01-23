@@ -261,20 +261,25 @@ class ScoreTurn(BaseModel):
                 case ArtistsMatchMode.ONE:
                     sim_artists = max(sim_all_artists)
 
-            sim_title = compare_strings(
-                self._transform_title(reference.title, settings.title_match_mode),
-                self._transform_title(candidate.title, settings.title_match_mode),
-            )
+            sim_all_titles = [
+                compare_strings(reference_title, candidate_title)
+                for reference_title in self._transform_title(reference.title, settings)
+                for candidate_title in self._transform_title(candidate.title, settings)
+            ]
+            sim_title = max(sim_all_titles)
+
             return (sim_artists + sim_title) / 2
 
         def _transform_title(
-            self, original_title: str, match_mode: TitleMatchMode
-        ) -> str:
-            match match_mode:
-                case TitleMatchMode.FULL:
-                    return original_title
-                case TitleMatchMode.MAIN:
-                    return re.sub(r"\([^\)]+\)", "", original_title).strip()
+            self, original_title: str, settings: GameSettings
+        ) -> set[str]:
+            result = {original_title}
+
+            if settings.title_match_mode == TitleMatchMode.MAIN:
+                result.add(re.sub(r"\([^\)]+\)", "", original_title))
+                result.add(re.sub(r" - (.*)$", "", original_title))
+
+            return result
 
         def _apply_token_limit(
             self, game: Game, turn_scoring: TurnScoring
