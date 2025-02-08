@@ -1,15 +1,13 @@
-from datetime import datetime
-
 from injector import Inject
 from pydantic import BaseModel
 
 from trackline.constants import MIN_PLAYER_COUNT
+from trackline.core.db.client import DatabaseClient
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.models import GameState, Turn
 from trackline.games.schemas import GameAborted, PlayerLeft, TurnOut
 from trackline.games.services.notifier import Notifier
-from trackline.games.services.repository import GameRepository
 from trackline.games.services.track_provider import TrackProvider
 from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
@@ -20,11 +18,11 @@ class LeaveGame(BaseModel):
     class Handler(TrackProvidingBaseHandler):
         def __init__(
             self,
-            game_repository: Inject[GameRepository],
+            db: Inject[DatabaseClient],
             track_provider: Inject[TrackProvider],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(game_repository, track_provider)
+            super().__init__(db, track_provider)
             self._notifier = notifier
 
         async def execute(self, user_id: ResourceId, use_case: "LeaveGame") -> None:
@@ -43,14 +41,11 @@ class LeaveGame(BaseModel):
                 game.state != GameState.WAITING_FOR_PLAYERS
                 and len(game.players) <= MIN_PLAYER_COUNT
             ):
-                await self._game_repository.update_by_id(
-                    game.id,
-                    {"state": GameState.ABORTED, "completion_time": datetime.utcnow()},
-                )
+                game.complete(GameState.ABORTED)
                 await self._notifier.notify(user_id, game, GameAborted())
                 return
 
-            await self._game_repository.remove_player(game.id, user_id)
+            game.players = [p for p in game.players if p.user_id != user_id]
 
             # If the user leaving is active user in an incomplete turn, it
             # will be replaced with a new one with next playing being active
@@ -58,14 +53,14 @@ class LeaveGame(BaseModel):
             active_user_id = game.turns[-1].active_user_id if game.turns else None
             if game.state == GameState.GUESSING and active_user_id == user_id:
                 track = await self._get_new_track(game)
-                next_player_id = self._get_next_player_id(game)
+                next_player = game.get_next_player()
                 new_turn = Turn(
-                    active_user_id=next_player_id,
+                    active_user_id=next_player.user_id,
                     track=track,
                 )
+                game.turns[-1] = new_turn
 
-                turn_id = len(game.turns) - 1
-                await self._game_repository.replace_turn(game.id, turn_id, new_turn)
+            await game.save_changes(session=self._db.session)
 
             new_turn_out = TurnOut.from_model(new_turn) if new_turn else None
             await self._notifier.notify(

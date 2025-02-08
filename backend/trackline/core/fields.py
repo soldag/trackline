@@ -1,5 +1,6 @@
 from typing import Annotated, Any
 
+from beanie import PydanticObjectId
 from bson import ObjectId
 from pydantic import Field, GetCoreSchemaHandler, GetJsonSchemaHandler
 from pydantic.json_schema import JsonSchemaValue
@@ -9,7 +10,10 @@ from pydantic_core import core_schema, CoreSchema
 Fraction = Annotated[float, Field(ge=0, le=1)]
 
 
-class ResourceId(ObjectId):
+ResourceId = PydanticObjectId
+
+
+class ResourceIdOld(ObjectId):
     @classmethod
     def __get_pydantic_core_schema__(
         cls,

@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_injector import attach_injector, InjectorMiddleware
 
 from trackline.auth.router import router as auth_router
+from trackline.core.db.client import DatabaseClient
 from trackline.core.deps import websocket_logger
 from trackline.core.logging import initialize_sentry
 from trackline.core.middleware import (
@@ -34,6 +35,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator:
     log.info("Waiting for application startup.")
 
     initialize_sentry(injector.get(Settings))
+
+    database_client = injector.get(DatabaseClient)
+    await database_client.initialize()
 
     spotify_client = injector.get(SpotifyClient)
     await spotify_client.initialize()

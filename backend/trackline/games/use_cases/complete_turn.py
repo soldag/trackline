@@ -1,8 +1,7 @@
-from datetime import datetime
-
 from injector import Inject
 from pydantic import BaseModel
 
+from trackline.core.db.client import DatabaseClient
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
@@ -14,7 +13,6 @@ from trackline.games.schemas import (
     TurnCompletionOut,
 )
 from trackline.games.services.notifier import Notifier
-from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
 
 
@@ -24,9 +22,9 @@ class CompleteTurn(BaseModel):
 
     class Handler(BaseHandler):
         def __init__(
-            self, game_repository: Inject[GameRepository], notifier: Inject[Notifier]
+            self, db: Inject[DatabaseClient], notifier: Inject[Notifier]
         ) -> None:
-            super().__init__(game_repository)
+            super().__init__(db)
             self._notifier = notifier
 
         async def execute(
@@ -38,16 +36,14 @@ class CompleteTurn(BaseModel):
             self._assert_is_active_turn(game, use_case.turn_id)
 
             turn = game.turns[use_case.turn_id]
-            if user_id in turn.completed_by:
+            if user_id not in turn.completed_by:
+                turn.completed_by.append(user_id)
+            else:
                 raise UseCaseException(
                     code="TURN_COMPLETED",
                     message="You have already completed this turn.",
                     status_code=400,
                 )
-
-            await self._game_repository.add_turn_completed_by(
-                use_case.game_id, use_case.turn_id, user_id
-            )
 
             user_ids = {p.user_id for p in game.players}
             completed_by = {*turn.completed_by, user_id}
@@ -55,13 +51,9 @@ class CompleteTurn(BaseModel):
 
             game_completed = turn_completed and self._check_end_condition(game)
             if game_completed:
-                await self._game_repository.update_by_id(
-                    game.id,
-                    {
-                        "state": GameState.COMPLETED,
-                        "completion_time": datetime.utcnow(),
-                    },
-                )
+                game.complete(GameState.COMPLETED)
+
+            await game.save_changes(session=self._db.session)
 
             completion_out = TurnCompletionOut(
                 turn_completed=turn_completed,

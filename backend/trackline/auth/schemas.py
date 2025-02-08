@@ -15,6 +15,9 @@ class SessionOut(BaseModel):
 
     @staticmethod
     def from_model(model: Session) -> "SessionOut":
+        if not model.id:
+            raise ValueError("ID is required")
+
         return SessionOut(
             id=model.id,
             user_id=model.user_id,

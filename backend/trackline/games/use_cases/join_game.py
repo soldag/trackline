@@ -3,15 +3,15 @@ import random
 from injector import Inject
 from pydantic import BaseModel
 
+from trackline.core.db.client import DatabaseClient
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.models import GameState, Player
 from trackline.games.schemas import PlayerJoined, PlayerOut
 from trackline.games.services.notifier import Notifier
-from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
+from trackline.users.models import User
 from trackline.users.schemas import UserOut
-from trackline.users.services.repository import UserRepository
 
 
 class JoinGame(BaseModel):
@@ -20,12 +20,10 @@ class JoinGame(BaseModel):
     class Handler(BaseHandler):
         def __init__(
             self,
-            game_repository: Inject[GameRepository],
-            user_repository: Inject[UserRepository],
+            db: Inject[DatabaseClient],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(game_repository)
-            self._user_repository = user_repository
+            super().__init__(db)
             self._notifier = notifier
 
         async def execute(self, user_id: ResourceId, use_case: "JoinGame") -> PlayerOut:
@@ -54,9 +52,10 @@ class JoinGame(BaseModel):
             # The player is inserted at a random position to prevent the
             # game master from always being the start player
             position = random.randint(0, len(game.players))
-            await self._game_repository.add_player(game.id, player, position)
+            game.players.insert(position, player)
+            await game.save_changes(session=self._db.session)
 
-            user = await self._user_repository.find_by_id(user_id)
+            user = await User.get(user_id)
             assert user
 
             user_out = UserOut.from_model(user)

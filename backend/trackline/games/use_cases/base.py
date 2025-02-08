@@ -1,20 +1,20 @@
 import abc
-from collections.abc import Collection, Mapping, Sequence
+from collections.abc import Collection, Mapping
 
 from injector import Inject
 
+from trackline.core.db.client import DatabaseClient
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
-from trackline.games.models import Game, Guess, Track, Turn
+from trackline.games.models import Game, Guess, Turn
 from trackline.games.schemas import GameState
 from trackline.games.services.notifier import Notifier
-from trackline.games.services.repository import GameRepository
 from trackline.games.services.track_provider import TrackProvider
 
 
 class BaseHandler:
-    def __init__(self, game_repository: Inject[GameRepository]) -> None:
-        self._game_repository = game_repository
+    def __init__(self, db: Inject[DatabaseClient]) -> None:
+        self._db = db
 
     def _assert_is_player(self, game: Game, user_id: ResourceId) -> None:
         player_ids = [p.user_id for p in game.players]
@@ -106,7 +106,7 @@ class BaseHandler:
             )
 
     async def _get_game(self, game_id: ResourceId) -> Game:
-        game = await self._game_repository.find_by_id(game_id)
+        game = await Game.get(game_id, session=self._db.session)
         if not game:
             raise UseCaseException(
                 code="GAME_NOT_FOUND",
@@ -116,33 +116,14 @@ class BaseHandler:
 
         return game
 
-    def _get_track_position(self, timeline: Sequence[Track], track: Track) -> int:
-        return next(
-            (
-                i
-                for i, timeline_track in enumerate(timeline)
-                if timeline_track.release_year > track.release_year
-            ),
-            len(timeline),
-        )
-
-    def _get_next_player_id(self, game: Game) -> ResourceId:
-        player_ids = [p.user_id for p in game.players]
-        try:
-            active_user_index = player_ids.index(game.turns[-1].active_user_id)
-        except (IndexError, ValueError):
-            active_user_index = -1
-
-        return player_ids[(active_user_index + 1) % len(player_ids)]
-
 
 class TrackProvidingBaseHandler(BaseHandler):
     def __init__(
         self,
-        game_repository: Inject[GameRepository],
+        db: Inject[DatabaseClient],
         track_provider: Inject[TrackProvider],
     ) -> None:
-        super().__init__(game_repository)
+        super().__init__(db)
         self._track_provider = track_provider
 
     async def _get_new_track(self, game: Game):
@@ -171,10 +152,10 @@ class TrackProvidingBaseHandler(BaseHandler):
 class CreateGuessBaseHandler(BaseHandler, abc.ABC):
     def __init__(
         self,
-        game_repository: Inject[GameRepository],
+        db: Inject[DatabaseClient],
         notifier: Inject[Notifier],
     ) -> None:
-        super().__init__(game_repository)
+        super().__init__(db)
         self._notifier = notifier
 
     @abc.abstractmethod

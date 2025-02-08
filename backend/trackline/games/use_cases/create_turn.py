@@ -1,11 +1,11 @@
 from injector import Inject
 from pydantic import BaseModel
 
+from trackline.core.db.client import DatabaseClient
 from trackline.core.fields import ResourceId
 from trackline.games.models import Turn
 from trackline.games.schemas import GameState, NewTurn, TurnOut
 from trackline.games.services.notifier import Notifier
-from trackline.games.services.repository import GameRepository
 from trackline.games.services.track_provider import TrackProvider
 from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
@@ -16,11 +16,11 @@ class CreateTurn(BaseModel):
     class Handler(TrackProvidingBaseHandler):
         def __init__(
             self,
-            game_repository: Inject[GameRepository],
+            db: Inject[DatabaseClient],
             track_provider: Inject[TrackProvider],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(game_repository, track_provider)
+            super().__init__(db, track_provider)
             self._notifier = notifier
 
         async def execute(self, user_id: ResourceId, use_case: "CreateTurn") -> TurnOut:
@@ -29,15 +29,15 @@ class CreateTurn(BaseModel):
             self._assert_has_state(game, (GameState.STARTED, GameState.SCORING))
 
             track = await self._get_new_track(game)
-            next_player_id = self._get_next_player_id(game)
+            next_player = game.get_next_player()
             turn = Turn(
-                active_user_id=next_player_id,
+                active_user_id=next_player.user_id,
                 track=track,
             )
-            await self._game_repository.add_turn(game.id, turn)
-            await self._game_repository.update_by_id(
-                game.id, {"state": GameState.GUESSING}
-            )
+
+            game.state = GameState.GUESSING
+            game.turns.append(turn)
+            await game.save_changes(session=self._db.session)
 
             turn_out = TurnOut.from_model(turn)
             await self._notifier.notify(user_id, game, NewTurn(turn=turn_out))

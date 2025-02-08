@@ -1,13 +1,11 @@
 import abc
-from collections.abc import Mapping
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
-from typing import Self
 from uuid import uuid4
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
-from trackline.core.db.models import BaseModel, IdentifiableModel
+from trackline.core.db.models import BaseDocument
 from trackline.core.fields import ResourceId
 from trackline.core.utils.datetime import utcnow
 
@@ -45,6 +43,17 @@ class Player(BaseModel):
     tokens: int = 0
     timeline: list[Track] = []
 
+    def add_to_timeline(self, track: Track) -> None:
+        index = next(
+            (
+                i
+                for i, timeline_track in enumerate(self.timeline)
+                if timeline_track.release_year > track.release_year
+            ),
+            len(self.timeline),
+        )
+        self.timeline.insert(index, track)
+
 
 class Guess(BaseModel, abc.ABC):
     creation_time: datetime = Field(default_factory=utcnow)
@@ -75,9 +84,6 @@ class Scoring(BaseModel):
     winner: ResourceId | None
     correct_guesses: list[ResourceId]
     token_gains: dict[ResourceId, TokenGain]
-
-    def with_token_gains(self, token_gains: Mapping[ResourceId, TokenGain]) -> Self:
-        return self.model_copy(update=dict(token_gains=dict(token_gains)))
 
 
 class ReleaseYearScoring(BaseModel):
@@ -122,7 +128,7 @@ class GameSettings(BaseModel):
     credits_similarity_threshold: float
 
 
-class Game(IdentifiableModel):
+class Game(BaseDocument):
     creation_time: datetime = Field(default_factory=utcnow)
     completion_time: datetime | None = None
     settings: GameSettings
@@ -140,3 +146,22 @@ class Game(IdentifiableModel):
 
         active_user_id = self.turns[-1].active_user_id
         return self.get_player(active_user_id)
+
+    def get_next_player(self) -> Player:
+        if not self.players:
+            raise ValueError("This game has no players")
+
+        active_player = self.get_active_player()
+        if active_player:
+            active_user_index = self.players.index(active_player)
+        else:
+            active_user_index = -1
+
+        return self.players[(active_user_index + 1) % len(self.players)]
+
+    def complete(self, state: GameState) -> None:
+        self.state = state
+        self.completion_time = datetime.now(timezone.utc)
+
+    class Settings(BaseDocument.Settings):
+        name = "game"

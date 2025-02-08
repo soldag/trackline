@@ -1,5 +1,7 @@
 from contextlib import asynccontextmanager
+from contextvars import ContextVar
 
+from beanie import init_beanie
 from injector import Inject
 from motor.motor_asyncio import (
     AsyncIOMotorClient,
@@ -7,7 +9,16 @@ from motor.motor_asyncio import (
     AsyncIOMotorDatabase,
 )
 
+from trackline.auth.models import Session
 from trackline.core.settings import Settings
+from trackline.games.models import Game
+from trackline.users.models import User
+
+
+session_ctx: ContextVar[AsyncIOMotorClientSession | None] = ContextVar(
+    "db_session",
+    default=None,
+)
 
 
 class DatabaseClient:
@@ -17,20 +28,22 @@ class DatabaseClient:
         )
         self._database: AsyncIOMotorDatabase = self._client[settings.db_name]
 
-        self._session: AsyncIOMotorClientSession | None = None
-
     @property
     def session(self) -> AsyncIOMotorClientSession | None:
-        return self._session
+        return session_ctx.get()
 
-    @property
-    def database(self) -> AsyncIOMotorDatabase:
-        return self._database
+    async def initialize(self) -> None:
+        await init_beanie(
+            database=self._database,
+            document_models=[Session, Game, User],
+        )
 
     @asynccontextmanager
     async def transaction(self):
-        async with await self._client.start_session() as self._session:
-            async with self._session.start_transaction():
-                yield
-
-        self._session = None
+        async with await self._client.start_session() as session:
+            async with session.start_transaction():
+                token = session_ctx.set(session)
+                try:
+                    yield
+                finally:
+                    session_ctx.reset(token)

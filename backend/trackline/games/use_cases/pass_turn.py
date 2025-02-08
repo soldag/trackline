@@ -1,12 +1,12 @@
 from injector import Inject
 from pydantic import BaseModel
 
+from trackline.core.db.client import DatabaseClient
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.models import GameState, TurnPass
 from trackline.games.schemas import TurnPassed, TurnPassOut
 from trackline.games.services.notifier import Notifier
-from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
 
 
@@ -17,10 +17,10 @@ class PassTurn(BaseModel):
     class Handler(BaseHandler):
         def __init__(
             self,
-            game_repository: Inject[GameRepository],
+            db: Inject[DatabaseClient],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(game_repository)
+            super().__init__(db)
             self._notifier = notifier
 
         async def execute(
@@ -40,12 +40,8 @@ class PassTurn(BaseModel):
                 )
 
             turn_pass = TurnPass()
-            await self._game_repository.add_turn_pass(
-                game.id,
-                use_case.turn_id,
-                user_id,
-                turn_pass,
-            )
+            turn.passes[user_id] = turn_pass
+            await game.save_changes(session=self._db.session)
 
             turn_pass_out = TurnPassOut.from_model(user_id, turn_pass)
             await self._notifier.notify(

@@ -1,9 +1,9 @@
 from injector import Inject
 from pydantic import BaseModel, ConfigDict
 
+from trackline.core.db.client import DatabaseClient
 from trackline.core.fields import ResourceId
 from trackline.games.services.notifier import NotificationChannel, Notifier
-from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
 
 
@@ -15,9 +15,9 @@ class RegisterNotificationChannel(BaseModel):
 
     class Handler(BaseHandler):
         def __init__(
-            self, game_repository: Inject[GameRepository], notifier: Inject[Notifier]
+            self, db: Inject[DatabaseClient], notifier: Inject[Notifier]
         ) -> None:
-            super().__init__(game_repository)
+            super().__init__(db)
             self._notifier = notifier
 
         async def execute(

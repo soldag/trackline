@@ -270,6 +270,9 @@ class GameOut(BaseModel):
 
     @staticmethod
     def from_model(model: Game) -> "GameOut":
+        if not model.id:
+            raise ValueError("ID is required")
+
         return GameOut(
             id=model.id,
             creation_time=model.creation_time,

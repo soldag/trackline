@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from trackline.constants import (
     TOKEN_COST_BUY_TRACK,
 )
+from trackline.core.db.client import DatabaseClient
 from trackline.core.fields import ResourceId
 from trackline.games.schemas import (
     GameState,
@@ -12,7 +13,6 @@ from trackline.games.schemas import (
     TrackPurchaseReceiptOut,
 )
 from trackline.games.services.notifier import Notifier
-from trackline.games.services.repository import GameRepository
 from trackline.games.services.track_provider import TrackProvider
 from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
@@ -23,11 +23,11 @@ class BuyTrack(BaseModel):
     class Handler(TrackProvidingBaseHandler):
         def __init__(
             self,
-            game_repository: Inject[GameRepository],
+            db: Inject[DatabaseClient],
             track_provider: Inject[TrackProvider],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(game_repository, track_provider)
+            super().__init__(db, track_provider)
             self._notifier = notifier
 
         async def execute(
@@ -42,15 +42,10 @@ class BuyTrack(BaseModel):
             assert current_player
 
             track = await self._get_new_track(game)
-            position = self._get_track_position(current_player.timeline, track)
-            await self._game_repository.insert_in_timeline(
-                game.id, user_id, track, position
-            )
 
-            await self._game_repository.inc_tokens(
-                game.id,
-                {user_id: -TOKEN_COST_BUY_TRACK},
-            )
+            current_player.add_to_timeline(track)
+            current_player.tokens -= TOKEN_COST_BUY_TRACK
+            await game.save_changes(session=self._db.session)
 
             track_out = TrackOut.from_model(track)
             await self._notifier.notify(

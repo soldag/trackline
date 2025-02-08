@@ -1,4 +1,3 @@
-from fastapi_injector import request_scope
 from injector import Binder, Module, singleton
 
 from trackline.core.db.client import DatabaseClient
@@ -12,4 +11,4 @@ class CoreModule(Module):
             to=get_settings(),
             scope=singleton,
         )
-        binder.bind(DatabaseClient, scope=request_scope)
+        binder.bind(DatabaseClient, scope=singleton)

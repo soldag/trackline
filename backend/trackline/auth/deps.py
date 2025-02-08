@@ -5,7 +5,6 @@ from fastapi import Depends, Query, Request
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_injector import Injected
 
-from trackline.auth.services.repository import SessionRepository
 from trackline.auth.use_cases import GetSessionUser
 from trackline.core.exceptions import RequestException
 from trackline.core.fields import ResourceId
@@ -48,12 +47,9 @@ AuthToken = Annotated[str, Depends(get_auth_token)]
 
 async def get_auth_user_id(
     token: Annotated[str, Depends(get_auth_token)],
-    session_repository: Annotated[SessionRepository, Injected(SessionRepository)],
+    handler: Annotated[GetSessionUser.Handler, Injected(GetSessionUser.Handler)],
 ) -> ResourceId:
-    use_case = GetSessionUser(token=token)
-    handler = GetSessionUser.Handler(session_repository)
-    user_id = await handler.execute(use_case)
-
+    user_id = await handler.execute(GetSessionUser(token=token))
     if not user_id:
         raise RequestException(
             "INVALID_TOKEN", "The session token is invalid.", status_code=400

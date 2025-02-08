@@ -1,11 +1,12 @@
 from injector import Inject
 from pydantic import BaseModel
+from pymongo.errors import DuplicateKeyError
 
+from trackline.core.db.client import DatabaseClient
 from trackline.core.exceptions import UseCaseException
 from trackline.core.utils.security import hash_password
 from trackline.users.models import User
 from trackline.users.schemas import UserOut
-from trackline.users.services.repository import UsernameExistsError, UserRepository
 
 
 class CreateUser(BaseModel):
@@ -13,8 +14,8 @@ class CreateUser(BaseModel):
     password: str
 
     class Handler:
-        def __init__(self, user_repository: Inject[UserRepository]) -> None:
-            self._user_repository = user_repository
+        def __init__(self, db: Inject[DatabaseClient]) -> None:
+            self._db = db
 
         async def execute(self, use_case: "CreateUser") -> UserOut:
             user = User(
@@ -23,8 +24,8 @@ class CreateUser(BaseModel):
             )
 
             try:
-                await self._user_repository.create(user)
-            except UsernameExistsError:
+                await user.create(session=self._db.session)
+            except DuplicateKeyError:
                 raise UseCaseException(
                     code="USERNAME_EXISTS",
                     message="A user with this username already exists.",

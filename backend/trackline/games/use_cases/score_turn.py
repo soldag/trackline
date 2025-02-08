@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 import re
 from typing import Protocol, TypeVar
 
@@ -9,6 +8,7 @@ from trackline.constants import (
     TOKEN_GAIN_CREDITS_GUESS,
     TOKEN_GAIN_YEAR_GUESS,
 )
+from trackline.core.db.client import DatabaseClient
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
     ArtistsMatchMode,
@@ -26,7 +26,6 @@ from trackline.games.models import (
 )
 from trackline.games.schemas import GameState, TurnScored, TurnScoringOut
 from trackline.games.services.notifier import Notifier
-from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
 from trackline.games.utils import compare_strings, is_valid_release_year
 
@@ -50,34 +49,33 @@ class ScoreTurn(BaseModel):
     class Handler(BaseHandler):
         def __init__(
             self,
-            game_repository: Inject[GameRepository],
+            db: Inject[DatabaseClient],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(game_repository)
+            super().__init__(db)
             self._notifier = notifier
 
         async def execute(
             self, user_id: ResourceId, use_case: "ScoreTurn"
         ) -> TurnScoringOut:
-            game = await self._get_game(use_case.game_id)
+            game_id = use_case.game_id
+            turn_id = use_case.turn_id
+
+            game = await self._get_game(game_id)
             self._assert_is_player(game, user_id)
             self._assert_has_state(game, GameState.GUESSING)
-            self._assert_is_active_turn(game, use_case.turn_id)
-            self._assert_is_active_player(game, use_case.turn_id, user_id)
+            self._assert_is_active_turn(game, turn_id)
+            self._assert_is_active_player(game, turn_id, user_id)
 
             current_player = game.get_player(user_id)
             assert current_player
 
             turn = game.turns[use_case.turn_id]
-            scoring, player_tokens = await self._score_game(game, turn)
+            scoring = await self._score_game(game, turn)
 
-            await self._game_repository.set_tokens(game.id, player_tokens)
-            await self._game_repository.set_turn_scoring(
-                game.id, use_case.turn_id, scoring
-            )
-            await self._game_repository.update_by_id(
-                game.id, {"state": GameState.SCORING}
-            )
+            game.state = GameState.SCORING
+            turn.scoring = scoring
+            await game.save_changes(session=self._db.session)
 
             scoring_out = TurnScoringOut.from_model(scoring)
             await self._notifier.notify(
@@ -88,9 +86,7 @@ class ScoreTurn(BaseModel):
 
             return scoring_out
 
-        async def _score_game(
-            self, game: Game, turn: Turn
-        ) -> tuple[TurnScoring, Mapping[ResourceId, int]]:
+        async def _score_game(self, game: Game, turn: Turn) -> TurnScoring:
             position_scoring = await self._score_position(game, turn)
             release_year_scoring = self._score_release_year(turn)
             credits_scoring = self._score_credits(game, turn)
@@ -102,8 +98,9 @@ class ScoreTurn(BaseModel):
                 ),
                 credits=credits_scoring,
             )
+            self._apply_token_limit(game, turn_scoring)
 
-            return self._apply_token_limit(game, turn_scoring)
+            return turn_scoring
 
         def _sort_guesses(
             self,
@@ -144,10 +141,7 @@ class ScoreTurn(BaseModel):
                 is_duplicate = guess.position in seen_positions
                 if is_correct and not winner:
                     winner = user_id
-                    position = self._get_track_position(player.timeline, turn.track)
-                    await self._game_repository.insert_in_timeline(
-                        game.id, player.user_id, turn.track, position
-                    )
+                    player.add_to_timeline(turn.track)
                 elif is_correct or is_duplicate:
                     # Duplicate guesses are ignored and these players get
                     # their spent token back. There might be multiple correct
@@ -281,43 +275,23 @@ class ScoreTurn(BaseModel):
 
             return result
 
-        def _apply_token_limit(
-            self, game: Game, turn_scoring: TurnScoring
-        ) -> tuple[TurnScoring, Mapping[ResourceId, int]]:
-            player_tokens = {p.user_id: p.tokens for p in game.players}
-
+        def _apply_token_limit(self, game: Game, turn_scoring: TurnScoring) -> None:
             scorings = (
                 turn_scoring.release_year.position,
                 turn_scoring.release_year.year,
                 turn_scoring.credits,
             )
+
             for scoring in scorings:
                 for user_id, token_gain in scoring.token_gains.items():
-                    player_tokens[user_id] += token_gain.refund
+                    if player := game.get_player(user_id):
+                        player.tokens += token_gain.refund
 
-            scoring_token_gains: list[dict[ResourceId, TokenGain]] = []
             for scoring in scorings:
-                new_token_gains: dict[ResourceId, TokenGain] = {}
                 for user_id, token_gain in scoring.token_gains.items():
-                    tokens = player_tokens.get(user_id, 0)
-                    reward_effective = min(
-                        token_gain.reward_theoretical,
-                        max(0, game.settings.max_tokens - tokens),
-                    )
-                    player_tokens[user_id] += reward_effective
-
-                    new_token_gains[user_id] = token_gain.model_copy(
-                        update=dict(reward_effective=reward_effective),
-                    )
-
-                scoring_token_gains.append(new_token_gains)
-
-            turn_scoring = TurnScoring(
-                release_year=ReleaseYearScoring(
-                    position=scorings[0].with_token_gains(scoring_token_gains[0]),
-                    year=scorings[1].with_token_gains(scoring_token_gains[1]),
-                ),
-                credits=scorings[2].with_token_gains(scoring_token_gains[2]),
-            )
-
-            return turn_scoring, player_tokens
+                    if player := game.get_player(user_id):
+                        token_gain.reward_effective = min(
+                            token_gain.reward_theoretical,
+                            max(0, game.settings.max_tokens - player.tokens),
+                        )
+                        player.tokens += token_gain.reward_effective

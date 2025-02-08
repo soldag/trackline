@@ -2,11 +2,11 @@ from injector import Inject
 from pydantic import BaseModel
 
 from trackline.constants import MIN_PLAYER_COUNT
+from trackline.core.db.client import DatabaseClient
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.schemas import GameOut, GameStarted, GameState, TrackOut
 from trackline.games.services.notifier import Notifier
-from trackline.games.services.repository import GameRepository
 from trackline.games.services.track_provider import TrackProvider
 from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
@@ -17,11 +17,11 @@ class StartGame(BaseModel):
     class Handler(TrackProvidingBaseHandler):
         def __init__(
             self,
-            game_repository: Inject[GameRepository],
+            db: Inject[DatabaseClient],
             track_provider: Inject[TrackProvider],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(game_repository, track_provider)
+            super().__init__(db, track_provider)
             self._notifier = notifier
 
         async def execute(self, user_id: ResourceId, use_case: "StartGame") -> GameOut:
@@ -35,39 +35,25 @@ class StartGame(BaseModel):
                     f"At least {MIN_PLAYER_COUNT} players are needed to start the game",
                 )
 
-            await self._game_repository.update_by_id(
-                game.id, {"state": GameState.STARTED}
-            )
-
             tracks = await self._track_provider.get_random_tracks(
                 game.settings.playlist_ids,
                 count=len(game.players),
                 market=game.settings.spotify_market,
             )
-            player_tracks = {p.user_id: t for p, t in zip(game.players, tracks)}
-            for player_user_id, track in player_tracks.items():
-                await self._game_repository.insert_in_timeline(
-                    game.id, player_user_id, track, 0
-                )
+            for player, track in zip(game.players, tracks):
+                player.timeline = [track]
+
+            game.state = GameState.STARTED
+            await game.save_changes(session=self._db.session)
 
             player_tracks_out = {
-                user_id: TrackOut.from_model(track)
-                for user_id, track in player_tracks.items()
+                player.user_id: TrackOut.from_model(player.timeline[0])
+                for player in game.players
             }
             await self._notifier.notify(
                 user_id,
                 game,
                 GameStarted(initial_tracks=player_tracks_out),
-            )
-
-            game = game.model_copy(
-                update={
-                    "state": GameState.STARTED,
-                    "players": [
-                        p.model_copy(update={"timeline": [player_tracks[p.user_id]]})
-                        for p in game.players
-                    ],
-                }
             )
 
             return GameOut.from_model(game)

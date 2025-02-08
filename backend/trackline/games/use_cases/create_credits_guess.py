@@ -29,19 +29,20 @@ class CreateCreditsGuess(BaseModel):
                 user_id, game, use_case.turn_id, use_case.turn_revision_id, token_cost
             )
 
+            current_player = game.get_player(user_id)
+            assert current_player
+
             guess = CreditsGuess(
                 token_cost=token_cost,
                 artists=use_case.artists,
                 title=use_case.title,
             )
-            await self._game_repository.add_guess(
-                game.id, use_case.turn_id, user_id, guess
-            )
+            game.turns[use_case.turn_id].guesses.credits[user_id] = guess
 
             if token_cost > 0:
-                await self._game_repository.inc_tokens(
-                    game.id, {user_id: -guess.token_cost}
-                )
+                current_player.tokens -= guess.token_cost
+
+            await game.save_changes(session=self._db.session)
 
             guess_out = CreditsGuessOut.from_model(guess, user_id)
             await self._notifier.notify(

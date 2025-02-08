@@ -1,25 +1,16 @@
-from injector import Inject
+from beanie.operators import In
 from pydantic import BaseModel
 
 from trackline.core.fields import ResourceId
-from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
+from trackline.users.models import User
 from trackline.users.schemas import UserOut
-from trackline.users.services.repository import UserRepository
 
 
 class GetGameUsers(BaseModel):
     game_id: ResourceId
 
     class Handler(BaseHandler):
-        def __init__(
-            self,
-            game_repository: Inject[GameRepository],
-            user_repository: Inject[UserRepository],
-        ) -> None:
-            super().__init__(game_repository)
-            self.user_repository = user_repository
-
         async def execute(
             self, user_id: ResourceId, use_case: "GetGameUsers"
         ) -> list[UserOut]:
@@ -27,6 +18,9 @@ class GetGameUsers(BaseModel):
             self._assert_is_player(game, user_id)
 
             user_ids = [player.user_id for player in game.players]
-            users = await self.user_repository.find_by_ids(user_ids)
+            users = await User.find(
+                In(User.id, user_ids),
+                session=self._db.session,
+            ).to_list()
 
             return [UserOut.from_model(user) for user in users]

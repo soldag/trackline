@@ -1,21 +1,22 @@
 from injector import Inject
 from pydantic import BaseModel
 
+from trackline.core.db.client import DatabaseClient
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
+from trackline.users.models import User
 from trackline.users.schemas import UserOut
-from trackline.users.services.repository import UserRepository
 
 
 class GetCurrentUser(BaseModel):
     class Handler:
-        def __init__(self, user_repository: Inject[UserRepository]) -> None:
-            self._user_repository = user_repository
+        def __init__(self, db: Inject[DatabaseClient]) -> None:
+            self._db = db
 
         async def execute(
             self, user_id: ResourceId, use_case: "GetCurrentUser"
         ) -> UserOut:
-            user = await self._user_repository.find_by_id(user_id)
+            user = await User.get(user_id, session=self._db.session)
             if not user:
                 raise UseCaseException(
                     code="USER_NOT_FOUND",

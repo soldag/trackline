@@ -1,12 +1,10 @@
-from datetime import datetime
-
 from injector import Inject
 from pydantic import BaseModel
 
+from trackline.core.db.client import DatabaseClient
 from trackline.core.fields import ResourceId
 from trackline.games.schemas import GameAborted, GameState
 from trackline.games.services.notifier import Notifier
-from trackline.games.services.repository import GameRepository
 from trackline.games.use_cases.base import BaseHandler
 
 
@@ -16,10 +14,10 @@ class AbortGame(BaseModel):
     class Handler(BaseHandler):
         def __init__(
             self,
-            game_repository: Inject[GameRepository],
+            db: Inject[DatabaseClient],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(game_repository)
+            super().__init__(db)
             self._notifier = notifier
 
         async def execute(self, user_id: ResourceId, use_case: "AbortGame") -> None:
@@ -27,9 +25,7 @@ class AbortGame(BaseModel):
             self._assert_is_game_master(game, user_id)
             self._assert_has_not_state(game, (GameState.ABORTED, GameState.COMPLETED))
 
-            await self._game_repository.update_by_id(
-                game.id,
-                {"state": GameState.ABORTED, "completion_time": datetime.utcnow()},
-            )
+            game.complete(GameState.ABORTED)
+            await game.save_changes(session=self._db.session)
 
             await self._notifier.notify(user_id, game, GameAborted())
