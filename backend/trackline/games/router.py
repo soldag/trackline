@@ -14,6 +14,8 @@ from trackline.core.fields import ResourceId
 from trackline.core.schemas import EntityResponse, Response
 from trackline.core.utils.binding import Bind
 from trackline.games.schemas import (
+    CorrectionProposalOut,
+    CorrectionProposalVoteResultOut,
     CreditsGuessOut,
     GameOut,
     ReleaseYearGuessOut,
@@ -38,10 +40,12 @@ from trackline.games.use_cases import (
     JoinGame,
     LeaveGame,
     PassTurn,
+    ProposeCorrection,
     RegisterNotificationChannel,
     ScoreTurn,
     StartGame,
     UnregisterNotificationChannel,
+    VoteCorrection,
 )
 from trackline.users.schemas import UserOut
 
@@ -186,6 +190,29 @@ async def score_turn(
 ) -> EntityResponse[TurnScoringOut]:
     turn_scoring_out = await handler.execute(auth_user_id, use_case)
     return EntityResponse(data=turn_scoring_out)
+
+
+@router.post("/{game_id}/turns/{turn_id}/correction")
+async def propose_correction(
+    auth_user_id: AuthUserId,
+    use_case: Annotated[
+        ProposeCorrection,
+        Bind(ProposeCorrection, body=["release_year"]),
+    ],
+    handler: Annotated[ProposeCorrection.Handler, Injected(ProposeCorrection.Handler)],
+) -> EntityResponse[CorrectionProposalOut]:
+    proposal_out = await handler.execute(auth_user_id, use_case)
+    return EntityResponse(data=proposal_out)
+
+
+@router.post("/{game_id}/turns/{turn_id}/correction/vote")
+async def vote_correction(
+    auth_user_id: AuthUserId,
+    use_case: Annotated[VoteCorrection, Bind(VoteCorrection, body=["agree"])],
+    handler: Annotated[VoteCorrection.Handler, Injected(VoteCorrection.Handler)],
+) -> EntityResponse[CorrectionProposalVoteResultOut]:
+    vote_out = await handler.execute(auth_user_id, use_case)
+    return EntityResponse(data=vote_out)
 
 
 @router.post("/{game_id}/turns/{turn_id}/complete")

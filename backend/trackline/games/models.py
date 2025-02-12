@@ -19,6 +19,12 @@ class GameState(str, Enum):
     ABORTED = "aborted"
 
 
+class CorrectionProposalState(str, Enum):
+    VOTING = "VOTING"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+
+
 class ArtistsMatchMode(str, Enum):
     ALL = "all"
     ONE = "one"
@@ -105,6 +111,19 @@ class TurnGuesses(BaseModel):
     credits: dict[ResourceId, CreditsGuess] = {}
 
 
+class CorrectionProposalVote(BaseModel):
+    agree: bool
+    creation_time: datetime = Field(default_factory=utcnow)
+
+
+class CorrectionProposal(BaseModel):
+    created_by: ResourceId
+    creation_time: datetime = Field(default_factory=utcnow)
+    state: CorrectionProposalState = CorrectionProposalState.VOTING
+    release_year: int
+    votes: dict[ResourceId, CorrectionProposalVote] = {}
+
+
 class Turn(BaseModel):
     revision_id: str = Field(default_factory=lambda: str(uuid4()))
     creation_time: datetime = Field(default_factory=utcnow)
@@ -113,6 +132,7 @@ class Turn(BaseModel):
     guesses: TurnGuesses = TurnGuesses()
     passes: dict[ResourceId, TurnPass] = {}
     scoring: TurnScoring | None = None
+    correction_proposal: CorrectionProposal | None = None
     completed_by: list[ResourceId] = []
 
 

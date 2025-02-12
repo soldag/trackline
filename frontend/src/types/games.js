@@ -41,6 +41,19 @@ export const TurnPassType = PropTypes.shape({
   creationTime: PropTypes.string.isRequired,
 });
 
+export const CorrectionProposalVoteType = PropTypes.shape({
+  userId: PropTypes.string.isRequired,
+  agree: PropTypes.bool.isRequired,
+  creationTime: PropTypes.string.isRequired,
+});
+
+export const CorrectionProposalType = PropTypes.shape({
+  createdBy: PropTypes.string.isRequired,
+  creationTime: PropTypes.string.isRequired,
+  releaseYear: PropTypes.number.isRequired,
+  votes: PropTypes.arrayOf(CorrectionProposalVoteType).isRequired,
+});
+
 export const TokenGainType = PropTypes.shape({
   refund: PropTypes.number.isRequired,
   rewardTheoretical: PropTypes.number.isRequired,
@@ -79,6 +92,7 @@ export const TurnType = PropTypes.shape({
   }),
   passes: PropTypes.arrayOf(TurnPassType).isRequired,
   scoring: TurnScoringType,
+  correctionProposal: CorrectionProposalType,
   completedBy: PropTypes.arrayOf(PropTypes.string).isRequired,
 });
 

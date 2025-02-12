@@ -3,21 +3,33 @@ import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import { Button, Stack } from "@mui/joy";
 
 import TrackCard from "~/components/common/TrackCard";
 import View from "~/components/views/View";
-import { TOKEN_COST_BUY_TRACK } from "~/constants";
-import { buyTrack, completeTurn } from "~/store/games/actions";
+import { CORRECTION_PROPOSAL_STATES, TOKEN_COST_BUY_TRACK } from "~/constants";
+import {
+  buyTrack,
+  completeTurn,
+  proposeCorrection,
+  voteCorrection,
+} from "~/store/games/actions";
 import { useConfetti, useStars } from "~/utils/confetti";
 import { useErrorToast, useLoadingSelector } from "~/utils/hooks";
 
 import BuyTrackModal from "./components/BuyTrackModal";
+import CorrectionProposalModal from "./components/CorrectionProposalModal";
+import CorrectionProposalVotingModal from "./components/CorrectionProposalVotingModal";
 import MaxTokenWarningSnackbar from "./components/MaxTokenWarningSnackbar";
 import ScoringTabs from "./components/ScoringTabs";
 
 const GameTurnScoringView = () => {
   const [buyTrackModalOpen, setBuyTrackModelOpen] = useState(false);
+  const [correctionProposalModalOpen, setCorrectionProposalModalOpen] =
+    useState(false);
+  const [correctionVotingModalOpen, setCorrectionVotingModalOpen] =
+    useState(false);
   const [showMaxTokenSnackbar, setShowMaxTokenSnackbar] = useState(false);
 
   const dispatch = useDispatch();
@@ -27,7 +39,8 @@ const GameTurnScoringView = () => {
 
   const loadingBuyTrack = useLoadingSelector(buyTrack);
   const loadingCompleteTurn = useLoadingSelector(completeTurn);
-  useErrorToast(buyTrack, completeTurn);
+  const loadingProposeCorrection = useLoadingSelector(proposeCorrection);
+  useErrorToast(buyTrack, completeTurn, proposeCorrection, voteCorrection);
 
   const userId = user.id;
   const gameId = game.id;
@@ -35,9 +48,14 @@ const GameTurnScoringView = () => {
   const turn = game.turns[turnId];
   const currentPlayer = game.players.find((p) => p.userId === user?.id);
   const { isGameMaster = false } = currentPlayer || {};
+  const { correctionProposal } = turn;
   const hasCompletedTurn = turn.completedBy.includes(userId);
   const canBuyTrack =
     !hasCompletedTurn && currentPlayer?.tokens >= TOKEN_COST_BUY_TRACK;
+  const canProposeCorrection =
+    !hasCompletedTurn &&
+    correctionProposal?.state !== CORRECTION_PROPOSAL_STATES.VOTING &&
+    correctionProposal?.state !== CORRECTION_PROPOSAL_STATES.ACCEPTED;
 
   const hasMaxTokens = currentPlayer?.tokens >= game.settings.maxTokens;
   useEffect(() => {
@@ -62,6 +80,12 @@ const GameTurnScoringView = () => {
     }
   }, [showConfetti, startConfetti]);
 
+  useEffect(() => {
+    if (correctionProposal?.state === CORRECTION_PROPOSAL_STATES.VOTING) {
+      setCorrectionVotingModalOpen(true);
+    }
+  }, [correctionProposal?.state]);
+
   return (
     <View
       appBar={{
@@ -74,6 +98,30 @@ const GameTurnScoringView = () => {
         open={buyTrackModalOpen}
         onConfirm={() => dispatch(buyTrack({ gameId, userId }))}
         onClose={() => setBuyTrackModelOpen(false)}
+      />
+
+      <CorrectionProposalModal
+        open={correctionProposalModalOpen}
+        track={turn.track}
+        onConfirm={({ releaseYear }) =>
+          dispatch(proposeCorrection({ gameId, turnId, releaseYear }))
+        }
+        onClose={() => setCorrectionProposalModalOpen(false)}
+      />
+
+      <CorrectionProposalVotingModal
+        open={correctionVotingModalOpen}
+        userId={userId}
+        users={users}
+        game={game}
+        proposal={correctionProposal}
+        onAgree={() =>
+          dispatch(voteCorrection({ gameId, turnId, agree: true }))
+        }
+        onDisagree={() =>
+          dispatch(voteCorrection({ gameId, turnId, agree: false }))
+        }
+        onClose={() => setCorrectionVotingModalOpen(false)}
       />
 
       <MaxTokenWarningSnackbar
@@ -125,6 +173,19 @@ const GameTurnScoringView = () => {
                   defaultMessage="Continue"
                 />
               )}
+            </Button>
+
+            <Button
+              variant="soft"
+              color="neutral"
+              disabled={
+                loadingProposeCorrection ||
+                !canProposeCorrection ||
+                hasCompletedTurn
+              }
+              onClick={() => setCorrectionProposalModalOpen(true)}
+            >
+              <PublishedWithChangesIcon />
             </Button>
           </Stack>
         </Stack>

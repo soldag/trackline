@@ -124,6 +124,26 @@ export const scoreTurn = async ({ gameId, turnId }) => {
   return scoring;
 };
 
+export const proposeCorrection = async ({ gameId, turnId, releaseYear }) => {
+  const {
+    data: { data: proposal },
+  } = await instance.post(`games/${gameId}/turns/${turnId}/correction`, {
+    releaseYear,
+  });
+
+  return proposal;
+};
+
+export const voteCorrection = async ({ gameId, turnId, agree }) => {
+  const {
+    data: { data: vote },
+  } = await instance.post(`games/${gameId}/turns/${turnId}/correction/vote`, {
+    agree,
+  });
+
+  return vote;
+};
+
 export const completeTurn = async ({ gameId, turnId }) => {
   const {
     data: { data: completion },

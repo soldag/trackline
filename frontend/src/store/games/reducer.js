@@ -10,6 +10,8 @@ import {
   buyTrack,
   clearGame,
   completeTurn,
+  correctionProposed,
+  correctionVoted,
   createGame,
   createTurn,
   creditsGuessCreated,
@@ -25,6 +27,7 @@ import {
   passTurn,
   playerJoined,
   playerLeft,
+  proposeCorrection,
   releaseYearGuessCreated,
   scoreTurn,
   startGame,
@@ -34,6 +37,7 @@ import {
   turnCreated,
   turnPassed,
   turnScored,
+  voteCorrection,
 } from "./actions";
 
 const initialState = {
@@ -211,6 +215,49 @@ const reducer = createReducer(initialState, (builder) => {
 
         if (completion.gameCompleted) {
           state.game.state = GAME_STATES.COMPLETED;
+        }
+      },
+    )
+
+    .addMatcher(
+      isAnyOf(isSuccess(proposeCorrection), correctionProposed),
+      (state, { payload: { proposal } }) => {
+        const turn = state.game.turns.at(-1);
+        turn.correctionProposal = proposal;
+        turn.passes = [];
+      },
+    )
+
+    .addMatcher(
+      isAnyOf(isSuccess(voteCorrection), correctionVoted),
+      (state, { payload: { vote, proposalState, scoring } }) => {
+        const game = state.game;
+        const turn = game.turns.at(-1);
+
+        const proposal = turn.correctionProposal;
+        proposal.state = proposalState;
+        proposal.votes = [
+          ...proposal.votes.filter(({ userId }) => userId !== vote.userId),
+          vote,
+        ];
+
+        if (scoring) {
+          turn.track.releaseYear = proposal.releaseYear;
+
+          for (const player of game.players) {
+            const { userId } = player;
+
+            player.timeline = player.timeline.filter(
+              (t) => t.spotifyId !== turn.track.spotifyId,
+            );
+
+            const oldTokenGain = aggregateTokenGains(userId, turn.scoring);
+            const newTokenGain = aggregateTokenGains(userId, scoring);
+            player.tokens -= oldTokenGain.refund + oldTokenGain.rewardEffective;
+            player.tokens += newTokenGain.refund + newTokenGain.rewardEffective;
+          }
+
+          turn.scoring = scoring;
         }
       },
     )

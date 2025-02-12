@@ -11,10 +11,12 @@ from .get_game_users import GetGameUsers
 from .join_game import JoinGame
 from .leave_game import LeaveGame
 from .pass_turn import PassTurn
+from .propose_correction import ProposeCorrection
 from .register_notification_channel import RegisterNotificationChannel
 from .score_turn import ScoreTurn
 from .start_game import StartGame
 from .unregister_notification_channel import UnregisterNotificationChannel
+from .vote_correction import VoteCorrection
 
 
 __all__ = [
@@ -31,8 +33,10 @@ __all__ = [
     "JoinGame",
     "LeaveGame",
     "PassTurn",
+    "ProposeCorrection",
     "RegisterNotificationChannel",
     "ScoreTurn",
     "StartGame",
     "UnregisterNotificationChannel",
+    "VoteCorrection",
 ]

@@ -25,6 +25,9 @@ export const guessTrackReleaseYear = createRoutine(
 );
 export const guessTrackCredits = createRoutine("GAMES/GUESS_TRACK_CREDITS");
 
+export const proposeCorrection = createRoutine("GAMES/CORRECTION_PROPOSE");
+export const voteCorrection = createRoutine("GAMES/CORRECTION_VOTE");
+
 export const buyTrack = createRoutine("GAMES/BUY_TRACK");
 export const exchangeTrack = createRoutine("GAMES/EXCHANGE_TRACK");
 
@@ -47,3 +50,6 @@ export const turnPassed = createAction("GAME/TURN_PASSED");
 export const turnScored = createAction("GAME/TURN_SCORED");
 export const turnCompleted = createAction("GAME/TURN_COMPLETED");
 export const trackBought = createAction("GAME/TRACK_BOUGHT");
+
+export const correctionProposed = createAction("GAME/CORRECTION_PROPOSED");
+export const correctionVoted = createAction("GAME/CORRECTION_VOTED");

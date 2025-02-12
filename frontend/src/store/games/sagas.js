@@ -22,6 +22,8 @@ import {
   abortGame,
   buyTrack,
   completeTurn,
+  correctionProposed,
+  correctionVoted,
   createGame,
   createTurn,
   creditsGuessCreated,
@@ -38,6 +40,7 @@ import {
   passTurn,
   playerJoined,
   playerLeft,
+  proposeCorrection,
   releaseYearGuessCreated,
   scoreTurn,
   startGame,
@@ -49,6 +52,7 @@ import {
   turnPassed,
   turnScored,
   unlistenNotifications,
+  voteCorrection,
 } from "./actions";
 
 const WS_OPEN = "WS_OPEN";
@@ -66,6 +70,8 @@ const NOTIFICATION_ACTIONS = {
   turn_completed: turnCompleted,
   turn_scored: turnScored,
   track_bought: trackBought,
+  correction_proposed: correctionProposed,
+  correction_voted: correctionVoted,
 };
 
 function* handleFetchGame({ gameId }) {
@@ -180,6 +186,23 @@ function* handleScoreTurn({ gameId, turnId }) {
   return { scoring };
 }
 
+function* handleProposeCorrection({ gameId, turnId, releaseYear }) {
+  const proposal = yield call(tracklineApi.games.proposeCorrection, {
+    gameId,
+    turnId,
+    releaseYear,
+  });
+  return { proposal };
+}
+
+function* handleVoteCorrection({ gameId, turnId, agree }) {
+  return yield call(tracklineApi.games.voteCorrection, {
+    gameId,
+    turnId,
+    agree,
+  });
+}
+
 function* handleCompleteTurn({ gameId, turnId }) {
   const userId = yield select((state) => state.auth.user?.id);
   const completion = yield call(tracklineApi.games.completeTurn, {
@@ -292,6 +315,8 @@ export default registerSagaHandlers([
   [guessTrackCredits, handleGuessTrackCredits, { cancelAction: stopRoutines }],
   [passTurn, handlePassTurn, { cancelAction: stopRoutines }],
   [scoreTurn, handleScoreTurn, { cancelAction: stopRoutines }],
+  [proposeCorrection, handleProposeCorrection, { cancelAction: stopRoutines }],
+  [voteCorrection, handleVoteCorrection, { cancelAction: stopRoutines }],
   [completeTurn, handleCompleteTurn, { cancelAction: stopRoutines }],
   [buyTrack, handleBuyTrack, { cancelAction: stopRoutines }],
   [

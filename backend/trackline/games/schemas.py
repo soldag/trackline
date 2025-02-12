@@ -7,6 +7,9 @@ from pydantic import BaseModel
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
     ArtistsMatchMode,
+    CorrectionProposal,
+    CorrectionProposalState,
+    CorrectionProposalVote,
     CreditsGuess,
     CreditsScoring,
     Game,
@@ -207,6 +210,49 @@ class TurnScoringOut(BaseModel):
         )
 
 
+class CorrectionProposalVoteOut(BaseModel):
+    user_id: ResourceId
+    agree: bool
+    creation_time: datetime
+
+    @staticmethod
+    def from_model(
+        user_id: ResourceId, model: CorrectionProposalVote
+    ) -> "CorrectionProposalVoteOut":
+        return CorrectionProposalVoteOut(
+            user_id=user_id,
+            agree=model.agree,
+            creation_time=model.creation_time,
+        )
+
+
+class CorrectionProposalVoteResultOut(BaseModel):
+    vote: CorrectionProposalVoteOut
+    proposal_state: CorrectionProposalState
+    scoring: TurnScoringOut | None
+
+
+class CorrectionProposalOut(BaseModel):
+    created_by: ResourceId
+    creation_time: datetime
+    state: CorrectionProposalState
+    release_year: int
+    votes: list[CorrectionProposalVoteOut]
+
+    @staticmethod
+    def from_model(model: CorrectionProposal) -> "CorrectionProposalOut":
+        return CorrectionProposalOut(
+            created_by=model.created_by,
+            creation_time=model.creation_time,
+            state=model.state,
+            release_year=model.release_year,
+            votes=[
+                CorrectionProposalVoteOut.from_model(user_id, vote)
+                for user_id, vote in model.votes.items()
+            ],
+        )
+
+
 class TurnOut(BaseModel):
     revision_id: str
     creation_time: datetime
@@ -215,6 +261,7 @@ class TurnOut(BaseModel):
     guesses: TurnGuessesOut
     passes: list[TurnPassOut]
     scoring: TurnScoringOut | None
+    correction_proposal: CorrectionProposalOut | None
     completed_by: list[ResourceId]
 
     @staticmethod
@@ -230,6 +277,11 @@ class TurnOut(BaseModel):
                 for user_id, turn_pass in model.passes.items()
             ],
             scoring=TurnScoringOut.from_model(model.scoring) if model.scoring else None,
+            correction_proposal=(
+                CorrectionProposalOut.from_model(model.correction_proposal)
+                if model.correction_proposal
+                else None
+            ),
             completed_by=model.completed_by,
         )
 
@@ -346,3 +398,13 @@ class TurnCompleted(Notification):
 class TrackBought(Notification):
     user_id: ResourceId
     track: TrackOut
+
+
+class CorrectionProposed(Notification):
+    proposal: CorrectionProposalOut
+
+
+class CorrectionVoted(Notification):
+    vote: CorrectionProposalVoteOut
+    proposal_state: CorrectionProposalState
+    scoring: TurnScoringOut | None
