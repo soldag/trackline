@@ -36,6 +36,7 @@ class DatabaseClient:
         await init_beanie(
             database=self._database,
             document_models=[Session, Game, User],
+            skip_indexes=True,
         )
 
     @asynccontextmanager
