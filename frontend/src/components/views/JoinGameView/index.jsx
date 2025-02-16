@@ -10,7 +10,7 @@ import { joinGame } from "~/store/games/actions";
 import { useErrorToast, useLoadingSelector } from "~/utils/hooks";
 
 import JoinGameForm from "./components/JoinGameForm";
-import QrScanner from "./components/QrScanner";
+import QrCodeScanner from "./components/QrCodeScanner";
 
 const JoinGameView = () => {
   const { gameId } = useParams();
@@ -52,7 +52,7 @@ const JoinGameView = () => {
           </Typography>
           <Box sx={{ flex: "1 1 0", overflow: "hidden" }}>
             {!gameId && (
-              <QrScanner
+              <QrCodeScanner
                 sx={{ margin: { xs: "0 auto", sm: "0" } }}
                 onResult={handleJoin}
               />

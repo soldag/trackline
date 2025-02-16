@@ -56,6 +56,7 @@ export default [
           extensions: [".js", ".jsx"],
         },
       },
+      "import/ignore": ["qr-scanner"],
     },
   },
   {

@@ -1,25 +1,37 @@
 import PropTypes from "prop-types";
-import { useRef, useState } from "react";
-import { useZxing } from "react-zxing";
+import QrScanner from "qr-scanner";
+import { useEffect, useRef, useState } from "react";
 
 import { Box, CircularProgress } from "@mui/joy";
 
 import { JOIN_URL_REGEX } from "~/constants";
 import SxType from "~/types/mui";
 
-const QrScanner = ({ sx, onResult = () => {} }) => {
+const QrCodeScanner = ({ sx, onResult = () => {} }) => {
+  const videoRef = useRef();
   const lastGameId = useRef();
+  const onResultRef = useRef();
   const [videoPlaying, setVideoPlaying] = useState(false);
 
-  const { ref: videoRef } = useZxing({
-    onDecodeResult: ({ text }) => {
-      const [, gameId] = text.match(JOIN_URL_REGEX) || [];
-      if (gameId != null && gameId !== lastGameId.current) {
-        onResult({ gameId });
-        lastGameId.current = gameId;
-      }
-    },
-  });
+  useEffect(() => {
+    onResultRef.current = onResultRef;
+  }, [onResult]);
+
+  useEffect(() => {
+    const qrScanner = new QrScanner(
+      videoRef.current,
+      ({ data }) => {
+        const [, gameId] = data.match(JOIN_URL_REGEX) || [];
+        if (gameId != null && gameId !== lastGameId.current) {
+          onResultRef.current?.({ gameId });
+          lastGameId.current = gameId;
+        }
+      },
+      { returnDetailedScanResult: true },
+    );
+    qrScanner.start();
+    return () => qrScanner.destroy();
+  }, []);
 
   return (
     <Box
@@ -56,14 +68,15 @@ const QrScanner = ({ sx, onResult = () => {} }) => {
           objectFit: "cover",
         }}
         onPlaying={() => setVideoPlaying(true)}
+        onPause={() => setVideoPlaying(false)}
       />
     </Box>
   );
 };
 
-QrScanner.propTypes = {
+QrCodeScanner.propTypes = {
   sx: SxType,
   onResult: PropTypes.func,
 };
 
-export default QrScanner;
+export default QrCodeScanner;
