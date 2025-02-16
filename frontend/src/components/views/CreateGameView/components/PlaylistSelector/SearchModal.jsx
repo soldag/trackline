@@ -162,7 +162,6 @@ const SearchModal = ({
         >
           {([placeholder]) => (
             <Input
-              autoFocus
               fullWidth
               variant="soft"
               placeholder={placeholder}
