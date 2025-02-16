@@ -83,6 +83,7 @@ const Timeline = ({
 }) => {
   const isVertical = useBreakpoint((breakpoints) => breakpoints.only("xs"));
 
+  const [isDragging, setIsDragging] = useState(false);
   const [isSelectingPosition, setIsSelectingPosition] = useState(false);
 
   const sensors = useSensors(
@@ -90,7 +91,7 @@ const Timeline = ({
       activationConstraint: { distance: 1 },
     }),
     useSensor(TouchSensor, {
-      activationConstraint: { delay: 200, tolerance: 5 },
+      activationConstraint: { delay: 150, tolerance: 5 },
     }),
   );
 
@@ -99,11 +100,15 @@ const Timeline = ({
   const maxYear = tracks[index + 1]?.releaseYear;
 
   const handleDragStart = () => {
+    setIsDragging(true);
     setIsSelectingPosition(true);
-    window.navigator.vibrate?.(100);
+    window.navigator.vibrate?.(40);
   };
 
   const handleDragEnd = (event) => {
+    setIsDragging(false);
+    window.navigator.vibrate?.(40);
+
     const { active, over } = event;
     if (active.id !== over.id) {
       const oldIndex = tracks.findIndex(
@@ -171,6 +176,7 @@ const Timeline = ({
               >
                 {track.spotifyId === activeTrackId ? (
                   <TrackCard
+                    highlight={isDragging}
                     releaseYearGuess={releaseYearGuess}
                     creditsGuess={creditsGuess}
                     canGuessReleaseYear={canGuessReleaseYear}

@@ -19,6 +19,7 @@ import TrackCover from "./TrackCover";
 
 const TrackCard = ({
   sx,
+  highlight = false,
   track = null,
   releaseYearGuess = null,
   creditsGuess = null,
@@ -103,8 +104,14 @@ const TrackCard = ({
         "justifyContent": "space-between",
         "textAlign": "center",
         "userSelect": "none",
-        "boxShadow": "sm",
-        "borderColor": theme.vars.palette.primary.softColor,
+        "boxShadow": highlight
+          ? `0 10px 20px rgba(11, 107, 203, 0.15),
+             0 0 40px rgba(var(--joy-palette-primary-mainChannel) / 0.25)`
+          : "sm",
+        "borderColor": highlight
+          ? theme.vars.palette.primary.plainColor
+          : theme.vars.palette.primary.softColor,
+        "transition": "box-shadow 0.1s ease-in-out",
         "--Card-radius": "var(--TrackCard-radius, 5px)",
         "--TrackCard-color-primary":
           track == null
@@ -133,6 +140,7 @@ const TrackCard = ({
 
 TrackCard.propTypes = {
   sx: SxType,
+  highlight: PropTypes.bool,
   track: TrackType,
   releaseYearGuess: ReleaseYearGuessType,
   creditsGuess: CreditsGuessType,
