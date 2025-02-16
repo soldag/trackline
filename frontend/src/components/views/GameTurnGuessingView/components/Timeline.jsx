@@ -91,7 +91,6 @@ const Timeline = ({
     }),
     useSensor(TouchSensor, {
       activationConstraint: { delay: 200, tolerance: 5 },
-      onActivation: () => window.navigator.vibrate?.(100),
     }),
   );
 
@@ -101,6 +100,7 @@ const Timeline = ({
 
   const handleDragStart = () => {
     setIsSelectingPosition(true);
+    window.navigator.vibrate?.(100);
   };
 
   const handleDragEnd = (event) => {
