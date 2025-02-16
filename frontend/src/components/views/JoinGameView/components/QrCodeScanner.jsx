@@ -14,7 +14,7 @@ const QrCodeScanner = ({ sx, onResult = () => {} }) => {
   const [videoPlaying, setVideoPlaying] = useState(false);
 
   useEffect(() => {
-    onResultRef.current = onResultRef;
+    onResultRef.current = onResult;
   }, [onResult]);
 
   useEffect(() => {
