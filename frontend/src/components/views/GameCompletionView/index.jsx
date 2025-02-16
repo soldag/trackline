@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import { Box, Button, Stack } from "@mui/joy";
 

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router";
 
 import GameAbortView from "~/components/views/GameAbortView";
 import GameCompletionView from "~/components/views/GameCompletionView";

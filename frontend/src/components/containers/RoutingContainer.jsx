@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router";
 
 import ProtectedRoute from "~/components/common/ProtectedRoute";
 import GameContainer from "~/components/containers/GameContainer";

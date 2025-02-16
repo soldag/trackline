@@ -1,6 +1,6 @@
 import { IntlProvider } from "react-intl";
 import { Provider } from "react-redux";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 import { PersistGate } from "redux-persist/integration/react";
 
 import { CssBaseline, GlobalStyles } from "@mui/joy";

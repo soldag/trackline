@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import MediaQuery from "react-responsive";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router";
 
 import LinkIcon from "@mui/icons-material/Link";
 import {

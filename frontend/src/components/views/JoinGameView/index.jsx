@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router";
 
 import { Box, Stack, Typography } from "@mui/joy";
 

@@ -1,6 +1,6 @@
 import { FormattedMessage } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router";
 
 import { Box, Stack, Typography } from "@mui/joy";
 
