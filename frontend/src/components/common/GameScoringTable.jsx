@@ -6,11 +6,11 @@ import TokenIcon from "@mui/icons-material/Token";
 import WebStoriesIcon from "@mui/icons-material/WebStories";
 import { Box, Typography } from "@mui/joy";
 
-import ScoringResult from "~/components/common/ScoringResult";
-import ShadowTable from "~/components/common/ShadowTable";
-import { PlayerType, TurnType } from "~/types/games";
-import { UserType } from "~/types/users";
-import { aggregateTokenGains } from "~/utils/games";
+import ScoringResult from "@/components/common/ScoringResult";
+import ShadowTable from "@/components/common/ShadowTable";
+import { PlayerType, TurnType } from "@/types/games";
+import { UserType } from "@/types/users";
+import { aggregateTokenGains } from "@/utils/games";
 
 const getTracksDelta = (userId, turn) => {
   if (!turn?.scoring) {

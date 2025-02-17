@@ -1,11 +1,11 @@
 import axios from "axios";
 import rateLimit from "axios-rate-limit";
 
-import SpotifyError from "~/api/spotify/error";
-import tracklineApi from "~/api/trackline";
-import { camelizeResponse, decamelizeRequest } from "~/api/utils/interceptors";
-import { Lock, sleep } from "~/utils/concurrency";
-import { NetworkError } from "~/utils/errors";
+import SpotifyError from "@/api/spotify/error";
+import tracklineApi from "@/api/trackline";
+import { camelizeResponse, decamelizeRequest } from "@/api/utils/interceptors";
+import { Lock, sleep } from "@/utils/concurrency";
+import { NetworkError } from "@/utils/errors";
 
 export let getAccessToken = () => {};
 export let setAccessToken = () => {};

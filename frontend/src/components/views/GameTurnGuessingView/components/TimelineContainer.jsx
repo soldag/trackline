@@ -3,8 +3,8 @@ import { useRef } from "react";
 
 import { Box } from "@mui/joy";
 
-import SxType from "~/types/mui";
-import { useEventListener } from "~/utils/hooks";
+import SxType from "@/types/mui";
+import { useEventListener } from "@/utils/hooks";
 
 const TimelineContainer = ({ sx, children }) => {
   const ref = useRef();

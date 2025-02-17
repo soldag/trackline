@@ -4,9 +4,9 @@ import { FormattedMessage } from "react-intl";
 
 import { Typography } from "@mui/joy";
 
-import ConfirmModal from "~/components/common/ConfirmModal";
-import YearPicker from "~/components/common/YearPicker";
-import { TrackType } from "~/types/games";
+import ConfirmModal from "@/components/common/ConfirmModal";
+import YearPicker from "@/components/common/YearPicker";
+import { TrackType } from "@/types/games";
 
 const getInitialYear = (min, max) => min || max || new Date().getFullYear();
 

@@ -15,11 +15,11 @@ import {
   Typography,
 } from "@mui/joy";
 
-import VotingButton from "~/components/common/VotingButton";
-import { CORRECTION_PROPOSAL_STATES } from "~/constants";
-import { CorrectionProposalType, GameType } from "~/types/games";
-import { UserType } from "~/types/users";
-import { getPossessiveForm } from "~/utils/i18n";
+import VotingButton from "@/components/common/VotingButton";
+import { CORRECTION_PROPOSAL_STATES } from "@/constants";
+import { CorrectionProposalType, GameType } from "@/types/games";
+import { UserType } from "@/types/users";
+import { getPossessiveForm } from "@/utils/i18n";
 
 const CorrectionProposalVotingModal = ({
   open,

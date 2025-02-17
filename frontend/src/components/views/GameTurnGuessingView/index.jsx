@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box } from "@mui/joy";
 
-import View from "~/components/views/View";
+import View from "@/components/views/View";
 import {
   TOKEN_COST_CREDITS_GUESS,
   TOKEN_COST_EXCHANGE_TRACK,
   TOKEN_COST_RELEASE_YEAR_GUESS,
-} from "~/constants";
+} from "@/constants";
 import {
   exchangeTrack,
   guessTrackCredits,
@@ -16,14 +16,14 @@ import {
   passTurn,
   scoreTurn,
   stopRoutines,
-} from "~/store/games/actions";
-import { play } from "~/store/spotify/actions";
+} from "@/store/games/actions";
+import { play } from "@/store/spotify/actions";
 import {
   useBreakpoint,
   useErrorToast,
   useInterval,
   useLoadingSelector,
-} from "~/utils/hooks";
+} from "@/utils/hooks";
 
 import BottomMenu from "./components/BottomMenu";
 import CountdownSnackbar from "./components/CountdownSnackbar";

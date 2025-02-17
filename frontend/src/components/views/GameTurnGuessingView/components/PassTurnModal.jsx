@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
-import ConfirmModal from "~/components/common/ConfirmModal";
+import ConfirmModal from "@/components/common/ConfirmModal";
 
 const getContent = (canGuessReleaseYear, canGuessCredits) => {
   if (canGuessReleaseYear && canGuessCredits) {

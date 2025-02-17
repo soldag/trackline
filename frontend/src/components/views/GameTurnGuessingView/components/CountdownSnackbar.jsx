@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { Box, IconButton, Snackbar, Typography } from "@mui/joy";
 
-import { useCountdown } from "~/utils/hooks";
+import { useCountdown } from "@/utils/hooks";
 
 const CountdownSnackbar = ({ open, timeoutStart, timeoutEnd, onClose }) => {
   const hasSmallHeight = useMediaQuery({ query: "(max-height: 550px)" });

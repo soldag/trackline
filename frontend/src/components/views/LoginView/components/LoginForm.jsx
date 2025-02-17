@@ -8,16 +8,16 @@ import KeyIcon from "@mui/icons-material/Key";
 import PersonIcon from "@mui/icons-material/Person";
 import { Button, Grid, Input } from "@mui/joy";
 
-import ErrorAlert from "~/components/common/ErrorAlert";
-import FormController from "~/components/common/FormController";
+import ErrorAlert from "@/components/common/ErrorAlert";
+import FormController from "@/components/common/FormController";
 import {
   MAX_PASSWORD_LENGTH,
   MAX_USERNAME_LENGTH,
   MIN_PASSWORD_LENGTH,
   MIN_USERNAME_LENGTH,
-} from "~/constants";
-import { ErrorType } from "~/types/errors";
-import { buildRules } from "~/utils/forms";
+} from "@/constants";
+import { ErrorType } from "@/types/errors";
+import { buildRules } from "@/utils/forms";
 
 const LoginForm = ({ loading, error, onSubmit, onDismissError }) => {
   const intl = useIntl();

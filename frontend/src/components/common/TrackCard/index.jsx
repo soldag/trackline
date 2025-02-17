@@ -6,8 +6,8 @@ import {
   CreditsGuessType,
   ReleaseYearGuessType,
   TrackType,
-} from "~/types/games";
-import SxType from "~/types/mui";
+} from "@/types/games";
+import SxType from "@/types/mui";
 
 import ConfirmFooter from "./ConfirmFooter";
 import CreditsFooter from "./CreditsFooter";

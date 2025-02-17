@@ -1,6 +1,6 @@
-import { ERROR_CODES } from "~/constants";
-import ApiErrorMessages from "~/translations/messages/ApiErrors";
-import GlobalErrorMessages from "~/translations/messages/GlobalErrors";
+import { ERROR_CODES } from "@/constants";
+import ApiErrorMessages from "@/translations/messages/ApiErrors";
+import GlobalErrorMessages from "@/translations/messages/GlobalErrors";
 
 export class NetworkError extends Error {
   code = ERROR_CODES.NETWORK;

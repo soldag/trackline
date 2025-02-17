@@ -6,17 +6,17 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import { Button, Stack } from "@mui/joy";
 
-import TrackCard from "~/components/common/TrackCard";
-import View from "~/components/views/View";
-import { CORRECTION_PROPOSAL_STATES, TOKEN_COST_BUY_TRACK } from "~/constants";
+import TrackCard from "@/components/common/TrackCard";
+import View from "@/components/views/View";
+import { CORRECTION_PROPOSAL_STATES, TOKEN_COST_BUY_TRACK } from "@/constants";
 import {
   buyTrack,
   completeTurn,
   proposeCorrection,
   voteCorrection,
-} from "~/store/games/actions";
-import { useConfetti, useStars } from "~/utils/confetti";
-import { useErrorToast, useLoadingSelector } from "~/utils/hooks";
+} from "@/store/games/actions";
+import { useConfetti, useStars } from "@/utils/confetti";
+import { useErrorToast, useLoadingSelector } from "@/utils/hooks";
 
 import BuyTrackModal from "./components/BuyTrackModal";
 import CorrectionProposalModal from "./components/CorrectionProposalModal";

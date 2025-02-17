@@ -4,7 +4,7 @@ import { Transition } from "react-transition-group";
 
 import { Modal } from "@mui/joy";
 
-import { useUpdatingRef } from "~/utils/hooks";
+import { useUpdatingRef } from "@/utils/hooks";
 
 const Popup = ({
   open,

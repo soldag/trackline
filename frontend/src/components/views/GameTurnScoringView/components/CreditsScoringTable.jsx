@@ -3,9 +3,9 @@ import { FormattedMessage } from "react-intl";
 
 import { Typography } from "@mui/joy";
 
-import ScoringResult from "~/components/common/ScoringResult";
-import { GuessType, PlayerType, TurnType } from "~/types/games";
-import { UserType } from "~/types/users";
+import ScoringResult from "@/components/common/ScoringResult";
+import { GuessType, PlayerType, TurnType } from "@/types/games";
+import { UserType } from "@/types/users";
 
 import TurnScoringTable from "./TurnScoringTable";
 

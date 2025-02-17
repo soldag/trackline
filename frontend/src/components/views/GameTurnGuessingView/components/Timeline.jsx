@@ -18,13 +18,13 @@ import { useEffect, useState } from "react";
 
 import { Box, Stack } from "@mui/joy";
 
-import TrackCard from "~/components/common/TrackCard";
+import TrackCard from "@/components/common/TrackCard";
 import {
   CreditsGuessType,
   ReleaseYearGuessType,
   TrackType,
-} from "~/types/games";
-import { useBreakpoint } from "~/utils/hooks";
+} from "@/types/games";
+import { useBreakpoint } from "@/utils/hooks";
 
 const SortableItem = ({ id, disabled = false, children }) => {
   const {

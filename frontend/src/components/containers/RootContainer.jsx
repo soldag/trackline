@@ -1,17 +1,17 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import RoutingContainer from "~/components/containers/RoutingContainer";
-import SpotifyContainer from "~/components/containers/SpotifyContainer";
-import LoadingView from "~/components/views/LoadingView";
+import RoutingContainer from "@/components/containers/RoutingContainer";
+import SpotifyContainer from "@/components/containers/SpotifyContainer";
+import LoadingView from "@/components/views/LoadingView";
 import {
   fetchCurrentUser as fetchCurrentApiUser,
   invalidateSession,
-} from "~/store/auth/actions";
+} from "@/store/auth/actions";
 import {
   fetchCurrentUser as fetchCurrentSpotifyUser,
   invalidateAccessToken,
-} from "~/store/spotify/actions";
-import { useMountEffect } from "~/utils/hooks";
+} from "@/store/spotify/actions";
+import { useMountEffect } from "@/utils/hooks";
 
 const RootContainer = () => {
   const dispatch = useDispatch();

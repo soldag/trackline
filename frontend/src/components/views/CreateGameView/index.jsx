@@ -17,30 +17,30 @@ import {
   useTheme,
 } from "@mui/joy";
 
-import ButtonFooter from "~/components/common/ButtonFooter";
-import View from "~/components/views/View";
+import ButtonFooter from "@/components/common/ButtonFooter";
+import View from "@/components/views/View";
 import {
   CREDITS_STRICTNESS_VALUES,
   DEFAULT_CREDITS_STRICTNESS,
   DEFAULT_INITIAL_TOKENS,
   DEFAULT_MAX_TOKENS,
   DEFAULT_TIMELINE_LENGTH,
-} from "~/constants";
-import { dismissAllErrors } from "~/store/errors/actions";
-import { createGame } from "~/store/games/actions";
+} from "@/constants";
+import { dismissAllErrors } from "@/store/errors/actions";
+import { createGame } from "@/store/games/actions";
 import {
   clearPlaylistSearchResults,
   fetchRecommendedPlaylists,
   searchPlaylists,
   startAuth,
-} from "~/store/spotify/actions";
+} from "@/store/spotify/actions";
 import {
   useErrorSelector,
   useErrorToast,
   useLoadingSelector,
   usePrevious,
   useSpotify,
-} from "~/utils/hooks";
+} from "@/utils/hooks";
 
 import PlaylistSelector from "./components/PlaylistSelector";
 import SettingsForm from "./components/SettingsForm";

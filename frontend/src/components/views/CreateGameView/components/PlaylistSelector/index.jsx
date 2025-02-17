@@ -7,8 +7,8 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Box, Button, Stack } from "@mui/joy";
 
-import { ErrorType } from "~/types/errors";
-import PlaylistType from "~/types/spotify";
+import { ErrorType } from "@/types/errors";
+import PlaylistType from "@/types/spotify";
 
 import PlaylistList from "./PlaylistList";
 import SearchModal from "./SearchModal";

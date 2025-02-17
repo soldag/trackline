@@ -4,9 +4,9 @@ import { FormattedMessage } from "react-intl";
 
 import { Typography } from "@mui/joy";
 
-import ConfirmModal from "~/components/common/ConfirmModal";
-import YearPicker from "~/components/common/YearPicker";
-import { TrackType } from "~/types/games";
+import ConfirmModal from "@/components/common/ConfirmModal";
+import YearPicker from "@/components/common/YearPicker";
+import { TrackType } from "@/types/games";
 
 const CorrectionProposalModal = ({ open, track, onConfirm, onClose }) => {
   const [releaseYear, setReleaseYear] = useState(track.releaseYear);

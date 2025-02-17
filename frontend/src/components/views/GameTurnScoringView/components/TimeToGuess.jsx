@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import FlagIcon from "@mui/icons-material/Flag";
 
-import { GuessType, TurnType } from "~/types/games";
+import { GuessType, TurnType } from "@/types/games";
 
 const TimeToGuess = ({ turn, userId, guess }) => {
   if (userId === turn.activeUserId) {

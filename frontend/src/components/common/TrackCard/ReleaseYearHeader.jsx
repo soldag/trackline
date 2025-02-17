@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 import { CardContent, CircularProgress, Typography } from "@mui/joy";
 
-import YearRange from "~/components/common/YearRange";
+import YearRange from "@/components/common/YearRange";
 
 const ReleaseYearHeader = ({ loading, year, minYear, maxYear }) => (
   <CardContent

@@ -1,6 +1,6 @@
 import { createReducer } from "@reduxjs/toolkit";
 
-import { resetState } from "~/store/common/actions";
+import { resetState } from "@/store/common/actions";
 
 import { setTimeDeviation } from "./actions";
 

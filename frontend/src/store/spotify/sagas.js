@@ -9,8 +9,8 @@ import {
   take,
 } from "redux-saga/effects";
 
-import spotifyApi from "~/api/spotify";
-import tracklineApi from "~/api/trackline";
+import spotifyApi from "@/api/spotify";
+import tracklineApi from "@/api/trackline";
 import {
   PLAYBACK_POLL_COMMAND_COOLDOWN,
   PLAYBACK_POLL_INTERVAL,
@@ -18,12 +18,12 @@ import {
   PLAYBACK_POLL_RETRY_MIN_INTERVAL,
   PLAYBACK_SIMULATE_PROGRESS_INTERVAL,
   RECOMMENDED_PLAYLIST_IDS,
-} from "~/constants";
+} from "@/constants";
 import {
   ignoreError,
   registerSagaHandlers,
   runWhileVisible,
-} from "~/store/utils/sagas";
+} from "@/store/utils/sagas";
 
 import {
   completeAuth,

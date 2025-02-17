@@ -6,10 +6,10 @@ import { Option, Select, Tab, TabList, TabPanel, Tabs } from "@mui/joy";
 import { tabClasses } from "@mui/joy/Tab";
 import { tabPanelClasses } from "@mui/joy/TabPanel";
 
-import GameScoringTable from "~/components/common/GameScoringTable";
-import { PlayerType, TurnType } from "~/types/games";
-import { UserType } from "~/types/users";
-import { useBreakpoint } from "~/utils/hooks";
+import GameScoringTable from "@/components/common/GameScoringTable";
+import { PlayerType, TurnType } from "@/types/games";
+import { UserType } from "@/types/users";
+import { useBreakpoint } from "@/utils/hooks";
 
 import CreditsScoringTable from "./CreditsScoringTable";
 import ReleaseYearScoringTable from "./ReleaseYearScoringTable";

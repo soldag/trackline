@@ -52,7 +52,7 @@ export default [
       },
       "import/resolver": {
         alias: {
-          map: [["~", "./src"]],
+          map: [["@", "./src"]],
           extensions: [".js", ".jsx"],
         },
       },

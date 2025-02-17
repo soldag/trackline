@@ -3,7 +3,7 @@ import { Link } from "react-router";
 
 import { Button, Stack } from "@mui/joy";
 
-import View from "~/components/views/View";
+import View from "@/components/views/View";
 
 const HomeView = () => {
   return (

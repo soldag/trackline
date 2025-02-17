@@ -2,22 +2,22 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate, useParams } from "react-router";
 
-import GameAbortView from "~/components/views/GameAbortView";
-import GameCompletionView from "~/components/views/GameCompletionView";
-import GameLobbyView from "~/components/views/GameLobbyView";
-import GameTurnGuessingView from "~/components/views/GameTurnGuessingView";
-import GameTurnScoringView from "~/components/views/GameTurnScoringView";
-import LoadingView from "~/components/views/LoadingView";
-import { GAME_STATES } from "~/constants";
+import GameAbortView from "@/components/views/GameAbortView";
+import GameCompletionView from "@/components/views/GameCompletionView";
+import GameLobbyView from "@/components/views/GameLobbyView";
+import GameTurnGuessingView from "@/components/views/GameTurnGuessingView";
+import GameTurnScoringView from "@/components/views/GameTurnScoringView";
+import LoadingView from "@/components/views/LoadingView";
+import { GAME_STATES } from "@/constants";
 import {
   clearGame,
   fetchGame,
   fetchGameUsers,
   listenNotifications,
   unlistenNotifications,
-} from "~/store/games/actions";
-import { pause } from "~/store/spotify/actions";
-import { usePrevious, useSpotify, useUnmountEffect } from "~/utils/hooks";
+} from "@/store/games/actions";
+import { pause } from "@/store/spotify/actions";
+import { usePrevious, useSpotify, useUnmountEffect } from "@/utils/hooks";
 
 const GAME_STATE_VIEWS = {
   [GAME_STATES.WAITING_FOR_PLAYERS]: GameLobbyView,

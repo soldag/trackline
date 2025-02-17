@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import AudiotrackIcon from "@mui/icons-material/Audiotrack";
 import { CardContent } from "@mui/joy";
 
-import CircularCountdown from "~/components/common/CircularCountdown";
+import CircularCountdown from "@/components/common/CircularCountdown";
 
 const pulseEffect = keyframes`
   from {

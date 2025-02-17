@@ -5,10 +5,10 @@ import { FormattedMessage } from "react-intl";
 import TimerIcon from "@mui/icons-material/Timer";
 import { Box } from "@mui/joy";
 
-import ShadowTable from "~/components/common/ShadowTable";
-import { PlayerType, TurnType } from "~/types/games";
-import SxType from "~/types/mui";
-import { UserType } from "~/types/users";
+import ShadowTable from "@/components/common/ShadowTable";
+import { PlayerType, TurnType } from "@/types/games";
+import SxType from "@/types/mui";
+import { UserType } from "@/types/users";
 
 import TimeToGuess from "./TimeToGuess";
 

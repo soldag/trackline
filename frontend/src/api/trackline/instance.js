@@ -1,11 +1,11 @@
 import axios from "axios";
 import rateLimit from "axios-rate-limit";
 
-import ApiError from "~/api/trackline/error";
-import { camelizeResponse, decamelizeRequest } from "~/api/utils/interceptors";
-import { BACKEND_URL } from "~/configuration";
-import { HTTP_REQUEST_TIMEOUT } from "~/constants";
-import { NetworkError, TimeoutError } from "~/utils/errors";
+import ApiError from "@/api/trackline/error";
+import { camelizeResponse, decamelizeRequest } from "@/api/utils/interceptors";
+import { BACKEND_URL } from "@/configuration";
+import { HTTP_REQUEST_TIMEOUT } from "@/constants";
+import { NetworkError, TimeoutError } from "@/utils/errors";
 
 export let getSessionToken = () => {};
 export let setSessionToken = () => {};

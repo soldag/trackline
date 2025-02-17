@@ -8,9 +8,9 @@ import ClearIcon from "@mui/icons-material/Clear";
 import NumbersIcon from "@mui/icons-material/Numbers";
 import { Button, Grid, IconButton, Input, Stack } from "@mui/joy";
 
-import FormController from "~/components/common/FormController";
-import { GAME_ID_LENGTH, GAME_ID_REGEX } from "~/constants";
-import { buildRules } from "~/utils/forms";
+import FormController from "@/components/common/FormController";
+import { GAME_ID_LENGTH, GAME_ID_REGEX } from "@/constants";
+import { buildRules } from "@/utils/forms";
 
 const JoinGameForm = ({ loading = false, onSubmit }) => {
   const intl = useIntl();

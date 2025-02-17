@@ -1,13 +1,13 @@
 import { Navigate, Route, Routes } from "react-router";
 
-import ProtectedRoute from "~/components/common/ProtectedRoute";
-import GameContainer from "~/components/containers/GameContainer";
-import CreateGameView from "~/components/views/CreateGameView";
-import HomeView from "~/components/views/HomeView";
-import JoinGameView from "~/components/views/JoinGameView";
-import LoginView from "~/components/views/LoginView";
-import RegisterView from "~/components/views/RegisterView";
-import SpotifyCallbackView from "~/components/views/SpotifyCallbackView";
+import ProtectedRoute from "@/components/common/ProtectedRoute";
+import GameContainer from "@/components/containers/GameContainer";
+import CreateGameView from "@/components/views/CreateGameView";
+import HomeView from "@/components/views/HomeView";
+import JoinGameView from "@/components/views/JoinGameView";
+import LoginView from "@/components/views/LoginView";
+import RegisterView from "@/components/views/RegisterView";
+import SpotifyCallbackView from "@/components/views/SpotifyCallbackView";
 
 const RoutingContainer = () => (
   <Routes>

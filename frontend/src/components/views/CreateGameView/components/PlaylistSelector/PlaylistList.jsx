@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/joy";
 
-import PlaylistType from "~/types/spotify";
+import PlaylistType from "@/types/spotify";
 
 const ItemTypography = (props) => (
   <Typography

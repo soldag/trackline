@@ -3,9 +3,9 @@ import { FormattedMessage } from "react-intl";
 
 import { Stack, Typography } from "@mui/joy";
 
-import { GameType } from "~/types/games";
-import { UserType } from "~/types/users";
-import { getRoundNumber } from "~/utils/games";
+import { GameType } from "@/types/games";
+import { UserType } from "@/types/users";
+import { getRoundNumber } from "@/utils/games";
 
 const StatusBar = ({ game, users, currentUserId }) => {
   const roundNumber = getRoundNumber(game);

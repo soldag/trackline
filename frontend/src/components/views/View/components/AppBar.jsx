@@ -9,16 +9,16 @@ import ClearIcon from "@mui/icons-material/Clear";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Box, IconButton, Stack, Typography } from "@mui/joy";
 
-import { TURN_GAME_STATES } from "~/constants";
-import { logout } from "~/store/auth/actions";
-import { abortGame, leaveGame } from "~/store/games/actions";
+import { TURN_GAME_STATES } from "@/constants";
+import { logout } from "@/store/auth/actions";
+import { abortGame, leaveGame } from "@/store/games/actions";
 import {
   pause,
   play,
   setVolume,
   unwatchPlayback,
   watchPlayback,
-} from "~/store/spotify/actions";
+} from "@/store/spotify/actions";
 
 import AbortGameModal from "./AbortGameModal";
 import LeaveGameModal from "./LeaveGameModal";

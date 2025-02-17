@@ -12,11 +12,11 @@ import {
   Typography,
 } from "@mui/joy";
 
-import Popup from "~/components/common/Popup";
-import TrackCard from "~/components/common/TrackCard";
-import { GameType } from "~/types/games";
-import { UserType } from "~/types/users";
-import { usePrevious } from "~/utils/hooks";
+import Popup from "@/components/common/Popup";
+import TrackCard from "@/components/common/TrackCard";
+import { GameType } from "@/types/games";
+import { UserType } from "@/types/users";
+import { usePrevious } from "@/utils/hooks";
 
 const TrackExchangePopup = ({ game, users, currentUserId }) => {
   const [isOpen, setIsOpen] = useState(false);

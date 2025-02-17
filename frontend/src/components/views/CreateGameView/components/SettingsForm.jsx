@@ -20,8 +20,8 @@ import {
   MIN_INITIAL_TOKENS,
   MIN_MAX_TOKENS,
   MIN_TIMELINE_LENGTH,
-} from "~/constants";
-import CreditsStrictnessMessages from "~/translations/messages/CreditsStrictness";
+} from "@/constants";
+import CreditsStrictnessMessages from "@/translations/messages/CreditsStrictness";
 
 const SettingsForm = ({
   initialTokens,

@@ -3,10 +3,10 @@ import { FormattedMessage } from "react-intl";
 
 import { Typography } from "@mui/joy";
 
-import ScoringResult from "~/components/common/ScoringResult";
-import YearRange from "~/components/common/YearRange";
-import { GuessType, PlayerType, TrackType, TurnType } from "~/types/games";
-import { UserType } from "~/types/users";
+import ScoringResult from "@/components/common/ScoringResult";
+import YearRange from "@/components/common/YearRange";
+import { GuessType, PlayerType, TrackType, TurnType } from "@/types/games";
+import { UserType } from "@/types/users";
 
 import TurnScoringTable from "./TurnScoringTable";
 

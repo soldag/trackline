@@ -1,9 +1,9 @@
 import { createReducer, isAnyOf } from "@reduxjs/toolkit";
 
-import { GAME_STATES, TOKEN_COST_BUY_TRACK } from "~/constants";
-import { resetState } from "~/store/common/actions";
-import { isSuccess } from "~/store/utils/matchers";
-import { aggregateTokenGains } from "~/utils/games";
+import { GAME_STATES, TOKEN_COST_BUY_TRACK } from "@/constants";
+import { resetState } from "@/store/common/actions";
+import { isSuccess } from "@/store/utils/matchers";
+import { aggregateTokenGains } from "@/utils/games";
 
 import {
   abortGame,

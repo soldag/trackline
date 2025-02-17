@@ -10,8 +10,8 @@ import {
   ModalDialog,
 } from "@mui/joy";
 
-import { ErrorType } from "~/types/errors";
-import { getErrorMessage } from "~/utils/errors";
+import { ErrorType } from "@/types/errors";
+import { getErrorMessage } from "@/utils/errors";
 
 const ErrorModal = ({ open, error, onRetry, onCancel }) => {
   const intl = useIntl();

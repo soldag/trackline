@@ -11,10 +11,10 @@ import {
   Typography,
 } from "@mui/joy";
 
-import Popup from "~/components/common/Popup";
-import { GameType } from "~/types/games";
-import { UserType } from "~/types/users";
-import { getRoundNumber } from "~/utils/games";
+import Popup from "@/components/common/Popup";
+import { GameType } from "@/types/games";
+import { UserType } from "@/types/users";
+import { getRoundNumber } from "@/utils/games";
 
 const TurnInfoPopup = ({ game, users, currentUserId }) => {
   const [isOpen, setIsOpen] = useState(false);

@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
 import { FormattedMessage } from "react-intl";
 
-import ResponsiveCircularProgress from "~/components/common/ResponsiveCircularProgress";
-import { useCountdown } from "~/utils/hooks";
+import ResponsiveCircularProgress from "@/components/common/ResponsiveCircularProgress";
+import { useCountdown } from "@/utils/hooks";
 
 const DANGER_THRESHOLD = 0.75;
 const WARNING_THRESHOLD = 0.5;

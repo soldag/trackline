@@ -8,11 +8,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import PeopleIcon from "@mui/icons-material/People";
 import { Chip, Input, Stack } from "@mui/joy";
 
-import ChipInput from "~/components/common/ChipInput";
-import ConfirmModal from "~/components/common/ConfirmModal";
-import FormController from "~/components/common/FormController";
-import FormValidationMessages from "~/translations/messages/FormValidation";
-import { buildRules } from "~/utils/forms";
+import ChipInput from "@/components/common/ChipInput";
+import ConfirmModal from "@/components/common/ConfirmModal";
+import FormController from "@/components/common/FormController";
+import FormValidationMessages from "@/translations/messages/FormValidation";
+import { buildRules } from "@/utils/forms";
 
 const GuessCreditsModal = ({ open, onConfirm, onClose }) => {
   const intl = useIntl();

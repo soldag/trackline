@@ -3,7 +3,7 @@ import { FormattedMessage } from "react-intl";
 import AlbumIcon from "@mui/icons-material/Album";
 import { Box, Typography } from "@mui/joy";
 
-import SxType from "~/types/mui";
+import SxType from "@/types/mui";
 
 const Heading = ({ sx }) => (
   <Box

@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router";
 
-import LoadingView from "~/components/views/LoadingView";
+import LoadingView from "@/components/views/LoadingView";
 
 const ProtectedRoute = ({ children }) => {
   const location = useLocation();

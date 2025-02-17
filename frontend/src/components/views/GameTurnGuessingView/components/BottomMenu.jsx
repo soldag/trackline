@@ -5,9 +5,9 @@ import ForwardIcon from "@mui/icons-material/Forward";
 import LoopIcon from "@mui/icons-material/Loop";
 import { Button, Divider, Stack } from "@mui/joy";
 
-import StatusBar from "~/components/views/GameTurnGuessingView/components/StatusBar";
-import { GameType } from "~/types/games";
-import { UserType } from "~/types/users";
+import StatusBar from "@/components/views/GameTurnGuessingView/components/StatusBar";
+import { GameType } from "@/types/games";
+import { UserType } from "@/types/users";
 
 const BottomMenu = ({
   game,

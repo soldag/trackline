@@ -5,7 +5,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import StarsIcon from "@mui/icons-material/Stars";
 import { List, ListItem, ListItemContent, ListItemDecorator } from "@mui/joy";
 
-import { UserType } from "~/types/users";
+import { UserType } from "@/types/users";
 
 const getUsernameComparator = (gameMasterId, currentUserId) => (u1, u2) => {
   const specialUserIds = [gameMasterId, currentUserId];

@@ -11,7 +11,13 @@ module.exports = {
   bracketSameLine: false,
   arrowParens: "always",
   plugins: ["@trivago/prettier-plugin-sort-imports"],
-  importOrder: ["<THIRD_PARTY_MODULES>", "^@mui", "^~", "^./"],
+  importOrder: [
+    "<THIRD_PARTY_MODULES>",
+    "^@mui",
+    "(.*)\\.css",
+    "^@/.*",
+    "^..?/(.*)",
+  ],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
 };

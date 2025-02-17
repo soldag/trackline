@@ -18,8 +18,8 @@ import {
   Typography,
 } from "@mui/joy";
 
-import { ErrorType } from "~/types/errors";
-import PlaylistType from "~/types/spotify";
+import { ErrorType } from "@/types/errors";
+import PlaylistType from "@/types/spotify";
 
 import PlaylistList from "./PlaylistList";
 

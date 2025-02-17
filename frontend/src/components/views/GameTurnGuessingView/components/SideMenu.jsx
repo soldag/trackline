@@ -8,7 +8,7 @@ import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import LoopIcon from "@mui/icons-material/Loop";
 import { List, Stack } from "@mui/joy";
 
-import ExpandableMenuItem from "~/components/common/ExpandableMenuItem";
+import ExpandableMenuItem from "@/components/common/ExpandableMenuItem";
 
 const SideMenu = ({
   canPassTurn = true,

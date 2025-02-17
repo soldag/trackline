@@ -4,9 +4,9 @@ import TokenIcon from "@mui/icons-material/Token";
 import WebStoriesIcon from "@mui/icons-material/WebStories";
 import { Typography } from "@mui/joy";
 
-import MaxTokenHint from "~/components/common/MaxTokenHint";
-import NumericDelta from "~/components/common/NumericDelta";
-import { TokenGainType } from "~/types/games";
+import MaxTokenHint from "@/components/common/MaxTokenHint";
+import NumericDelta from "@/components/common/NumericDelta";
+import { TokenGainType } from "@/types/games";
 
 const ScoringResult = ({
   tracksDelta = 0,
