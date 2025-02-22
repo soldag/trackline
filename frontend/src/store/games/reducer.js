@@ -50,6 +50,45 @@ const getTrackPosition = (timeline, track) => {
   return position < 0 ? timeline.length : position;
 };
 
+const applyScoring = (game, scoring) => {
+  const turn = game.turns.at(-1);
+  turn.scoring = scoring;
+
+  for (const player of game.players) {
+    const { userId } = player;
+
+    const { refund, rewardEffective } = aggregateTokenGains(userId, scoring);
+    player.tokens += refund + rewardEffective;
+
+    if (userId === scoring.releaseYear.position.winner) {
+      const guess = turn.guesses.releaseYear.find((g) => g.userId === userId);
+      const position =
+        userId === turn.activeUserId
+          ? guess?.position
+          : getTrackPosition(player.timeline, turn.track);
+
+      if (position != null) {
+        player.timeline.splice(position, 0, turn.track);
+      }
+    }
+  }
+};
+
+const revertScoring = (game) => {
+  const turn = game.turns.at(-1);
+
+  for (const player of game.players) {
+    const { userId } = player;
+
+    player.timeline = player.timeline.filter(
+      (t) => t.spotifyId !== turn.track.spotifyId,
+    );
+
+    const tokenGain = aggregateTokenGains(userId, turn.scoring);
+    player.tokens -= tokenGain.refund + tokenGain.rewardEffective;
+  }
+};
+
 const reducer = createReducer(initialState, (builder) => {
   builder
     .addCase(resetState, () => initialState)
@@ -175,33 +214,7 @@ const reducer = createReducer(initialState, (builder) => {
       isAnyOf(isSuccess(scoreTurn), turnScored),
       (state, { payload: { scoring } }) => {
         state.game.state = GAME_STATES.SCORING;
-
-        const turn = state.game.turns.at(-1);
-        turn.scoring = scoring;
-
-        for (const player of state.game.players) {
-          const { userId } = player;
-
-          const { refund, rewardEffective } = aggregateTokenGains(
-            userId,
-            scoring,
-          );
-          player.tokens += refund + rewardEffective;
-
-          if (userId === scoring.releaseYear.position.winner) {
-            const guess = turn.guesses.releaseYear.find(
-              (g) => g.userId === userId,
-            );
-            const position =
-              userId === turn.activeUserId
-                ? guess?.position
-                : getTrackPosition(player.timeline, turn.track);
-
-            if (position != null) {
-              player.timeline.splice(position, 0, turn.track);
-            }
-          }
-        }
+        applyScoring(state.game, scoring);
       },
     )
 
@@ -244,20 +257,8 @@ const reducer = createReducer(initialState, (builder) => {
         if (scoring) {
           turn.track.releaseYear = proposal.releaseYear;
 
-          for (const player of game.players) {
-            const { userId } = player;
-
-            player.timeline = player.timeline.filter(
-              (t) => t.spotifyId !== turn.track.spotifyId,
-            );
-
-            const oldTokenGain = aggregateTokenGains(userId, turn.scoring);
-            const newTokenGain = aggregateTokenGains(userId, scoring);
-            player.tokens -= oldTokenGain.refund + oldTokenGain.rewardEffective;
-            player.tokens += newTokenGain.refund + newTokenGain.rewardEffective;
-          }
-
-          turn.scoring = scoring;
+          revertScoring(game);
+          applyScoring(game, scoring);
         }
       },
     )
