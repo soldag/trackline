@@ -8,11 +8,13 @@ import {
   race,
   select,
   take,
+  takeEvery,
   takeLatest,
 } from "redux-saga/effects";
 
 import tracklineApi from "@/api/trackline";
 import {
+  ERROR_CODES,
   WS_RECONNECT_MAX_INTERVAL,
   WS_RECONNECT_MIN_INTERVAL,
 } from "@/constants";
@@ -230,6 +232,21 @@ function* handleExchangeTrack({ gameId, turnId }) {
   return exchange;
 }
 
+function* handleFailure({ payload: { error } }) {
+  const { code, trigger } = error;
+  const gameId = trigger?.payload?.gameId;
+  if (code === ERROR_CODES.API && gameId) {
+    // Fetch current game after sync with backend in case of inconsistencies
+    yield put(fetchGame({ gameId }));
+  }
+}
+
+function* watchFailures(actions) {
+  for (const action of actions) {
+    yield takeEvery(action.FAILURE, handleFailure);
+  }
+}
+
 function* handleListenNotifications({ gameId }) {
   let retries = 0;
   while (true) {
@@ -297,31 +314,56 @@ function* handleNotification(notification) {
   }
 }
 
-export default registerSagaHandlers([
-  [fetchGame, handleFetchGame, { cancelAction: stopRoutines }],
-  [fetchGameUsers, handleFetchGameUsers, { cancelAction: stopRoutines }],
-  [createGame, handleCreateGame, { cancelAction: stopRoutines }],
-  [startGame, handleStartGame, { cancelAction: stopRoutines }],
-  [abortGame, handleAbortGame, { cancelAction: stopRoutines }],
-  [joinGame, handleJoinGame, { cancelAction: stopRoutines }],
-  [leaveGame, handleLeaveGame, { cancelAction: stopRoutines }],
-  [createTurn, handleCreateTurn, { cancelAction: stopRoutines }],
-  [exchangeTrack, handleExchangeTrack, { cancelAction: stopRoutines }],
-  [
+export default [
+  watchFailures([
+    buyTrack,
+    completeTurn,
+    createGame,
+    createTurn,
+    exchangeTrack,
+    guessTrackCredits,
     guessTrackReleaseYear,
-    handleGuessTrackReleaseYear,
-    { cancelAction: stopRoutines },
-  ],
-  [guessTrackCredits, handleGuessTrackCredits, { cancelAction: stopRoutines }],
-  [passTurn, handlePassTurn, { cancelAction: stopRoutines }],
-  [scoreTurn, handleScoreTurn, { cancelAction: stopRoutines }],
-  [proposeCorrection, handleProposeCorrection, { cancelAction: stopRoutines }],
-  [voteCorrection, handleVoteCorrection, { cancelAction: stopRoutines }],
-  [completeTurn, handleCompleteTurn, { cancelAction: stopRoutines }],
-  [buyTrack, handleBuyTrack, { cancelAction: stopRoutines }],
-  [
-    listenNotifications,
-    handleListenNotifications,
-    { effectCreator: takeLatest },
-  ],
-]);
+    joinGame,
+    leaveGame,
+    passTurn,
+    proposeCorrection,
+    scoreTurn,
+    voteCorrection,
+  ]),
+  ...registerSagaHandlers([
+    [fetchGame, handleFetchGame, { cancelAction: stopRoutines }],
+    [fetchGameUsers, handleFetchGameUsers, { cancelAction: stopRoutines }],
+    [createGame, handleCreateGame, { cancelAction: stopRoutines }],
+    [startGame, handleStartGame, { cancelAction: stopRoutines }],
+    [abortGame, handleAbortGame, { cancelAction: stopRoutines }],
+    [joinGame, handleJoinGame, { cancelAction: stopRoutines }],
+    [leaveGame, handleLeaveGame, { cancelAction: stopRoutines }],
+    [createTurn, handleCreateTurn, { cancelAction: stopRoutines }],
+    [exchangeTrack, handleExchangeTrack, { cancelAction: stopRoutines }],
+    [
+      guessTrackReleaseYear,
+      handleGuessTrackReleaseYear,
+      { cancelAction: stopRoutines },
+    ],
+    [
+      guessTrackCredits,
+      handleGuessTrackCredits,
+      { cancelAction: stopRoutines },
+    ],
+    [passTurn, handlePassTurn, { cancelAction: stopRoutines }],
+    [scoreTurn, handleScoreTurn, { cancelAction: stopRoutines }],
+    [
+      proposeCorrection,
+      handleProposeCorrection,
+      { cancelAction: stopRoutines },
+    ],
+    [voteCorrection, handleVoteCorrection, { cancelAction: stopRoutines }],
+    [completeTurn, handleCompleteTurn, { cancelAction: stopRoutines }],
+    [buyTrack, handleBuyTrack, { cancelAction: stopRoutines }],
+    [
+      listenNotifications,
+      handleListenNotifications,
+      { effectCreator: takeLatest },
+    ],
+  ]),
+];
