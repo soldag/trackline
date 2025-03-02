@@ -8,7 +8,7 @@ import { Box, Button, Stack } from "@mui/joy";
 import GameScoringTable from "@/components/common/GameScoringTable";
 import View from "@/components/views/View";
 import { GAME_COMPLETION_TRACK_ID } from "@/constants";
-import { play } from "@/store/spotify/actions";
+import { play } from "@/store/spotify";
 import { useFireworks } from "@/utils/confetti";
 import { useMountEffect } from "@/utils/hooks";
 

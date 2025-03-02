@@ -1,4 +1,7 @@
 import { createAction } from "@reduxjs/toolkit";
 
-export const dismissError = createAction("ERRORS/DISMISS");
-export const dismissAllErrors = createAction("ERRORS/DISMISS_ALL");
+import { PREFIX } from "./constants";
+
+export const dismissError = createAction(`${PREFIX}/dismiss`);
+
+export const dismissAllErrors = createAction(`${PREFIX}/dismissAll`);

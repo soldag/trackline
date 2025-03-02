@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate, useParams } from "react-router";
 
@@ -9,15 +9,14 @@ import GameTurnGuessingView from "@/components/views/GameTurnGuessingView";
 import GameTurnScoringView from "@/components/views/GameTurnScoringView";
 import LoadingView from "@/components/views/LoadingView";
 import { GAME_STATES } from "@/constants";
+import { clearGame, fetchGame, fetchGameUsers } from "@/store/games";
+import { pause } from "@/store/spotify";
 import {
-  clearGame,
-  fetchGame,
-  fetchGameUsers,
-  listenNotifications,
-  unlistenNotifications,
-} from "@/store/games/actions";
-import { pause } from "@/store/spotify/actions";
-import { usePrevious, useSpotify, useUnmountEffect } from "@/utils/hooks";
+  useNotifications,
+  usePrevious,
+  useSpotify,
+  useUnmountEffect,
+} from "@/utils/hooks";
 
 const GAME_STATE_VIEWS = {
   [GAME_STATES.WAITING_FOR_PLAYERS]: GameLobbyView,
@@ -39,20 +38,23 @@ const GameContainer = () => {
   const currentPlayer = game?.players.find((p) => p.userId === user?.id);
   const { isGameMaster = false } = currentPlayer || {};
 
+  const refreshGame = useCallback(() => {
+    if (gameId) {
+      dispatch(fetchGame({ gameId }));
+      dispatch(fetchGameUsers({ gameId }));
+    }
+  }, [gameId, dispatch]);
+
+  useNotifications({
+    gameId,
+    onReconnect: refreshGame,
+  });
   useSpotify({ requireAuth: isGameMaster });
 
   useEffect(() => {
-    if (!gameId) return;
-
-    dispatch(fetchGame({ gameId }));
-    dispatch(fetchGameUsers({ gameId }));
-    dispatch(listenNotifications({ gameId }));
-
-    return () => {
-      dispatch(clearGame());
-      dispatch(unlistenNotifications());
-    };
-  }, [dispatch, gameId]);
+    refreshGame();
+    return () => dispatch(clearGame());
+  }, [refreshGame, dispatch]);
 
   const prevGame = usePrevious(game);
   useEffect(() => {

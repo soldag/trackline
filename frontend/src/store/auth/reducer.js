@@ -3,16 +3,9 @@ import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import { resetState } from "@/store/common/actions";
-import { isSuccess } from "@/store/utils/matchers";
 
-import {
-  createUser,
-  fetchCurrentUser,
-  invalidateSession,
-  login,
-  logout,
-  setSessionToken,
-} from "./actions";
+import { invalidateSession, setSessionToken } from "./actions";
+import { createUser, fetchCurrentUser, login, logout } from "./thunks";
 
 const persistConfig = {
   key: "auth",
@@ -34,14 +27,8 @@ const reducer = createReducer(initialState, (builder) => {
     }))
 
     .addCase(setSessionToken, (state, { payload: { token } }) => {
-      if (token) {
-        state.isLoggedIn = true;
-        state.sessionToken = token;
-      } else {
-        state.isLoggedIn = false;
-        state.user = null;
-        state.sessionToken = null;
-      }
+      state.isLoggedIn = true;
+      state.sessionToken = token;
     })
 
     .addCase(invalidateSession, (state) => {
@@ -50,24 +37,24 @@ const reducer = createReducer(initialState, (builder) => {
       state.sessionToken = null;
     })
 
+    .addCase(fetchCurrentUser.fulfilled, (state, { payload: { user } }) => {
+      state.isLoggedIn = true;
+      state.user = user;
+    })
+
+    .addCase(logout.fulfilled, (state) => {
+      state.isLoggedIn = false;
+      state.user = null;
+    })
+
     .addMatcher(
-      isAnyOf(isSuccess(login), isSuccess(createUser)),
+      isAnyOf(login.fulfilled, createUser.fulfilled),
       (state, { payload: { session, user } }) => {
         state.isLoggedIn = true;
         state.sessionToken = session.token;
         state.user = user;
       },
-    )
-
-    .addMatcher(isSuccess(fetchCurrentUser), (state, { payload: { user } }) => {
-      state.isLoggedIn = true;
-      state.user = user;
-    })
-
-    .addMatcher(isSuccess(logout), (state) => {
-      state.isLoggedIn = false;
-      state.user = null;
-    });
+    );
 });
 
 export default persistReducer(persistConfig, reducer);

@@ -1,43 +1,34 @@
-import { createReducer } from "@reduxjs/toolkit";
+import { createReducer, isPending, isRejected } from "@reduxjs/toolkit";
 
-import actions from "@/store/actions";
 import { resetState } from "@/store/common/actions";
 import { dismissAllErrors, dismissError } from "@/store/errors/actions";
-import { isFailure, isTrigger } from "@/store/utils/matchers";
-import { getRoutinePrefix } from "@/utils/routines";
+import { getThunkTypePrefix } from "@/store/utils/thunks";
 
-const routinePrefixes = actions.map(getRoutinePrefix).filter((p) => p);
 const initialState = {
-  byRoutine: Object.fromEntries(routinePrefixes.map((p) => [p, null])),
+  byThunk: {},
 };
 
 const reducer = createReducer(initialState, (builder) => {
   builder
     .addCase(resetState, () => initialState)
 
-    .addCase(dismissError, (state, action) => {
-      const {
-        payload: { actionType },
-      } = action;
-
-      const prefix = getRoutinePrefix(actionType);
-      state.byRoutine[prefix] = null;
+    .addCase(dismissError, (state, { payload: { typePrefix } }) => {
+      state.byThunk[typePrefix] = null;
     })
 
-    .addCase(dismissAllErrors, () => initialState)
-
-    .addMatcher(isTrigger(...actions), (state, action) => {
-      const prefix = getRoutinePrefix(action);
-      state.byRoutine[prefix] = null;
+    .addCase(dismissAllErrors, (state) => {
+      state.byThunk = {};
     })
 
-    .addMatcher(isFailure(...actions), (state, action) => {
-      const {
-        payload: { error },
-      } = action;
+    .addMatcher(isPending, (state, action) => {
+      const typePrefix = getThunkTypePrefix(action);
+      state.byThunk[typePrefix] = null;
+    })
 
-      const prefix = getRoutinePrefix(action);
-      state.byRoutine[prefix] = error;
+    .addMatcher(isRejected, (state, action) => {
+      const { payload: { error } = {} } = action;
+      const typePrefix = getThunkTypePrefix(action);
+      state.byThunk[typePrefix] = error;
     });
 });
 

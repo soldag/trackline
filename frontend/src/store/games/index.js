@@ -1,3 +1,4 @@
-export * as actions from "./actions";
+export * from "./actions";
+export * from "./thunks";
+export { default as middleware } from "./middleware";
 export { default as reducer } from "./reducer";
-export { default as sagas } from "./sagas";

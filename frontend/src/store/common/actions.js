@@ -1,3 +1,5 @@
 import { createAction } from "@reduxjs/toolkit";
 
-export const resetState = createAction("COMMON/RESET_STATE");
+import { PREFIX } from "./constants";
+
+export const resetState = createAction(`${PREFIX}/resetState`);

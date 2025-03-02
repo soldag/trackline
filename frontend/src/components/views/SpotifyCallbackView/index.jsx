@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate, useSearchParams } from "react-router";
 
 import View from "@/components/views/View";
-import { dismissError } from "@/store/errors/actions";
-import { completeAuth, startAuth } from "@/store/spotify/actions";
+import { dismissError } from "@/store/errors";
+import { completeAuth, startAuth } from "@/store/spotify";
 import { useErrorSelector, useLoadingSelector } from "@/utils/hooks";
 
 import ErrorModal from "./components/ErrorModal";
@@ -14,7 +14,7 @@ const SpotifyCallbackView = () => {
   const user = useSelector((state) => state.spotify.user);
 
   const loading = useLoadingSelector(completeAuth);
-  const error = useErrorSelector(completeAuth);
+  const { error } = useErrorSelector(completeAuth);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -36,12 +36,12 @@ const SpotifyCallbackView = () => {
   }, [dispatch, code]);
 
   const handleRetry = () => {
-    dispatch(dismissError({ actionType: completeAuth.toString() }));
+    dispatch(dismissError({ typePrefix: completeAuth.typePrefix }));
     dispatch(startAuth());
   };
 
   const handleCancel = () => {
-    dispatch(dismissError({ actionType: completeAuth.toString() }));
+    dispatch(dismissError({ typePrefix: completeAuth.typePrefix }));
     navigate("/");
   };
 

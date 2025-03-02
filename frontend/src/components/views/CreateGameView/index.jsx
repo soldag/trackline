@@ -26,14 +26,14 @@ import {
   DEFAULT_MAX_TOKENS,
   DEFAULT_TIMELINE_LENGTH,
 } from "@/constants";
-import { dismissAllErrors } from "@/store/errors/actions";
-import { createGame } from "@/store/games/actions";
+import { dismissAllErrors } from "@/store/errors";
+import { createGame } from "@/store/games";
 import {
   clearPlaylistSearchResults,
   fetchRecommendedPlaylists,
   searchPlaylists,
   startAuth,
-} from "@/store/spotify/actions";
+} from "@/store/spotify";
 import {
   useErrorSelector,
   useErrorToast,
@@ -52,7 +52,7 @@ const CreateGameView = () => {
   const user = useSelector((state) => state.auth.user);
   const game = useSelector((state) => state.games.game);
   const loadingCreateGame = useLoadingSelector(createGame);
-  const errorSpotify = useErrorSelector(
+  const { error: errorSpotify } = useErrorSelector(
     fetchRecommendedPlaylists,
     searchPlaylists,
   );
