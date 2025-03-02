@@ -15,9 +15,8 @@ import {
   guessTrackReleaseYear,
   passTurn,
   scoreTurn,
-  stopRoutines,
-} from "@/store/games/actions";
-import { play } from "@/store/spotify/actions";
+} from "@/store/games";
+import { play } from "@/store/spotify";
 import {
   useBreakpoint,
   useErrorToast,
@@ -145,10 +144,6 @@ const GameTurnGuessingView = () => {
     exchangeTrackModalOpen;
   const showCountdownToast =
     isAnyModalOpen && hasTimeout && !wasCountdownToastDismissed;
-
-  useEffect(() => {
-    return () => dispatch(stopRoutines());
-  }, [dispatch]);
 
   useEffect(() => {
     if (hasTimeout && !isActivePlayer && !hasPassed) {

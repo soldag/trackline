@@ -14,7 +14,7 @@ import {
   completeTurn,
   proposeCorrection,
   voteCorrection,
-} from "@/store/games/actions";
+} from "@/store/games";
 import { useConfetti, useStars } from "@/utils/confetti";
 import { useErrorToast, useLoadingSelector } from "@/utils/hooks";
 

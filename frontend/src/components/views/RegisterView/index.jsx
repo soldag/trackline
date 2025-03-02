@@ -6,8 +6,8 @@ import { Box, Stack, Typography } from "@mui/joy";
 
 import Heading from "@/components/common/Heading";
 import View from "@/components/views/View";
-import { createUser } from "@/store/auth/actions";
-import { dismissAllErrors } from "@/store/errors/actions";
+import { createUser } from "@/store/auth";
+import { dismissAllErrors } from "@/store/errors";
 import { useErrorSelector, useLoadingSelector } from "@/utils/hooks";
 
 import RegisterForm from "./components/RegisterForm";
@@ -15,7 +15,7 @@ import RegisterForm from "./components/RegisterForm";
 const RegisterView = () => {
   const dispatch = useDispatch();
   const loading = useLoadingSelector(createUser);
-  const error = useErrorSelector(createUser);
+  const { error } = useErrorSelector(createUser);
   const user = useSelector((state) => state.auth.user);
 
   const handleLogin = ({ username, password }) =>

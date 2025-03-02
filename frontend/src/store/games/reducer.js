@@ -2,43 +2,44 @@ import { createReducer, isAnyOf } from "@reduxjs/toolkit";
 
 import { GAME_STATES, TOKEN_COST_BUY_TRACK } from "@/constants";
 import { resetState } from "@/store/common/actions";
-import { isSuccess } from "@/store/utils/matchers";
 import { aggregateTokenGains } from "@/utils/games";
 
 import {
-  abortGame,
-  buyTrack,
   clearGame,
-  completeTurn,
   correctionProposed,
   correctionVoted,
-  createGame,
-  createTurn,
   creditsGuessCreated,
-  exchangeTrack,
-  fetchGame,
-  fetchGameUsers,
   gameAborted,
   gameStarted,
-  guessTrackCredits,
-  guessTrackReleaseYear,
-  joinGame,
-  leaveGame,
-  passTurn,
   playerJoined,
   playerLeft,
-  proposeCorrection,
   releaseYearGuessCreated,
-  scoreTurn,
-  startGame,
   trackBought,
   trackExchanged,
   turnCompleted,
   turnCreated,
   turnPassed,
   turnScored,
-  voteCorrection,
 } from "./actions";
+import {
+  abortGame,
+  buyTrack,
+  completeTurn,
+  createGame,
+  createTurn,
+  exchangeTrack,
+  fetchGame,
+  fetchGameUsers,
+  guessTrackCredits,
+  guessTrackReleaseYear,
+  joinGame,
+  leaveGame,
+  passTurn,
+  proposeCorrection,
+  scoreTurn,
+  startGame,
+  voteCorrection,
+} from "./thunks";
 
 const initialState = {
   game: null,
@@ -133,23 +134,11 @@ const reducer = createReducer(initialState, (builder) => {
       state.game.state = GAME_STATES.ABORTED;
     })
 
-    .addMatcher(
-      isSuccess(fetchGame, createGame, joinGame),
-      (state, { payload: { game } }) => {
-        state.game = game;
-      },
-    )
-
-    .addMatcher(isSuccess(abortGame, leaveGame), (state) => {
-      state.game = null;
-      state.users = [];
-    })
-
-    .addMatcher(isSuccess(fetchGameUsers), (state, { payload: { users } }) => {
+    .addCase(fetchGameUsers.fulfilled, (state, { payload: { users } }) => {
       state.users = users;
     })
 
-    .addMatcher(isSuccess(startGame), (state, { payload: { game, turn } }) => {
+    .addCase(startGame.fulfilled, (state, { payload: { game, turn } }) => {
       state.game = {
         ...game,
         state: GAME_STATES.GUESSING,
@@ -158,7 +147,19 @@ const reducer = createReducer(initialState, (builder) => {
     })
 
     .addMatcher(
-      isAnyOf(isSuccess(createTurn), turnCreated),
+      isAnyOf(fetchGame.fulfilled, createGame.fulfilled, joinGame.fulfilled),
+      (state, { payload: { game } }) => {
+        state.game = game;
+      },
+    )
+
+    .addMatcher(isAnyOf(abortGame.fulfilled, leaveGame.fulfilled), (state) => {
+      state.game = null;
+      state.users = [];
+    })
+
+    .addMatcher(
+      isAnyOf(createTurn.fulfilled, turnCreated),
       (state, { payload: { turn } }) => {
         state.game.state = GAME_STATES.GUESSING;
         state.game.turns.push(turn);
@@ -166,7 +167,7 @@ const reducer = createReducer(initialState, (builder) => {
     )
 
     .addMatcher(
-      isAnyOf(isSuccess(guessTrackReleaseYear), releaseYearGuessCreated),
+      isAnyOf(guessTrackReleaseYear.fulfilled, releaseYearGuessCreated),
       (state, { payload: { guess } }) => {
         const guesses = state.game.turns.at(-1).guesses;
         guesses.releaseYear = [
@@ -184,7 +185,7 @@ const reducer = createReducer(initialState, (builder) => {
     )
 
     .addMatcher(
-      isAnyOf(isSuccess(guessTrackCredits), creditsGuessCreated),
+      isAnyOf(guessTrackCredits.fulfilled, creditsGuessCreated),
       (state, { payload: { guess } }) => {
         const guesses = state.game.turns.at(-1).guesses;
         guesses.credits = [
@@ -200,7 +201,7 @@ const reducer = createReducer(initialState, (builder) => {
     )
 
     .addMatcher(
-      isAnyOf(isSuccess(passTurn), turnPassed),
+      isAnyOf(passTurn.fulfilled, turnPassed),
       (state, { payload: { turnPass } }) => {
         const turn = state.game.turns.at(-1);
         turn.passes = [
@@ -211,7 +212,7 @@ const reducer = createReducer(initialState, (builder) => {
     )
 
     .addMatcher(
-      isAnyOf(isSuccess(scoreTurn), turnScored),
+      isAnyOf(scoreTurn.fulfilled, turnScored),
       (state, { payload: { scoring } }) => {
         state.game.state = GAME_STATES.SCORING;
         applyScoring(state.game, scoring);
@@ -219,7 +220,7 @@ const reducer = createReducer(initialState, (builder) => {
     )
 
     .addMatcher(
-      isAnyOf(isSuccess(completeTurn), turnCompleted),
+      isAnyOf(completeTurn.fulfilled, turnCompleted),
       (state, { payload: { userId, completion } }) => {
         const turn = state.game.turns.at(-1);
         if (!turn.completedBy.includes(userId)) {
@@ -233,7 +234,7 @@ const reducer = createReducer(initialState, (builder) => {
     )
 
     .addMatcher(
-      isAnyOf(isSuccess(proposeCorrection), correctionProposed),
+      isAnyOf(proposeCorrection.fulfilled, correctionProposed),
       (state, { payload: { proposal } }) => {
         const turn = state.game.turns.at(-1);
         turn.correctionProposal = proposal;
@@ -242,7 +243,7 @@ const reducer = createReducer(initialState, (builder) => {
     )
 
     .addMatcher(
-      isAnyOf(isSuccess(voteCorrection), correctionVoted),
+      isAnyOf(voteCorrection.fulfilled, correctionVoted),
       (state, { payload: { vote, proposalState, scoring } }) => {
         const game = state.game;
         const turn = game.turns.at(-1);
@@ -264,7 +265,7 @@ const reducer = createReducer(initialState, (builder) => {
     )
 
     .addMatcher(
-      isAnyOf(isSuccess(buyTrack), trackBought),
+      isAnyOf(buyTrack.fulfilled, trackBought),
       (state, { payload }) => {
         const { userId, track, gameCompleted } = payload.receipt || payload;
 
@@ -283,7 +284,7 @@ const reducer = createReducer(initialState, (builder) => {
     )
 
     .addMatcher(
-      isAnyOf(isSuccess(exchangeTrack), trackExchanged),
+      isAnyOf(exchangeTrack.fulfilled, trackExchanged),
       (state, { payload: { turnRevisionId, track, tokenDelta } }) => {
         const turn = state.game.turns.at(-1);
         turn.revisionId = turnRevisionId;

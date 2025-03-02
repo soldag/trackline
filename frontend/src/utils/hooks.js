@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   useRef,
   useState,
@@ -10,15 +11,52 @@ import {
 import { useIntl } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
+import useWebSocket from "react-use-websocket";
 import { toast } from "sonner";
 
 import { useTheme } from "@mui/joy";
 
-import api from "@/api/trackline";
+import tracklineApi from "@/api/trackline";
 import SpotifyContext from "@/components/contexts/SpotifyContext";
+import {
+  WS_RECONNECT_MAX_INTERVAL,
+  WS_RECONNECT_MIN_INTERVAL,
+} from "@/constants";
 import { dismissError } from "@/store/errors/actions";
+import {
+  correctionProposed,
+  correctionVoted,
+  creditsGuessCreated,
+  gameAborted,
+  gameStarted,
+  playerJoined,
+  playerLeft,
+  releaseYearGuessCreated,
+  trackBought,
+  trackExchanged,
+  turnCompleted,
+  turnCreated,
+  turnPassed,
+  turnScored,
+} from "@/store/games";
 import { getErrorMessage } from "@/utils/errors";
-import { getRoutinePrefix } from "@/utils/routines";
+
+const NOTIFICATION_ACTIONS = {
+  player_joined: playerJoined,
+  player_left: playerLeft,
+  game_started: gameStarted,
+  game_aborted: gameAborted,
+  new_turn: turnCreated,
+  release_year_guess_created: releaseYearGuessCreated,
+  credits_guess_created: creditsGuessCreated,
+  track_exchanged: trackExchanged,
+  turn_passed: turnPassed,
+  turn_completed: turnCompleted,
+  turn_scored: turnScored,
+  track_bought: trackBought,
+  correction_proposed: correctionProposed,
+  correction_voted: correctionVoted,
+};
 
 export const useMountEffect = (effect) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,14 +158,14 @@ export const useCountdown = ({ start, end, updateInterval = 100 }) => {
   return { progress, remaining };
 };
 
-export const useErrorSelector = (...actions) => {
-  const prefixes = actions.map(getRoutinePrefix);
-  return useSelector(
-    (state) =>
-      prefixes
-        .map((prefix) => state.errors.byRoutine[prefix])
-        .filter((error) => error)[0],
+export const useErrorSelector = (...thunks) => {
+  const typePrefixes = thunks.map((a) => a.typePrefix);
+  const typePrefix = useSelector((state) =>
+    typePrefixes.find((p) => state.errors.byThunk[p]),
   );
+  const error = useSelector((state) => state.errors.byThunk[typePrefix]);
+
+  return { typePrefix, error };
 };
 
 export const useBreakpoint = (querySelector) => {
@@ -136,68 +174,83 @@ export const useBreakpoint = (querySelector) => {
   return useMediaQuery({ query });
 };
 
-export const useLoadingSelector = (...actions) => {
-  const prefixes = actions.map(getRoutinePrefix);
+export const useLoadingSelector = (...thunks) => {
+  const typePrefixes = thunks.map((a) => a.typePrefix);
   return useSelector((state) =>
-    prefixes.some((prefix) => state.loading.byRoutine[prefix]),
+    typePrefixes.some((typePrefix) => state.loading.byThunk[typePrefix]),
   );
 };
 
-export const useErrorToast = (...actions) => {
+export const useErrorToast = (...thunks) => {
   const intl = useIntl();
   const dispatch = useDispatch();
 
-  const error = useErrorSelector(...actions);
+  const { typePrefix, error } = useErrorSelector(...thunks);
 
   const prevError = usePrevious(error);
   useEffect(() => {
     if (!error || error === prevError) return;
 
-    const {
-      trigger: { type: actionType },
-    } = error;
     const message = getErrorMessage(intl, error);
     toast.error(message, {
-      onDismiss: () => dispatch(dismissError({ actionType })),
-      onAutoClose: () => dispatch(dismissError({ actionType })),
+      onDismiss: () => dispatch(dismissError({ typePrefix })),
+      onAutoClose: () => dispatch(dismissError({ typePrefix })),
     });
-  }, [prevError, error, intl, dispatch]);
+  }, [prevError, error, typePrefix, intl, dispatch]);
 };
 
-export const useNotifications = ({ gameId, onMessage }) => {
-  const [webSocket, setWebSocket] = useState();
+export const useNotifications = ({ gameId, onReconnect }) => {
+  const dispatch = useDispatch();
+  const [wasConnected, setWasConnected] = useState(false);
 
-  const connect = useCallback(() => {
-    const url = api.notifications.getWebSocketUrl(gameId);
-    const ws = new WebSocket(url);
-    setWebSocket(ws);
-  }, [gameId]);
-
-  const disconnect = useCallback(() => {
-    if (!webSocket || webSocket.readyState !== webSocket.OPEN) return;
-    webSocket.close(1001);
-  }, [webSocket]);
-
-  const prevGameId = usePrevious(gameId);
-  useEffect(() => {
-    if (!gameId || gameId === prevGameId) return;
-    connect();
-    return disconnect;
-  }, [gameId, prevGameId, connect, disconnect]);
+  const handleOpen = useCallback(() => {
+    if (wasConnected) {
+      onReconnect?.();
+    }
+    setWasConnected(true);
+  }, [wasConnected, onReconnect]);
 
   const handleMessage = useCallback(
     ({ data }) => {
-      if (!onMessage) return;
-      onMessage(camelizeKeys(JSON.parse(data)));
-    },
-    [onMessage],
-  );
-  useEventListener(webSocket, "message", handleMessage);
+      let notification;
+      try {
+        notification = camelizeKeys(JSON.parse(data));
+      } catch {
+        console.warn("Invalid notification received", data);
+        return;
+      }
 
-  return {
-    connect,
-    disconnect,
-  };
+      const { type, payload } = notification;
+      const action = NOTIFICATION_ACTIONS[type];
+      if (action) {
+        dispatch(action(payload));
+      } else {
+        console.warn("Unknown notification received", data);
+      }
+    },
+    [dispatch],
+  );
+
+  const webSocketUrl = useMemo(
+    () => (gameId ? tracklineApi.notifications.getWebSocketUrl(gameId) : null),
+    [gameId],
+  );
+
+  useWebSocket(
+    webSocketUrl,
+    {
+      retryOnError: true,
+      shouldReconnect: () => true,
+      reconnectAttempts: Infinity,
+      reconnectInterval: (retries) => {
+        const interval = 2 ** retries * WS_RECONNECT_MIN_INTERVAL;
+        return Math.min(interval, WS_RECONNECT_MAX_INTERVAL);
+      },
+      onOpen: handleOpen,
+      onMessage: handleMessage,
+    },
+    !!webSocketUrl,
+  );
 };
 
 export const useSpotify = ({ requireAuth = false }) => {

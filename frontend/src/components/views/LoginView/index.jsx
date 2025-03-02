@@ -6,8 +6,8 @@ import { Box, Stack, Typography } from "@mui/joy";
 
 import Heading from "@/components/common/Heading";
 import View from "@/components/views/View";
-import { login } from "@/store/auth/actions";
-import { dismissAllErrors } from "@/store/errors/actions";
+import { login } from "@/store/auth";
+import { dismissAllErrors } from "@/store/errors";
 import { useErrorSelector, useLoadingSelector } from "@/utils/hooks";
 
 import LoginForm from "./components/LoginForm";
@@ -17,7 +17,7 @@ const LoginView = () => {
 
   const dispatch = useDispatch();
   const loading = useLoadingSelector(login);
-  const error = useErrorSelector(login);
+  const { error } = useErrorSelector(login);
   const user = useSelector((state) => state.auth.user);
 
   const handleLogin = ({ username, password }) =>

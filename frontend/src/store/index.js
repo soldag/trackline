@@ -1,7 +1,5 @@
-import createSagaMiddleware from "@redux-saga/core";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { PERSIST, persistStore } from "redux-persist";
-import { all } from "redux-saga/effects";
 
 import spotifyApi from "@/api/spotify";
 import tracklineApi from "@/api/trackline";
@@ -12,8 +10,6 @@ import * as loading from "@/store/loading";
 import * as spotify from "@/store/spotify";
 import * as timing from "@/store/timing";
 
-const sagaMiddleware = createSagaMiddleware();
-
 const store = configureStore({
   reducer: combineReducers({
     auth: auth.reducer,
@@ -23,41 +19,49 @@ const store = configureStore({
     spotify: spotify.reducer,
     timing: timing.reducer,
   }),
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
+  middleware: (getDefaultMiddleware) => [
+    ...getDefaultMiddleware({
       immutableCheck: { warnAfter: 128 },
       serializableCheck: {
         warnAfter: 128,
         ignoredActions: [PERSIST],
       },
-    }).concat(sagaMiddleware),
+    }),
+    auth.middleware,
+    games.middleware,
+    spotify.middleware,
+  ],
   devTools: {
     actionsDenylist: [
-      spotify.actions.setPlaybackState,
-      spotify.actions.increasePlaybackProgress,
+      spotify.setPlaybackState,
+      spotify.increasePlaybackProgress,
     ],
   },
 });
 
 const persistor = persistStore(store);
 
-sagaMiddleware.run(function* () {
-  yield all([...auth.sagas, ...games.sagas, ...spotify.sagas]);
-});
-
 tracklineApi.setup({
   getSessionToken: () => store.getState()?.auth?.sessionToken,
-  setSessionToken: (token) =>
-    store.dispatch(auth.actions.setSessionToken({ token })),
+  setSessionToken: (token) => {
+    if (token) {
+      store.dispatch(auth.setSessionToken({ token }));
+    } else {
+      store.dispatch(auth.invalidateSession());
+    }
+  },
   setTimeDeviation: (value) =>
-    store.dispatch(
-      timing.actions.setTimeDeviation({ service: "trackline", value }),
-    ),
+    store.dispatch(timing.setTimeDeviation({ service: "trackline", value })),
 });
 spotifyApi.setup({
   getAccessToken: () => store.getState()?.spotify?.accessToken,
-  setAccessToken: (token) =>
-    store.dispatch(spotify.actions.setAccessToken({ token })),
+  setAccessToken: (token) => {
+    if (token) {
+      store.dispatch(spotify.setAccessToken({ token }));
+    } else {
+      store.dispatch(spotify.invalidateAccessToken());
+    }
+  },
 });
 
 export { store, persistor };

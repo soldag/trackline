@@ -6,11 +6,11 @@ import LoadingView from "@/components/views/LoadingView";
 import {
   fetchCurrentUser as fetchCurrentApiUser,
   invalidateSession,
-} from "@/store/auth/actions";
+} from "@/store/auth";
 import {
   fetchCurrentUser as fetchCurrentSpotifyUser,
   invalidateAccessToken,
-} from "@/store/spotify/actions";
+} from "@/store/spotify";
 import { useMountEffect } from "@/utils/hooks";
 
 const RootContainer = () => {

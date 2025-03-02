@@ -1,55 +1,37 @@
 import { createAction } from "@reduxjs/toolkit";
-import { createRoutine } from "redux-saga-routines";
 
-export const stopRoutines = createAction("GAMES/STOP_ROUTINES");
+import { PREFIX } from "./constants";
 
-export const clearGame = createAction("GAMES/CLEAR_GAME");
+export const clearGame = createAction(`${PREFIX}/clearGame`);
 
-export const fetchGame = createRoutine("GAMES/FETCH");
-export const fetchGameUsers = createRoutine("GAMES/FETCH_USERS");
+export const playerJoined = createAction(`${PREFIX}/playerAdded`);
 
-export const createGame = createRoutine("GAMES/CREATE");
-export const startGame = createRoutine("GAMES/START");
-export const abortGame = createRoutine("GAMES/ABORT");
+export const playerLeft = createAction(`${PREFIX}/playerRemoved`);
 
-export const joinGame = createRoutine("GAMES/JOIN");
-export const leaveGame = createRoutine("GAMES/LEAVE");
+export const gameStarted = createAction(`${PREFIX}/started`);
 
-export const createTurn = createRoutine("GAMES/CREATE_TURN");
-export const passTurn = createRoutine("GAMES/PASS_TURN");
-export const scoreTurn = createRoutine("GAMES/SCORE_TURN");
-export const completeTurn = createRoutine("GAMES/COMPLETE_TURN");
+export const gameAborted = createAction(`${PREFIX}/aborted`);
 
-export const guessTrackReleaseYear = createRoutine(
-  "GAMES/GUESS_TRACK_RELEASE_YEAR",
-);
-export const guessTrackCredits = createRoutine("GAMES/GUESS_TRACK_CREDITS");
+export const turnCreated = createAction(`${PREFIX}/turnCreated`);
 
-export const proposeCorrection = createRoutine("GAMES/CORRECTION_PROPOSE");
-export const voteCorrection = createRoutine("GAMES/CORRECTION_VOTE");
+export const trackExchanged = createAction(`${PREFIX}/trackExchanged`);
 
-export const buyTrack = createRoutine("GAMES/BUY_TRACK");
-export const exchangeTrack = createRoutine("GAMES/EXCHANGE_TRACK");
-
-export const listenNotifications = createAction("GAMES/LISTEN_NOTIFICATION");
-export const unlistenNotifications = createAction(
-  "GAMES/UNLISTEN_NOTIFICATIONS",
-);
-
-export const playerJoined = createAction("GAME/PLAYER_ADDED");
-export const playerLeft = createAction("GAME/PLAYER_REMOVED");
-export const gameStarted = createAction("GAME/STARTED");
-export const gameAborted = createAction("GAME/ABORTED");
-export const turnCreated = createAction("GAME/TURN_CREATED");
-export const trackExchanged = createAction("GAME/TRACK_EXCHANGED");
 export const releaseYearGuessCreated = createAction(
-  "GAME/RELEASE_YEAR_GUESS_CREATED",
+  `${PREFIX}/releaseYearGuessCreated`,
 );
-export const creditsGuessCreated = createAction("GAME/CREDITS_GUESS_CREATED");
-export const turnPassed = createAction("GAME/TURN_PASSED");
-export const turnScored = createAction("GAME/TURN_SCORED");
-export const turnCompleted = createAction("GAME/TURN_COMPLETED");
-export const trackBought = createAction("GAME/TRACK_BOUGHT");
 
-export const correctionProposed = createAction("GAME/CORRECTION_PROPOSED");
-export const correctionVoted = createAction("GAME/CORRECTION_VOTED");
+export const creditsGuessCreated = createAction(
+  `${PREFIX}/creditsGuessCreated`,
+);
+
+export const turnPassed = createAction(`${PREFIX}/turnPassed`);
+
+export const turnScored = createAction(`${PREFIX}/turnScored`);
+
+export const turnCompleted = createAction(`${PREFIX}/turnCompleted`);
+
+export const trackBought = createAction(`${PREFIX}/trackBought`);
+
+export const correctionProposed = createAction(`${PREFIX}/correctionProposed`);
+
+export const correctionVoted = createAction(`${PREFIX}/correctionVoted`);

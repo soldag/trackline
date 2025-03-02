@@ -1,24 +1,26 @@
-import { createReducer } from "@reduxjs/toolkit";
+import { createReducer, isAnyOf } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import { resetState } from "@/store/common/actions";
-import { isSuccess } from "@/store/utils/matchers";
 
 import {
   clearPlaylistSearchResults,
+  increasePlaybackProgress,
+  invalidateAccessToken,
+  setAccessToken,
+  setPlaybackState,
+  unwatchPlayback,
+} from "./actions";
+import {
   completeAuth,
   fetchCurrentUser,
   fetchRecommendedPlaylists,
-  increasePlaybackProgress,
-  invalidateAccessToken,
   pause,
   play,
   searchPlaylists,
-  setAccessToken,
-  setPlaybackState,
   setVolume,
-} from "./actions";
+} from "./thunks";
 
 const persistConfig = {
   key: "spotify",
@@ -52,14 +54,8 @@ const reducer = createReducer(initialState, (builder) => {
     }))
 
     .addCase(setAccessToken, (state, { payload: { token } }) => {
-      if (token) {
-        state.isLoggedIn = true;
-        state.accessToken = token;
-      } else {
-        state.isLoggedIn = false;
-        state.user = null;
-        state.accessToken = null;
-      }
+      state.isLoggedIn = true;
+      state.accessToken = token;
     })
 
     .addCase(invalidateAccessToken, (state) => {
@@ -82,38 +78,31 @@ const reducer = createReducer(initialState, (builder) => {
       );
     })
 
+    .addCase(unwatchPlayback, (state) => {
+      state.playback = initialState.playback;
+    })
+
     .addCase(clearPlaylistSearchResults, (state) => {
       state.playlists.searchResults = [];
     })
 
-    .addMatcher(
-      isSuccess(completeAuth, fetchCurrentUser),
-      (state, { payload: { user } }) => {
-        state.isLoggedIn = true;
-        state.user = user;
-      },
-    )
-
-    .addMatcher(
-      isSuccess(fetchRecommendedPlaylists),
+    .addCase(
+      fetchRecommendedPlaylists.fulfilled,
       (state, { payload: { playlists } }) => {
         state.playlists.recommendations = playlists;
       },
     )
 
-    .addMatcher(
-      isSuccess(searchPlaylists),
-      (state, { payload: { playlists } }) => {
-        state.playlists.searchResults = playlists;
-      },
-    )
+    .addCase(searchPlaylists.fulfilled, (state, { payload: { playlists } }) => {
+      state.playlists.searchResults = playlists;
+    })
 
-    .addMatcher(isSuccess(pause), (state) => {
+    .addCase(pause.fulfilled, (state) => {
       state.playback.isActive = true;
       state.playback.isPlaying = false;
     })
 
-    .addMatcher(isSuccess(play), (state, { payload: { trackId } }) => {
+    .addCase(play.fulfilled, (state, { payload: { trackId } }) => {
       state.playback.isActive = true;
       state.playback.isPlaying = true;
       if (trackId) {
@@ -121,9 +110,17 @@ const reducer = createReducer(initialState, (builder) => {
       }
     })
 
-    .addMatcher(isSuccess(setVolume), (state, { payload: { volume } }) => {
+    .addCase(setVolume.fulfilled, (state, { payload: { volume } }) => {
       state.playback.volume = volume;
-    });
+    })
+
+    .addMatcher(
+      isAnyOf(completeAuth.fulfilled, fetchCurrentUser.fulfilled),
+      (state, { payload: { user } }) => {
+        state.isLoggedIn = true;
+        state.user = user;
+      },
+    );
 });
 
 export default persistReducer(persistConfig, reducer);
