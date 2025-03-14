@@ -2,7 +2,8 @@ FROM python:3.13-alpine AS poetry
 
 WORKDIR /tmp
 
-RUN apk add poetry py3-poetry-plugin-export
+RUN pip install poetry==2.1.1 \
+    && poetry self add poetry-plugin-export
 
 ADD pyproject.toml poetry.lock /tmp/
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
