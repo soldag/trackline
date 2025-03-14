@@ -14,7 +14,7 @@ const TimelineContainer = ({
   sx = {},
   children,
 }: PropsWithChildren<TimelineContainerProps>) => {
-  const ref = useRef<HTMLDivElement>();
+  const ref = useRef<HTMLDivElement>(null);
 
   useEventListener(ref.current, "wheel", (e: WheelEvent) => {
     const element = ref.current;

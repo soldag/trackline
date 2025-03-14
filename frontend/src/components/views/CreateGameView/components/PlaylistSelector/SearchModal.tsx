@@ -134,7 +134,7 @@ const SearchModal = ({
   searchError,
   searchResults = [],
 }: SearchModalProps) => {
-  const listContainerRef = useRef<HTMLDivElement>();
+  const listContainerRef = useRef<HTMLDivElement>(null);
   const [newSelection, setNewSelection] = useState(selection);
 
   useEffect(() => setNewSelection(selection), [selection]);

@@ -97,7 +97,7 @@ export const useFireworks = ({
 }: {
   duration: number;
 }): { start: () => void; stop: () => void } => {
-  const intervalRef = useRef<number | undefined>();
+  const intervalRef = useRef<number>(undefined);
 
   const start = useCallback(() => {
     const animationEnd = Date.now() + duration;

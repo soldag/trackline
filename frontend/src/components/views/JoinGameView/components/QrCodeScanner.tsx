@@ -14,9 +14,9 @@ interface QrCodeScannerProps {
 }
 
 const QrCodeScanner = ({ sx, onResult = () => {} }: QrCodeScannerProps) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const lastGameId = useRef<string>();
-  const onResultRef = useRef<OnResultCallback>();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const lastGameId = useRef<string>(null);
+  const onResultRef = useRef<OnResultCallback>(null);
   const [videoPlaying, setVideoPlaying] = useState(false);
 
   useEffect(() => {
