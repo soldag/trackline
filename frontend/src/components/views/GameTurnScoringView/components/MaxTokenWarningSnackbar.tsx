@@ -50,7 +50,7 @@ const MaxTokenWarningSnackbar = ({
           <FormattedMessage
             id="GameTurnScoringView.MaxTokenWarningSnackbar.message"
             defaultMessage="You cannot have more than {limit, plural, =1 {#{nbsp}token} other {#{nbsp}tokens}}. You should spend some for buying a track."
-            values={{ limit, nbsp: <>&nbsp;</> }}
+            values={{ limit, nbsp: "\u00a0" }}
           />
         </Typography>
       </Box>

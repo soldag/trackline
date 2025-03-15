@@ -84,7 +84,7 @@ const SettingsForm = ({
           <FormattedMessage
             id="CreateGameView.SettingsForm.initialTokens.helpText"
             defaultMessage="Each player starts the game {value, plural, =0 {without any tokens} =1 {with #{nbsp}token} other {with #{nbsp}tokens}}."
-            values={{ value: initialTokens, nbsp: <>&nbsp;</> }}
+            values={{ value: initialTokens, nbsp: "\u00a0" }}
           />
         </FormHelperText>
       </FormControl>
@@ -117,7 +117,7 @@ const SettingsForm = ({
           <FormattedMessage
             id="CreateGameView.SettingsForm.maxTokens.helpText"
             defaultMessage="Players cannot have more than {value, plural, =1 {with #{nbsp}token} other {with #{nbsp}tokens}}."
-            values={{ value: maxTokens, nbsp: <>&nbsp;</> }}
+            values={{ value: maxTokens, nbsp: "\u00a0" }}
           />
         </FormHelperText>
       </FormControl>
@@ -150,7 +150,7 @@ const SettingsForm = ({
           <FormattedMessage
             id="CreateGameView.SettingsForm.timelineLength.helpText"
             defaultMessage="The game ends when a single player has at least {value}{nbsp}tracks in their trackline."
-            values={{ value: timelineLength, nbsp: <>&nbsp;</> }}
+            values={{ value: timelineLength, nbsp: "\u00a0" }}
           />
         </FormHelperText>
       </FormControl>
@@ -179,7 +179,8 @@ const SettingsForm = ({
             {intl.formatMessage(
               CreditsStrictnessMessages.descriptions[creditsStrictness],
               {
-                bold: (chunks) => <strong>{chunks}</strong>,
+                // Key is needed as a workaround until https://github.com/formatjs/formatjs/issues/4782 is fixed
+                bold: (chunks) => <strong key={Math.random()}>{chunks}</strong>,
               },
             )}
           </span>

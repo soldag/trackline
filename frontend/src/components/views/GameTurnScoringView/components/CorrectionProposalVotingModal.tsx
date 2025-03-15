@@ -97,7 +97,10 @@ const CorrectionProposalVotingModal = ({
                   isCurrentUser,
                   username,
                   releaseYear: proposal?.releaseYear,
-                  bold: (chunks) => <strong>{chunks}</strong>,
+                  // Key is needed as a workaround until https://github.com/formatjs/formatjs/issues/4782 is fixed
+                  bold: (chunks) => (
+                    <strong key={Math.random()}>{chunks}</strong>
+                  ),
                 }}
               />
             )}
@@ -109,7 +112,10 @@ const CorrectionProposalVotingModal = ({
                   isCurrentUser,
                   username: getPossessiveForm(username, locale),
                   releaseYear: proposal?.releaseYear,
-                  bold: (chunks) => <strong>{chunks}</strong>,
+                  // Key is needed as a workaround until https://github.com/formatjs/formatjs/issues/4782 is fixed
+                  bold: (chunks) => (
+                    <strong key={Math.random()}>{chunks}</strong>
+                  ),
                 }}
               />
             )}
@@ -121,7 +127,10 @@ const CorrectionProposalVotingModal = ({
                   isCurrentUser,
                   username: getPossessiveForm(username, locale),
                   releaseYear: proposal?.releaseYear,
-                  bold: (chunks) => <strong>{chunks}</strong>,
+                  // Key is needed as a workaround until https://github.com/formatjs/formatjs/issues/4782 is fixed
+                  bold: (chunks) => (
+                    <strong key={Math.random()}>{chunks}</strong>
+                  ),
                 }}
               />
             )}

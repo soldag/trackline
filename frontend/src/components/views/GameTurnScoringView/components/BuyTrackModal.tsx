@@ -31,7 +31,7 @@ const BuyTrackModal = ({ open, onConfirm, onClose }: BuyTrackModalProps) => {
       <FormattedMessage
         id="GameTurnScoringView.BuyTrackModal.message"
         defaultMessage="Do you want to spend {cost, plural, =1 {#{nbsp}token} other {#{nbsp}tokens}} to buy an extra track for your timeline?"
-        values={{ cost: TOKEN_COST_BUY_TRACK, nbsp: <>&nbsp;</> }}
+        values={{ cost: TOKEN_COST_BUY_TRACK, nbsp: "\u00a0" }}
       />
     </ConfirmModal>
   );

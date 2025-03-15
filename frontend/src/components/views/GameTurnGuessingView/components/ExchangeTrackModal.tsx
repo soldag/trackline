@@ -28,7 +28,7 @@ const ExchangeTrackModal = ({
     <FormattedMessage
       id="GameTurnGuessingView.ExchangeTrackModal.content"
       defaultMessage="Do you want to exchange the current track by paying {cost, plural, =1 {#{nbsp}token} other {#{nbsp}tokens}}?"
-      values={{ cost: TOKEN_COST_EXCHANGE_TRACK, nbsp: <>&nbsp;</> }}
+      values={{ cost: TOKEN_COST_EXCHANGE_TRACK, nbsp: "\u00a0" }}
     />
   </ConfirmModal>
 );
