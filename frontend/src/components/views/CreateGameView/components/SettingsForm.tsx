@@ -179,8 +179,7 @@ const SettingsForm = ({
             {intl.formatMessage(
               CreditsStrictnessMessages.descriptions[creditsStrictness],
               {
-                // Key is needed as a workaround until https://github.com/formatjs/formatjs/issues/4782 is fixed
-                bold: (chunks) => <strong key={Math.random()}>{chunks}</strong>,
+                bold: (chunks) => <strong>{chunks}</strong>,
               },
             )}
           </span>
