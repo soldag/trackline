@@ -4,6 +4,7 @@ import {
   AsyncThunkPayloadCreator,
   createAsyncThunk,
 } from "@reduxjs/toolkit";
+import * as Sentry from "@sentry/react";
 
 import { ApiError } from "@/api/utils/errors";
 import { AppError, ErrorCode } from "@/types/errors";
@@ -37,6 +38,10 @@ export const createSafeAsyncThunk = <Result, Payload = void>(
             code: ErrorCode.Unexpected,
             message: "An unexpected error has occurred",
           };
+        }
+
+        if (error.code === ErrorCode.Unexpected) {
+          Sentry.captureException(e);
         }
 
         throw thunkApi.rejectWithValue({ error });

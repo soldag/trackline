@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import * as Sentry from "@sentry/react";
 import { PERSIST, persistStore } from "redux-persist";
 
 import spotifyApi from "@/api/spotify";
@@ -22,6 +23,8 @@ const store = configureStore({
         ignoredActions: [PERSIST],
       },
     }).concat([auth.middleware, games.middleware, spotify.middleware]),
+  enhancers: (getDefaultEnhancers) =>
+    getDefaultEnhancers().concat(Sentry.createReduxEnhancer()),
   devTools: {
     actionsDenylist: [
       spotify.setPlaybackState.type,

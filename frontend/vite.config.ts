@@ -1,5 +1,9 @@
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import react from "@vitejs/plugin-react";
 import path from "path";
+
+const isCI = process.env.CI === "true";
+const isMainBranch = process.env.GITHUB_REF_NAME === "main";
 
 export default {
   resolve: {
@@ -9,6 +13,14 @@ export default {
   },
   build: {
     outDir: "build",
+    sourcemap: true,
   },
-  plugins: [react()],
+  plugins: [
+    react(),
+    sentryVitePlugin({
+      org: "trackline",
+      project: "trackline-frontend",
+      disable: !isCI || !isMainBranch,
+    }),
+  ],
 };
