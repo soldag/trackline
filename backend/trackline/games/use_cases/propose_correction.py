@@ -1,7 +1,7 @@
 from injector import Inject
 from pydantic import BaseModel
 
-from trackline.core.db.client import DatabaseClient
+from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
@@ -26,10 +26,10 @@ class ProposeCorrection(BaseModel):
     class Handler(BaseHandler):
         def __init__(
             self,
-            db: Inject[DatabaseClient],
+            repository: Inject[Repository],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(db)
+            super().__init__(repository)
             self._notifier = notifier
 
         async def execute(
@@ -71,7 +71,6 @@ class ProposeCorrection(BaseModel):
 
             turn.correction_proposal = proposal
             turn.passes.clear()
-            await game.save_changes(session=self._db.session)
 
             proposal_out = CorrectionProposalOut.from_model(proposal)
             await self._notifier.notify(

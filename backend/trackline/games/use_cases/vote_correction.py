@@ -2,7 +2,7 @@ from injector import Inject
 from pydantic import BaseModel
 
 from trackline.constants import CORRECTION_PROPOSAL_MIN_VOTES
-from trackline.core.db.client import DatabaseClient
+from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
@@ -29,11 +29,11 @@ class VoteCorrection(BaseModel):
     class Handler(BaseHandler):
         def __init__(
             self,
-            db: Inject[DatabaseClient],
+            repository: Inject[Repository],
             scoring_service: Inject[ScoringService],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(db)
+            super().__init__(repository)
             self._scoring_service = scoring_service
             self._notifier = notifier
 
@@ -77,8 +77,6 @@ class VoteCorrection(BaseModel):
 
                 scoring = await self._scoring_service.score_turn(game, use_case.turn_id)
                 scoring_out = TurnScoringOut.from_model(scoring)
-
-            await game.save_changes(session=self._db.session)
 
             vote_out = CorrectionProposalVoteOut.from_model(user_id, vote)
             await self._notifier.notify(

@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from trackline.constants import (
     TOKEN_COST_BUY_TRACK,
 )
-from trackline.core.db.client import DatabaseClient
+from trackline.core.db.repository import Repository
 from trackline.core.fields import ResourceId
 from trackline.games.schemas import (
     GameState,
@@ -23,11 +23,11 @@ class BuyTrack(BaseModel):
     class Handler(TrackProvidingBaseHandler):
         def __init__(
             self,
-            db: Inject[DatabaseClient],
+            repository: Inject[Repository],
             track_provider: Inject[TrackProvider],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(db, track_provider)
+            super().__init__(repository, track_provider)
             self._notifier = notifier
 
         async def execute(
@@ -45,7 +45,6 @@ class BuyTrack(BaseModel):
 
             current_player.add_to_timeline(track)
             current_player.tokens -= TOKEN_COST_BUY_TRACK
-            await game.save_changes(session=self._db.session)
 
             track_out = TrackOut.from_model(track)
             await self._notifier.notify(

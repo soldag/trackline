@@ -42,8 +42,6 @@ class CreateCreditsGuess(BaseModel):
             if token_cost > 0:
                 current_player.tokens -= guess.token_cost
 
-            await game.save_changes(session=self._db.session)
-
             guess_out = CreditsGuessOut.from_model(guess, user_id)
             await self._notifier.notify(
                 user_id,

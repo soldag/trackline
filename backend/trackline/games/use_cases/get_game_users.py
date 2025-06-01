@@ -18,9 +18,6 @@ class GetGameUsers(BaseModel):
             self._assert_is_player(game, user_id)
 
             user_ids = [player.user_id for player in game.players]
-            users = await User.find(
-                In(User.id, user_ids),
-                session=self._db.session,
-            ).to_list()
+            users = await self._repository.get_many(User, In(User.id, user_ids))
 
             return [UserOut.from_model(user) for user in users]

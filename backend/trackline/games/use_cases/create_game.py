@@ -54,6 +54,6 @@ class CreateGame(BaseModel):
                     ),
                 ],
             )
-            await game.create(session=self._db.session)
+            await self._repository.create(game)
 
             return GameOut.from_model(game)

@@ -1,7 +1,7 @@
 from injector import Inject
 from pydantic import BaseModel
 
-from trackline.core.db.client import DatabaseClient
+from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
@@ -22,9 +22,11 @@ class CompleteTurn(BaseModel):
 
     class Handler(BaseHandler):
         def __init__(
-            self, db: Inject[DatabaseClient], notifier: Inject[Notifier]
+            self,
+            repository: Inject[Repository],
+            notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(db)
+            super().__init__(repository)
             self._notifier = notifier
 
         async def execute(
@@ -52,8 +54,6 @@ class CompleteTurn(BaseModel):
             game_completed = turn_completed and self._check_end_condition(game)
             if game_completed:
                 game.complete(GameState.COMPLETED)
-
-            await game.save_changes(session=self._db.session)
 
             completion_out = TurnCompletionOut(
                 turn_completed=turn_completed,

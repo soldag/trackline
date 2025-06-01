@@ -12,11 +12,11 @@ from trackline.core.db.client import DatabaseClient
 from trackline.core.deps import websocket_logger
 from trackline.core.logging import initialize_sentry
 from trackline.core.middleware import (
-    DatabaseTransactionMiddleware,
     ExceptionHandlingMiddleware,
     LoggingMiddleware,
     NoIndexMiddleware,
     ServerTimeMiddleware,
+    UnitOfWorkMiddleware,
 )
 from trackline.core.schemas import ErrorResponse
 from trackline.core.settings import Settings
@@ -64,7 +64,7 @@ app = FastAPI(
 )
 attach_injector(app, injector)
 
-app.add_middleware(DatabaseTransactionMiddleware, injector=injector)
+app.add_middleware(UnitOfWorkMiddleware, injector=injector)
 app.add_middleware(InjectorMiddleware, injector=injector)
 app.add_middleware(ExceptionHandlingMiddleware)
 app.add_middleware(ServerTimeMiddleware)

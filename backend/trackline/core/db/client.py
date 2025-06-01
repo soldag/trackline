@@ -40,11 +40,10 @@ class DatabaseClient:
         )
 
     @asynccontextmanager
-    async def transaction(self):
+    async def start_session(self):
         async with await self._client.start_session() as session:
-            async with session.start_transaction():
-                token = session_ctx.set(session)
-                try:
-                    yield
-                finally:
-                    session_ctx.reset(token)
+            token = session_ctx.set(session)
+            try:
+                yield session
+            finally:
+                session_ctx.reset(token)

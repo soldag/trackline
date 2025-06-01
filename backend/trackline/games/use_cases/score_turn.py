@@ -1,7 +1,7 @@
 from injector import Inject
 from pydantic import BaseModel
 
-from trackline.core.db.client import DatabaseClient
+from trackline.core.db.repository import Repository
 from trackline.core.fields import ResourceId
 from trackline.games.schemas import GameState, TurnScored, TurnScoringOut
 from trackline.games.services.notifier import Notifier
@@ -16,11 +16,11 @@ class ScoreTurn(BaseModel):
     class Handler(BaseHandler):
         def __init__(
             self,
-            db: Inject[DatabaseClient],
+            repository: Inject[Repository],
             scoring_service: Inject[ScoringService],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(db)
+            super().__init__(repository)
             self._scoring_service = scoring_service
             self._notifier = notifier
 
@@ -37,7 +37,6 @@ class ScoreTurn(BaseModel):
             self._assert_is_active_player(game, turn_id, user_id)
 
             scoring = await self._scoring_service.score_turn(game, turn_id)
-            await game.save_changes(session=self._db.session)
 
             scoring_out = TurnScoringOut.from_model(scoring)
             await self._notifier.notify(

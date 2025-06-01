@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     db_uri: str = "mongodb://localhost:27017"
     db_name: str = "trackline"
-    db_txn_retries_max: PositiveInt = 3
+    db_txn_retries_max_attempts: PositiveInt = 3
     db_txn_retries_min_interval: PositiveInt = 100
     db_txn_retries_jitter: PositiveInt = 50
 

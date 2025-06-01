@@ -3,7 +3,7 @@ from collections.abc import Collection, Mapping
 
 from injector import Inject
 
-from trackline.core.db.client import DatabaseClient
+from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import ResourceId
 from trackline.games.models import Game, Guess, Turn
@@ -13,8 +13,8 @@ from trackline.games.services.track_provider import TrackProvider
 
 
 class BaseHandler:
-    def __init__(self, db: Inject[DatabaseClient]) -> None:
-        self._db = db
+    def __init__(self, repository: Inject[Repository]) -> None:
+        self._repository = repository
 
     def _assert_is_player(self, game: Game, user_id: ResourceId) -> None:
         player_ids = [p.user_id for p in game.players]
@@ -106,7 +106,7 @@ class BaseHandler:
             )
 
     async def _get_game(self, game_id: ResourceId) -> Game:
-        game = await Game.get(game_id, session=self._db.session)
+        game = await self._repository.get(Game, game_id)
         if not game:
             raise UseCaseException(
                 code="GAME_NOT_FOUND",
@@ -120,10 +120,10 @@ class BaseHandler:
 class TrackProvidingBaseHandler(BaseHandler):
     def __init__(
         self,
-        db: Inject[DatabaseClient],
+        repository: Inject[Repository],
         track_provider: Inject[TrackProvider],
     ) -> None:
-        super().__init__(db)
+        super().__init__(repository)
         self._track_provider = track_provider
 
     async def _get_new_track(self, game: Game):
@@ -152,10 +152,10 @@ class TrackProvidingBaseHandler(BaseHandler):
 class CreateGuessBaseHandler(BaseHandler, abc.ABC):
     def __init__(
         self,
-        db: Inject[DatabaseClient],
+        repository: Inject[Repository],
         notifier: Inject[Notifier],
     ) -> None:
-        super().__init__(db)
+        super().__init__(repository)
         self._notifier = notifier
 
     @abc.abstractmethod

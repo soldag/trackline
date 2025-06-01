@@ -1,14 +1,11 @@
-import asyncio
 from collections.abc import Awaitable, Callable, Sequence
 import logging
-import random
 import time
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from injector import Injector
-from pymongo.errors import OperationFailure
 from sentry_sdk import capture_exception
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -17,9 +14,9 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from starlette.websockets import WebSocket
 
 from trackline.core.db.client import DatabaseClient
+from trackline.core.db.unit_of_work import UnitOfWork
 from trackline.core.exceptions import RequestException
 from trackline.core.schemas import Error, ErrorDetail, ErrorResponse
-from trackline.core.settings import Settings
 from trackline.core.utils import list_or_none
 from trackline.core.utils.datetime import utcnow
 
@@ -134,7 +131,7 @@ class ExceptionHandlingMiddleware:
         return JSONResponse(jsonable_encoder(content, exclude_none=True), status_code)
 
 
-class DatabaseTransactionMiddleware(BaseHTTPMiddleware):
+class UnitOfWorkMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, injector: Injector) -> None:
         super().__init__(app)
         self._injector = injector
@@ -142,28 +139,10 @@ class DatabaseTransactionMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
-        settings = self._injector.get(Settings)
         db_client = self._injector.get(DatabaseClient)
+        unit_of_work = self._injector.get(UnitOfWork)
 
-        retries = 0
-        while True:
-            try:
-                async with db_client.transaction():
-                    return await call_next(request)
-            except OperationFailure as e:
-                if e.code != 112:
-                    raise e
-
-                if retries >= settings.db_txn_retries_max:
-                    raise RequestException(
-                        status_code=409,
-                        code="REQUEST_CONFLICT",
-                        message="The request could not be executed due to a conflict with another request.",
-                    )
-
-                base_interval = settings.db_txn_retries_min_interval * 2**retries
-                jitter = random.randrange(0, settings.db_txn_retries_jitter)
-                interval = (base_interval + jitter) / 1000
-                await asyncio.sleep(interval)
-
-                retries += 1
+        async with db_client.start_session():
+            response = await call_next(request)
+            await unit_of_work.save_changes()
+            return response

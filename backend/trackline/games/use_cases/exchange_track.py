@@ -5,7 +5,7 @@ from injector import Inject
 from pydantic import BaseModel
 
 from trackline.constants import TOKEN_COST_EXCHANGE_TRACK
-from trackline.core.db.client import DatabaseClient
+from trackline.core.db.repository import Repository
 from trackline.core.fields import ResourceId
 from trackline.games.schemas import (
     GameState,
@@ -25,11 +25,11 @@ class ExchangeTrack(BaseModel):
     class Handler(TrackProvidingBaseHandler):
         def __init__(
             self,
-            db: Inject[DatabaseClient],
+            repository: Inject[Repository],
             track_provider: Inject[TrackProvider],
             notifier: Inject[Notifier],
         ) -> None:
-            super().__init__(db, track_provider)
+            super().__init__(repository, track_provider)
             self._notifier = notifier
 
         async def execute(
@@ -68,7 +68,6 @@ class ExchangeTrack(BaseModel):
             turn.guesses.release_year.clear()
             turn.guesses.credits.clear()
             turn.passes.clear()
-            await game.save_changes(session=self._db.session)
 
             new_track_out = TrackOut.from_model(new_track)
             await self._notifier.notify(

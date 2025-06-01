@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from trackline.auth.models import Session
 from trackline.auth.schemas import SessionOut
-from trackline.core.db.client import DatabaseClient
+from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseException
 from trackline.core.utils.security import verify_password
 from trackline.users.models import User
@@ -14,14 +14,11 @@ class CreateSession(BaseModel):
     password: str
 
     class Handler:
-        def __init__(self, db: Inject[DatabaseClient]) -> None:
-            self._db = db
+        def __init__(self, repository: Inject[Repository]) -> None:
+            self._repository = repository
 
         async def execute(self, use_case: "CreateSession") -> SessionOut:
-            user = await User.find_one(
-                {"username": use_case.username},
-                session=self._db.session,
-            )
+            user = await self._repository.get_one(User, {"username": use_case.username})
             if not user or not user.id:
                 raise UseCaseException(
                     code="WRONG_CREDENTIALS",
@@ -34,7 +31,6 @@ class CreateSession(BaseModel):
             )
             if new_hash:
                 user.password_hash = new_hash
-                await user.save_changes(session=self._db.session)
             if not password_correct:
                 raise UseCaseException(
                     code="WRONG_CREDENTIALS",
@@ -43,6 +39,6 @@ class CreateSession(BaseModel):
                 )
 
             session = Session(user_id=user.id)
-            await session.create(session=self._db.session)
+            await self._repository.create(session)
 
             return SessionOut.from_model(session)
