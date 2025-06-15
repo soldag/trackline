@@ -1,9 +1,10 @@
 import asyncio
 from collections import defaultdict
-from collections.abc import Collection
+from collections.abc import Iterable
 import logging
 from typing import Any, Generic, Protocol, runtime_checkable, TypeVar
 
+from fastapi import WebSocketDisconnect
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
@@ -80,24 +81,17 @@ class Notifier:
     async def _send_multicast(
         self,
         game_id: ResourceId,
-        player_ids: Collection[ResourceId],
+        player_ids: Iterable[ResourceId],
         envelope: NotificationEnvelope,
     ):
-        await asyncio.gather(
-            *(self._send(game_id, player_id, envelope) for player_id in player_ids),
-            return_exceptions=True,
-        )
+        channels: list[NotificationChannel] = []
+        for player_id in player_ids:
+            channels += self._channels.get((game_id, player_id), [])
 
-    async def _send(
-        self, game_id: ResourceId, player_id: ResourceId, envelope: NotificationEnvelope
-    ):
-        channels = self._channels.get((game_id, player_id))
-        if not channels:
-            log.warning(
-                f"Failed to send notification as user {player_id} is not connected"
-            )
-            return
+        await asyncio.gather(*(self._send(channel, envelope) for channel in channels))
 
-        await asyncio.gather(
-            *(channel.send_json(jsonable_encoder(envelope)) for channel in channels)
-        )
+    async def _send(self, channel: NotificationChannel, envelope: NotificationEnvelope):
+        try:
+            await channel.send_json(jsonable_encoder(envelope))
+        except WebSocketDisconnect:
+            self.remove_channel(channel)
