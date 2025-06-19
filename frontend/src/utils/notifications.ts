@@ -24,7 +24,7 @@ import {
   turnPassed,
   turnScored,
 } from "@/store/games";
-import { useAppDispatch } from "@/utils/hooks";
+import { useAppDispatch, useEventListener } from "@/utils/hooks";
 
 const actionsByType: Record<string, ActionCreator<Action> | undefined> = {
   player_joined: playerJoined,
@@ -51,7 +51,9 @@ export const useNotifications = ({
   onReconnect?: () => void;
 }) => {
   const dispatch = useAppDispatch();
+
   const [wasConnected, setWasConnected] = useState(false);
+  const [isDocumentVisible, setIsDocumentVisible] = useState(true);
 
   const handleOpen = useCallback(() => {
     if (wasConnected) {
@@ -86,6 +88,10 @@ export const useNotifications = ({
     [gameId],
   );
 
+  useEventListener(document, "visibilitychange", () => {
+    setIsDocumentVisible(document.visibilityState === "visible");
+  });
+
   useWebSocket(
     webSocketUrl,
     {
@@ -99,6 +105,6 @@ export const useNotifications = ({
       onOpen: handleOpen,
       onMessage: handleMessage,
     },
-    !!webSocketUrl,
+    isDocumentVisible,
   );
 };
