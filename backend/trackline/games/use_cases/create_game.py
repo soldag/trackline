@@ -1,3 +1,7 @@
+from typing import Annotated
+
+from annotated_types import Len
+from injector import Inject
 from pydantic import BaseModel
 
 from trackline.constants import (
@@ -9,20 +13,24 @@ from trackline.constants import (
     DEFAULT_TIMELINE_LENGTH,
     DEFAULT_TITLE_MATCH_MODE,
 )
+from trackline.core.db.repository import Repository
+from trackline.core.exceptions import UseCaseException
 from trackline.core.fields import Fraction, ResourceId
 from trackline.games.models import (
     ArtistsMatchMode,
     Game,
     GameSettings,
     Player,
+    Playlist,
     TitleMatchMode,
 )
 from trackline.games.schemas import GameOut
 from trackline.games.use_cases.base import BaseHandler
+from trackline.spotify.services.client import PlaylistNotFoundException, SpotifyClient
 
 
 class CreateGame(BaseModel):
-    playlist_ids: list[str]
+    playlist_ids: Annotated[list[str], Len(min_length=1)]
     spotify_market: str
     initial_tokens: int = DEFAULT_INITIAL_TOKENS
     max_tokens: int = DEFAULT_MAX_TOKENS
@@ -33,10 +41,20 @@ class CreateGame(BaseModel):
     credits_similarity_threshold: Fraction = DEFAULT_CREDITS_SIMILARITY_THRESHOLD
 
     class Handler(BaseHandler):
+        def __init__(
+            self, repository: Inject[Repository], spotify_client: Inject[SpotifyClient]
+        ) -> None:
+            super().__init__(repository)
+            self._spotify_client = spotify_client
+
         async def execute(self, user_id: ResourceId, use_case: "CreateGame") -> GameOut:
+            playlists = await self._get_playlists(
+                use_case.playlist_ids, use_case.spotify_market
+            )
+
             game = Game(
                 settings=GameSettings(
-                    playlist_ids=use_case.playlist_ids,
+                    playlists=playlists,
                     spotify_market=use_case.spotify_market,
                     initial_tokens=use_case.initial_tokens,
                     max_tokens=use_case.max_tokens,
@@ -57,3 +75,27 @@ class CreateGame(BaseModel):
             await self._repository.create(game)
 
             return GameOut.from_model(game)
+
+        async def _get_playlists(
+            self, playlist_ids: list[str], spotify_market: str
+        ) -> list[Playlist]:
+            playlists = []
+            for playlist_id in playlist_ids:
+                try:
+                    track_count = await self._spotify_client.get_playlist_total_tracks(
+                        playlist_id,
+                        market=spotify_market,
+                    )
+                except PlaylistNotFoundException:
+                    raise UseCaseException(
+                        code="PLAYLIST_NOT_FOUND",
+                        message=f"The playlist {playlist_id} does not exist.",
+                    )
+
+                playlist = Playlist(
+                    spotify_id=playlist_id,
+                    track_count=track_count,
+                )
+                playlists.append(playlist)
+
+            return playlists

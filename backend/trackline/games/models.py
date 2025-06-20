@@ -136,9 +136,14 @@ class Turn(BaseModel):
     completed_by: list[ResourceId] = []
 
 
+class Playlist(BaseModel):
+    spotify_id: str
+    track_count: int
+
+
 class GameSettings(BaseModel):
     spotify_market: str
-    playlist_ids: list[str]
+    playlists: list[Playlist]
     initial_tokens: int
     max_tokens: int
     timeline_length: int

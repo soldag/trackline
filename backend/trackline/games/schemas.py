@@ -301,7 +301,7 @@ class GameSettingsOut(BaseModel):
     def from_model(model: GameSettings) -> "GameSettingsOut":
         return GameSettingsOut(
             spotify_market=model.spotify_market,
-            playlist_ids=model.playlist_ids,
+            playlist_ids=[p.spotify_id for p in model.playlists],
             initial_tokens=model.initial_tokens,
             max_tokens=model.max_tokens,
             timeline_length=model.timeline_length,

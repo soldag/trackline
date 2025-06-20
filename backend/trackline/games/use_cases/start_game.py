@@ -36,7 +36,7 @@ class StartGame(BaseModel):
                 )
 
             tracks = await self._track_provider.get_random_tracks(
-                game.settings.playlist_ids,
+                game.settings.playlists,
                 count=len(game.players),
                 market=game.settings.spotify_market,
             )

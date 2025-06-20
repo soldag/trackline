@@ -78,12 +78,15 @@ class SpotifyClient:
                 SpotifyAuthorisationToken(access_token=access_token)
             )
 
-    async def get_playlist_total_tracks(self, playlist_id: str) -> int:
+    async def get_playlist_total_tracks(
+        self, playlist_id: str, market: str | None = None
+    ) -> int:
         await self._get_auth_token_if_needed()
 
         playlist = await self._client.playlists.get_one(
             playlist_id,
             fields="tracks.total",
+            market=market,
         )
         if not playlist:
             raise PlaylistNotFoundException(playlist_id)

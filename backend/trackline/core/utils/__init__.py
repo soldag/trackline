@@ -1,4 +1,4 @@
-from collections.abc import Collection, Sequence
+from collections.abc import Iterable
 import random
 import re
 from typing import TypeVar
@@ -7,11 +7,11 @@ from typing import TypeVar
 T = TypeVar("T")
 
 
-def list_or_none(lst: Sequence[T] | None) -> list[T] | None:
+def list_or_none(lst: Iterable[T] | None) -> list[T] | None:
     return None if lst is None else list(lst)
 
 
-def shuffle(seq: Collection[T]) -> list[T]:
+def shuffle(seq: Iterable[T]) -> list[T]:
     copy = list(seq)
     random.shuffle(copy)
     return copy

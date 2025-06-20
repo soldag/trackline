@@ -136,7 +136,7 @@ class TrackProvidingBaseHandler(BaseHandler):
         }
 
         track = await self._track_provider.get_random_track(
-            game.settings.playlist_ids,
+            game.settings.playlists,
             exclude=exclude_track_ids,
             market=game.settings.spotify_market,
         )
