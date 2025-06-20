@@ -61,11 +61,11 @@ jobs:
         run: poetry install --no-interaction --no-root
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
 
-      - name: Run flake8
-        run: poetry run flake8
+      - name: Run ruff linter
+        run: poetry run ruff check .
 
-      - name: Run black
-        run: poetry run black . --check
+      - name: Run ruff formatter
+        run: poetry run ruff format --check .
 
       - name: Run mypy
         run: poetry run mypy .
