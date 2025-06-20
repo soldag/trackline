@@ -93,6 +93,16 @@ const CreateGameView = () => {
     }
   }, [spotifyUser, playlistRecommendations.length, dispatch]);
 
+  const handleSearchPlaylists = useCallback(
+    (args: { query: string; limit: number }) => dispatch(searchPlaylists(args)),
+    [dispatch],
+  );
+
+  const handleClearPlaylistSearchResults = useCallback(
+    () => dispatch(clearPlaylistSearchResults()),
+    [dispatch],
+  );
+
   const handleCreate = useCallback(() => {
     if (!spotifyUser) return;
     dispatch(
@@ -143,8 +153,8 @@ const CreateGameView = () => {
       loading={loadingSpotify}
       recommendations={playlistRecommendations}
       searchResults={publicPlaylistSearchResults}
-      onSearch={(args) => dispatch(searchPlaylists(args))}
-      onClearSearchResults={() => dispatch(clearPlaylistSearchResults())}
+      onSearch={handleSearchPlaylists}
+      onClearSearchResults={handleClearPlaylistSearchResults}
     />
   ) : (
     <Button
