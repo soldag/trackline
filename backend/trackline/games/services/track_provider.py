@@ -1,6 +1,7 @@
 from collections.abc import Collection, Iterable
 
 from injector import Inject
+
 from trackline.core.utils import shuffle
 from trackline.games.models import Playlist, Track
 from trackline.games.services.music_brainz import MusicBrainzClient

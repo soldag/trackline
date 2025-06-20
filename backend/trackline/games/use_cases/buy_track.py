@@ -1,9 +1,7 @@
 from injector import Inject
 from pydantic import BaseModel
 
-from trackline.constants import (
-    TOKEN_COST_BUY_TRACK,
-)
+from trackline.constants import TOKEN_COST_BUY_TRACK
 from trackline.core.db.repository import Repository
 from trackline.core.fields import ResourceId
 from trackline.games.schemas import (
@@ -31,18 +29,18 @@ class BuyTrack(BaseModel):
             self._notifier = notifier
 
         async def execute(
-            self, user_id: ResourceId, use_case: "BuyTrack"
+            self,
+            user_id: ResourceId,
+            use_case: "BuyTrack",
         ) -> TrackPurchaseReceiptOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
             self._assert_has_state(game, GameState.SCORING)
             self._assert_has_tokens(game, user_id, TOKEN_COST_BUY_TRACK)
 
-            current_player = game.get_player(user_id)
-            assert current_player
-
             track = await self._get_new_track(game)
 
+            current_player = game.get_player(user_id)
             current_player.add_to_timeline(track)
             current_player.tokens -= TOKEN_COST_BUY_TRACK
 

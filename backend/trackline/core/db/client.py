@@ -1,3 +1,4 @@
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
@@ -14,7 +15,6 @@ from trackline.core.settings import Settings
 from trackline.games.models import Game
 from trackline.users.models import User
 
-
 session_ctx: ContextVar[AsyncIOMotorClientSession | None] = ContextVar(
     "db_session",
     default=None,
@@ -24,7 +24,8 @@ session_ctx: ContextVar[AsyncIOMotorClientSession | None] = ContextVar(
 class DatabaseClient:
     def __init__(self, settings: Inject[Settings]) -> None:
         self._client: AsyncIOMotorClient = AsyncIOMotorClient(
-            settings.db_uri, tz_aware=True
+            settings.db_uri,
+            tz_aware=True,
         )
         self._database: AsyncIOMotorDatabase = self._client[settings.db_name]
 
@@ -40,7 +41,7 @@ class DatabaseClient:
         )
 
     @asynccontextmanager
-    async def start_session(self):
+    async def start_session(self) -> AsyncIterator[AsyncIOMotorClientSession]:
         async with await self._client.start_session() as session:
             token = session_ctx.set(session)
             try:

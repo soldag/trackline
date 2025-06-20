@@ -15,13 +15,17 @@ class RegisterNotificationChannel(BaseModel):
 
     class Handler(BaseHandler):
         def __init__(
-            self, repository: Inject[Repository], notifier: Inject[Notifier]
+            self,
+            repository: Inject[Repository],
+            notifier: Inject[Notifier],
         ) -> None:
             super().__init__(repository)
             self._notifier = notifier
 
         async def execute(
-            self, user_id: ResourceId, use_case: "RegisterNotificationChannel"
+            self,
+            user_id: ResourceId,
+            use_case: "RegisterNotificationChannel",
         ) -> None:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)

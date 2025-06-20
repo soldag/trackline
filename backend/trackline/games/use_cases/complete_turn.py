@@ -2,16 +2,10 @@ from injector import Inject
 from pydantic import BaseModel
 
 from trackline.core.db.repository import Repository
-from trackline.core.exceptions import UseCaseException
+from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
-from trackline.games.models import (
-    Game,
-)
-from trackline.games.schemas import (
-    GameState,
-    TurnCompleted,
-    TurnCompletionOut,
-)
+from trackline.games.models import Game
+from trackline.games.schemas import GameState, TurnCompleted, TurnCompletionOut
 from trackline.games.services.notifier import Notifier
 from trackline.games.use_cases.base import BaseHandler
 
@@ -30,7 +24,9 @@ class CompleteTurn(BaseModel):
             self._notifier = notifier
 
         async def execute(
-            self, user_id: ResourceId, use_case: "CompleteTurn"
+            self,
+            user_id: ResourceId,
+            use_case: "CompleteTurn",
         ) -> TurnCompletionOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
@@ -41,7 +37,7 @@ class CompleteTurn(BaseModel):
             if user_id not in turn.completed_by:
                 turn.completed_by.append(user_id)
             else:
-                raise UseCaseException(
+                raise UseCaseError(
                     code="TURN_COMPLETED",
                     message="You have already completed this turn.",
                     status_code=400,

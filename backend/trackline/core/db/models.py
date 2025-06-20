@@ -8,7 +8,7 @@ from motor.motor_asyncio import AsyncIOMotorClientSession
 class BaseDocument(Document):
     async def save_changes(
         self: Self,
-        ignore_revision: bool = False,
+        ignore_revision: bool = False,  # noqa: FBT001, FBT002
         session: AsyncIOMotorClientSession | None = None,
         bulk_writer: BulkWriter | None = None,
         skip_actions: list[ActionDirections | str] | None = None,

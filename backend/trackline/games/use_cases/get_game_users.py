@@ -12,7 +12,9 @@ class GetGameUsers(BaseModel):
 
     class Handler(BaseHandler):
         async def execute(
-            self, user_id: ResourceId, use_case: "GetGameUsers"
+            self,
+            user_id: ResourceId,
+            use_case: "GetGameUsers",
         ) -> list[UserOut]:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)

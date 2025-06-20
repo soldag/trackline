@@ -3,7 +3,7 @@ from injector import Binder, Module, singleton
 
 from trackline.core.db.client import DatabaseClient
 from trackline.core.db.unit_of_work import UnitOfWork
-from trackline.core.settings import get_settings, Settings
+from trackline.core.settings import Settings, get_settings
 
 
 class CoreModule(Module):

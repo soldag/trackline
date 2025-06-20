@@ -6,16 +6,16 @@ from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_injector import Injected
 
 from trackline.auth.use_cases import GetSessionUser
-from trackline.core.exceptions import RequestException
+from trackline.core.exceptions import RequestError
 from trackline.core.fields import ResourceId
-
 
 log = logging.getLogger(__name__)
 
 
 class OptionalHTTPBearer(HTTPBearer):
     async def __call__(
-        self, request: Request = None  # type: ignore
+        self,
+        request: Request = None,  # type: ignore[assignment]
     ) -> HTTPAuthorizationCredentials | None:
         if not request:
             return None
@@ -35,9 +35,9 @@ def get_auth_token(
     if session_token:
         return session_token
 
-    raise RequestException(
-        "UNAUTHORIZED",
-        "You must be authorized to perform this request.",
+    raise RequestError(
+        code="UNAUTHORIZED",
+        message="You must be authorized to perform this request.",
         status_code=401,
     )
 
@@ -51,8 +51,10 @@ async def get_auth_user_id(
 ) -> ResourceId:
     user_id = await handler.execute(GetSessionUser(token=token))
     if not user_id:
-        raise RequestException(
-            "INVALID_TOKEN", "The session token is invalid.", status_code=400
+        raise RequestError(
+            code="INVALID_TOKEN",
+            message="The session token is invalid.",
+            status_code=400,
         )
 
     return user_id

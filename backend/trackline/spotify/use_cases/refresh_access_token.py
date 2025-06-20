@@ -1,9 +1,9 @@
 from injector import Inject
 from pydantic import BaseModel
 
-from trackline.core.exceptions import UseCaseException
+from trackline.core.exceptions import UseCaseError
 from trackline.spotify.schemas import SpotifyAccessToken
-from trackline.spotify.services.client import InvalidTokenException, SpotifyClient
+from trackline.spotify.services.client import InvalidTokenError, SpotifyClient
 
 
 class RefreshAccessToken(BaseModel):
@@ -19,14 +19,14 @@ class RefreshAccessToken(BaseModel):
                     access_token,
                     refresh_token,
                 ) = await self._spotify_client.refresh_access_token(
-                    use_case.refresh_token
+                    use_case.refresh_token,
                 )
-            except InvalidTokenException:
-                raise UseCaseException(
+            except InvalidTokenError as e:
+                raise UseCaseError(
                     code="INVALID_SPOTIFY_REFRESH_TOKEN",
                     message="The refresh token is invalid.",
                     status_code=400,
-                )
+                ) from e
 
             return SpotifyAccessToken(
                 access_token=access_token,

@@ -1,11 +1,11 @@
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-import logging
 
-from fastapi import Depends, FastAPI, WebSocket
+from fastapi import Depends, FastAPI, Request, WebSocket
 from fastapi.exceptions import RequestValidationError, WebSocketRequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_injector import attach_injector, InjectorMiddleware
+from fastapi_injector import InjectorMiddleware, attach_injector
 
 from trackline.auth.router import router as auth_router
 from trackline.core.db.client import DatabaseClient
@@ -25,7 +25,6 @@ from trackline.games.router import router as games_router
 from trackline.spotify.router import router as spotify_router
 from trackline.spotify.services.client import SpotifyClient
 from trackline.users.router import router as users_router
-
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +85,7 @@ app.include_router(users_router)
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request, exc):
+async def validation_exception_handler(request: Request, exc: Exception) -> None:
     # This is needed to disable the builtin error handler of fastapi
     # and instead use the custom ExceptionHandlingMiddleware
     raise exc
@@ -94,6 +93,7 @@ async def validation_exception_handler(request, exc):
 
 @app.exception_handler(WebSocketRequestValidationError)
 async def ws_validation_exception_handler(
-    ws: WebSocket, exc: WebSocketRequestValidationError
-):
+    ws: WebSocket,
+    exc: WebSocketRequestValidationError,
+) -> None:
     pass

@@ -1,5 +1,5 @@
-from datetime import datetime
 import secrets
+from datetime import datetime
 
 from pydantic import Field
 
@@ -9,11 +9,11 @@ from trackline.core.fields import ResourceId
 from trackline.core.utils.datetime import utcnow
 
 
-def get_default_expiration_time():
+def get_default_expiration_time() -> datetime:
     return utcnow() + SESSION_EXPIRY_INTERVAL
 
 
-def generate_token():
+def generate_token() -> str:
     return secrets.token_urlsafe(SESSION_TOKEN_LENGTH)
 
 

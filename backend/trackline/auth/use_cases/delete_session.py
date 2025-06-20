@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from trackline.auth.models import Session
 from trackline.core.db.repository import Repository
-from trackline.core.exceptions import UseCaseException
+from trackline.core.exceptions import UseCaseError
 
 
 class DeleteSession(BaseModel):
@@ -15,7 +15,8 @@ class DeleteSession(BaseModel):
 
         async def execute(self, use_case: "DeleteSession") -> None:
             result = await self._repository.delete_many(
-                Session, {"token": use_case.token}
+                Session,
+                {"token": use_case.token},
             )
             if not result or result.deleted_count == 0:
-                raise UseCaseException("INVALID_TOKEN", "The session token is invalid.")
+                raise UseCaseError("INVALID_TOKEN", "The session token is invalid.")

@@ -2,7 +2,7 @@ from injector import Inject
 from pydantic import BaseModel
 
 from trackline.core.db.repository import Repository
-from trackline.core.exceptions import UseCaseException
+from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
     CorrectionProposal,
@@ -10,10 +10,7 @@ from trackline.games.models import (
     CorrectionProposalVote,
     GameState,
 )
-from trackline.games.schemas import (
-    CorrectionProposalOut,
-    CorrectionProposed,
-)
+from trackline.games.schemas import CorrectionProposalOut, CorrectionProposed
 from trackline.games.services.notifier import Notifier
 from trackline.games.use_cases.base import BaseHandler
 
@@ -33,7 +30,9 @@ class ProposeCorrection(BaseModel):
             self._notifier = notifier
 
         async def execute(
-            self, user_id: ResourceId, use_case: "ProposeCorrection"
+            self,
+            user_id: ResourceId,
+            use_case: "ProposeCorrection",
         ) -> CorrectionProposalOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
@@ -43,21 +42,30 @@ class ProposeCorrection(BaseModel):
             turn = game.turns[use_case.turn_id]
             match turn.correction_proposal:
                 case CorrectionProposal(state=CorrectionProposalState.VOTING):
-                    raise UseCaseException(
+                    raise UseCaseError(
                         code="CORRECTION_VOTING_ACTIVE",
-                        message="Another user has already proposed a correction that's up for vote.",
+                        message=(
+                            "Another user has already proposed a correction "
+                            "that's up for vote."
+                        ),
                         status_code=400,
                     )
                 case CorrectionProposal(state=CorrectionProposalState.ACCEPTED):
-                    raise UseCaseException(
+                    raise UseCaseError(
                         code="CORRECTION_VOTING_ACCEPTED",
-                        message="Another user has already proposed a correction that was accepted.",
+                        message=(
+                            "Another user has already proposed a correction "
+                            "that was accepted."
+                        ),
                         status_code=400,
                     )
             if use_case.release_year == turn.track.release_year:
-                raise UseCaseException(
+                raise UseCaseError(
                     code="SAME_RELEASE_YEAR",
-                    message="The proposed release year must differ from the track's original release year.",
+                    message=(
+                        "The proposed release year must differ from the track's "
+                        "original release year."
+                    ),
                     status_code=400,
                 )
 

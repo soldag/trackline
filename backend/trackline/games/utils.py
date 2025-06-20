@@ -17,12 +17,11 @@ def normalize_string(value: str) -> str:
 
 
 def is_valid_release_year(
-    timeline: list[Track], position: int, release_year: int
+    timeline: list[Track],
+    position: int,
+    release_year: int,
 ) -> bool:
-    if position == 0:
-        min_year = 0
-    else:
-        min_year = timeline[position - 1].release_year
+    min_year = 0 if position == 0 else timeline[position - 1].release_year
 
     if position == len(timeline):
         max_year = float("inf")

@@ -1,10 +1,10 @@
-import os
+from pathlib import Path
 
 import toml
 
 
 def get_version() -> str | None:
-    path = os.path.join(os.path.dirname(__file__), "../../../pyproject.toml")
+    path = Path(__file__).parent.parent.parent.parent / "pyproject.toml"
     try:
         return toml.load(path)["project"]["version"]
     except (FileNotFoundError, toml.TomlDecodeError, KeyError):

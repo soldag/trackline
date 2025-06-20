@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from trackline.constants import MIN_PLAYER_COUNT
 from trackline.core.db.repository import Repository
-from trackline.core.exceptions import UseCaseException
+from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
 from trackline.games.schemas import GameOut, GameStarted, GameState, TrackOut
 from trackline.games.services.notifier import Notifier
@@ -30,7 +30,7 @@ class StartGame(BaseModel):
             self._assert_has_state(game, GameState.WAITING_FOR_PLAYERS)
 
             if len(game.players) < MIN_PLAYER_COUNT:
-                raise UseCaseException(
+                raise UseCaseError(
                     "INSUFFICIENT_PLAYER_COUNT",
                     f"At least {MIN_PLAYER_COUNT} players are needed to start the game",
                 )
@@ -40,7 +40,7 @@ class StartGame(BaseModel):
                 count=len(game.players),
                 market=game.settings.spotify_market,
             )
-            for player, track in zip(game.players, tracks):
+            for player, track in zip(game.players, tracks, strict=False):
                 player.timeline = [track]
 
             game.state = GameState.STARTED

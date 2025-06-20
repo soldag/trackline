@@ -8,7 +8,6 @@ from trackline.auth.schemas import SessionOut
 from trackline.auth.use_cases import CreateSession, DeleteSession
 from trackline.core.schemas import EntityResponse, Response
 
-
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],

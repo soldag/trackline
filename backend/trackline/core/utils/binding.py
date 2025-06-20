@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from dataclasses import asdict, field, make_dataclass
-from typing import Annotated, Any, TypeVar
+from typing import Annotated, Any
 
 from fastapi import Body, Depends, Path, Query, Request
 from fastapi.exceptions import RequestValidationError
@@ -8,15 +8,12 @@ from pydantic import BaseModel, ValidationError
 from pydantic_core import ErrorDetails, PydanticUndefined
 
 
-TModel = TypeVar("TModel", bound=BaseModel, covariant=True)
-
-
-def Bind(
+def Bind[TModel: BaseModel](  # noqa: N802
     model_type: type[TModel],
     path: Sequence[str] | None = None,
     query: Sequence[str] | None = None,
     body: Sequence[str] | None = None,
-) -> Any:
+) -> TModel:
     """
     Binds different parts of a request to a single model.
 
@@ -51,15 +48,15 @@ def Bind(
                 field_name,
                 field_type,
                 field(**field_kwargs),
-            )
+            ),
         )
 
-    ModelWrapper = make_dataclass(
+    ModelWrapper = make_dataclass(  # noqa: N806
         cls_name=model_type.__name__,
         fields=fields,
     )
 
-    async def unwrap(request: Request, wrapper: Any = Depends(ModelWrapper)) -> TModel:
+    async def unwrap(request: Request, wrapper: Any = Depends(ModelWrapper)) -> TModel:  # noqa: ANN401
         try:
             return model_type(**asdict(wrapper))
         except ValidationError as e:
@@ -67,13 +64,14 @@ def Bind(
             raise RequestValidationError(
                 _convert_pydantic_errors(request, e.errors()),
                 body=body,
-            )
+            ) from e
 
     return Depends(unwrap)
 
 
 def _convert_pydantic_errors(
-    request: Request, errors: list[ErrorDetails]
+    request: Request,
+    errors: list[ErrorDetails],
 ) -> list[ErrorDetails]:
     result: list[ErrorDetails] = []
     for error in errors:

@@ -2,7 +2,7 @@ from injector import Inject
 from pydantic import BaseModel
 
 from trackline.core.db.repository import Repository
-from trackline.core.exceptions import UseCaseException
+from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
 from trackline.games.models import GameState, TurnPass
 from trackline.games.schemas import TurnPassed, TurnPassOut
@@ -24,7 +24,9 @@ class PassTurn(BaseModel):
             self._notifier = notifier
 
         async def execute(
-            self, user_id: ResourceId, use_case: "PassTurn"
+            self,
+            user_id: ResourceId,
+            use_case: "PassTurn",
         ) -> TurnPassOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
@@ -33,7 +35,7 @@ class PassTurn(BaseModel):
 
             turn = game.turns[use_case.turn_id]
             if user_id in turn.passes:
-                raise UseCaseException(
+                raise UseCaseError(
                     code="TURN_PASSED",
                     message="You have already passed for this turn.",
                     status_code=400,
@@ -44,7 +46,9 @@ class PassTurn(BaseModel):
 
             turn_pass_out = TurnPassOut.from_model(user_id, turn_pass)
             await self._notifier.notify(
-                user_id, game, TurnPassed(turn_pass=turn_pass_out)
+                user_id,
+                game,
+                TurnPassed(turn_pass=turn_pass_out),
             )
 
             return turn_pass_out

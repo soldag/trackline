@@ -21,16 +21,19 @@ class CreateCreditsGuess(BaseModel):
             return turn.guesses.credits
 
         async def execute(
-            self, user_id: ResourceId, use_case: "CreateCreditsGuess"
+            self,
+            user_id: ResourceId,
+            use_case: "CreateCreditsGuess",
         ) -> CreditsGuessOut:
             game = await self._get_game(use_case.game_id)
             token_cost = self._get_token_cost(user_id, game, TOKEN_COST_CREDITS_GUESS)
             self._assert_can_guess(
-                user_id, game, use_case.turn_id, use_case.turn_revision_id, token_cost
+                user_id,
+                game,
+                use_case.turn_id,
+                use_case.turn_revision_id,
+                token_cost,
             )
-
-            current_player = game.get_player(user_id)
-            assert current_player
 
             guess = CreditsGuess(
                 token_cost=token_cost,
@@ -40,6 +43,7 @@ class CreateCreditsGuess(BaseModel):
             game.turns[use_case.turn_id].guesses.credits[user_id] = guess
 
             if token_cost > 0:
+                current_player = game.get_player(user_id)
                 current_player.tokens -= guess.token_cost
 
             guess_out = CreditsGuessOut.from_model(guess, user_id)

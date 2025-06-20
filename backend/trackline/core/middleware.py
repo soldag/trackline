@@ -1,6 +1,6 @@
-from collections.abc import Awaitable, Callable, Sequence
 import logging
 import time
+from collections.abc import Awaitable, Callable, Sequence
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -15,18 +15,19 @@ from starlette.websockets import WebSocket
 
 from trackline.core.db.client import DatabaseClient
 from trackline.core.db.unit_of_work import UnitOfWork
-from trackline.core.exceptions import RequestException
+from trackline.core.exceptions import RequestError
 from trackline.core.schemas import Error, ErrorDetail, ErrorResponse
 from trackline.core.utils import list_or_none
 from trackline.core.utils.datetime import utcnow
-
 
 log = logging.getLogger(__name__)
 
 
 class NoIndexMiddleware(BaseHTTPMiddleware):
     async def dispatch(
-        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+        self,
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
         response = await call_next(request)
         response.headers["x-robots-tag"] = "noindex, nofollow"
@@ -36,7 +37,9 @@ class NoIndexMiddleware(BaseHTTPMiddleware):
 
 class ServerTimeMiddleware(BaseHTTPMiddleware):
     async def dispatch(
-        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+        self,
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
         response = await call_next(request)
         response.headers["x-server-time"] = utcnow().isoformat()
@@ -46,7 +49,9 @@ class ServerTimeMiddleware(BaseHTTPMiddleware):
 
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(
-        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+        self,
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
         start_time = time.perf_counter()
         response = await call_next(request)
@@ -54,14 +59,18 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         duration = (end_time - start_time) * 1000
 
         log.info(
-            f"{request.method} {request.url.path} - HTTP {response.status_code} ({duration:.2f} ms)"
+            "%s %s - HTTP %d (%.2f ms)",
+            request.method,
+            request.url.path,
+            response.status_code,
+            duration,
         )
 
         return response
 
 
 class ExceptionHandlingMiddleware:
-    def __init__(self, app: ASGIApp):
+    def __init__(self, app: ASGIApp) -> None:
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
@@ -82,13 +91,14 @@ class ExceptionHandlingMiddleware:
                 message="The request is invalid.",
                 details=[
                     ErrorDetail(
-                        message=err["msg"], location=list_or_none(err.get("loc"))
+                        message=err["msg"],
+                        location=list_or_none(err.get("loc")),
                     )
                     for err in exc.errors()
                 ],
                 status_code=400,
             )(scope, receive, send)
-        except RequestException as exc:
+        except RequestError as exc:
             await self._create_response(
                 code=exc.code,
                 message=exc.message,
@@ -96,7 +106,7 @@ class ExceptionHandlingMiddleware:
             )(scope, receive, send)
         except Exception:
             capture_exception()
-            log.exception("Unhandled exception", exc_info=True)
+            log.exception("Unhandled exception")
             await self._create_response(
                 code="UNEXPECTED_ERROR",
                 message="An unexpected error occurred.",
@@ -104,18 +114,21 @@ class ExceptionHandlingMiddleware:
             )(scope, receive, send)
 
     async def _handle_websocket(
-        self, scope: Scope, receive: Receive, send: Send
+        self,
+        scope: Scope,
+        receive: Receive,
+        send: Send,
     ) -> None:
         ws = WebSocket(scope, receive, send)
         try:
             await self.app(scope, receive, send)
         except RequestValidationError:
             await ws.close(code=1008, reason="VALIDATION_ERROR")
-        except RequestException as exc:
+        except RequestError as exc:
             await ws.close(code=1008, reason=exc.code)
         except Exception:
             capture_exception()
-            log.exception("Unhandled exception", exc_info=True)
+            log.exception("Unhandled exception")
             await ws.close(code=1008)
 
     def _create_response(
@@ -132,12 +145,14 @@ class ExceptionHandlingMiddleware:
 
 
 class UnitOfWorkMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app, injector: Injector) -> None:
+    def __init__(self, app: ASGIApp, injector: Injector) -> None:
         super().__init__(app)
         self._injector = injector
 
     async def dispatch(
-        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+        self,
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
         db_client = self._injector.get(DatabaseClient)
         unit_of_work = self._injector.get(UnitOfWork)

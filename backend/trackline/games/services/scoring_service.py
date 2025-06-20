@@ -1,10 +1,7 @@
 import re
-from typing import Protocol, TypeVar
+from typing import Protocol
 
-from trackline.constants import (
-    TOKEN_GAIN_CREDITS_GUESS,
-    TOKEN_GAIN_YEAR_GUESS,
-)
+from trackline.constants import TOKEN_GAIN_CREDITS_GUESS, TOKEN_GAIN_YEAR_GUESS
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
     ArtistsMatchMode,
@@ -23,10 +20,6 @@ from trackline.games.models import (
     TurnScoring,
 )
 from trackline.games.utils import compare_strings, is_valid_release_year
-
-
-GuessT = TypeVar("GuessT", bound=Guess)
-ScoringT = TypeVar("ScoringT", bound=Scoring)
 
 
 class Credits(Protocol):
@@ -83,7 +76,8 @@ class ScoringService:
 
     async def _score_position(self, game: Game, turn: Turn) -> Scoring:
         active_player = game.get_active_player()
-        assert active_player
+        if not active_player:
+            raise ValueError("There is no active player for the current turn")
 
         guesses = turn.guesses.release_year
         sorted_guesses = self._sort_guesses(guesses, turn.active_user_id)
@@ -97,7 +91,9 @@ class ScoringService:
             user_id
             for user_id, guess in sorted_guesses.items()
             if is_valid_release_year(
-                active_player.timeline, guess.position, correct_release_year
+                active_player.timeline,
+                guess.position,
+                correct_release_year,
             )
         ]
         for user_id, guess in sorted_guesses.items():
@@ -137,7 +133,7 @@ class ScoringService:
             for user_id, guess in sorted_guesses.items()
             if guess.year == correct_release_year
         ]
-        for user_id in sorted_guesses.keys():
+        for user_id in sorted_guesses:
             if user_id in correct_guesses:
                 winner = user_id
                 token_gains[user_id] = TokenGain(
@@ -163,9 +159,6 @@ class ScoringService:
 
     def _score_credits(self, game: Game, turn: Turn) -> CreditsScoring:
         token_gains: dict[ResourceId, TokenGain] = {}
-
-        active_player = game.get_active_player()
-        assert active_player
 
         guesses = turn.guesses.credits
         sorted_guesses = self._sort_guesses(guesses, turn.active_user_id)
@@ -217,7 +210,7 @@ class ScoringService:
             similarity_scores=similarity_scores,
         )
 
-    def _sort_guesses(
+    def _sort_guesses[GuessT: Guess](
         self,
         guesses: dict[ResourceId, GuessT],
         active_user_id: ResourceId,
@@ -226,11 +219,14 @@ class ScoringService:
             sorted(
                 guesses.items(),
                 key=lambda kv: (kv[0] != active_user_id, kv[1].creation_time),
-            )
+            ),
         )
 
     def _get_credits_similarity(
-        self, candidate: Credits, reference: Credits, settings: GameSettings
+        self,
+        candidate: Credits,
+        reference: Credits,
+        settings: GameSettings,
     ) -> float:
         sim_all_artists = [
             max(

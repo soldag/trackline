@@ -1,5 +1,5 @@
-from enum import Enum
 import os
+from enum import Enum
 
 from pydantic import PositiveInt
 from pydantic_settings import BaseSettings
@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     log_level: LogLevel = LogLevel.INFO
 
-    host: str = "0.0.0.0"
+    host: str = "localhost"
     port: PositiveInt = 8000
     reload: bool = False
 

@@ -4,7 +4,7 @@ from trackline.core.logging import get_log_config
 from trackline.core.settings import get_settings
 
 
-def main():
+def main() -> None:
     settings = get_settings()
 
     uvicorn.run(

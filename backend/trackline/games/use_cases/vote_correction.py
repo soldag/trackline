@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from trackline.constants import CORRECTION_PROPOSAL_MIN_VOTES
 from trackline.core.db.repository import Repository
-from trackline.core.exceptions import UseCaseException
+from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
     CorrectionProposalState,
@@ -38,7 +38,9 @@ class VoteCorrection(BaseModel):
             self._notifier = notifier
 
         async def execute(
-            self, user_id: ResourceId, use_case: "VoteCorrection"
+            self,
+            user_id: ResourceId,
+            use_case: "VoteCorrection",
         ) -> CorrectionProposalVoteResultOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
@@ -48,13 +50,13 @@ class VoteCorrection(BaseModel):
             turn = game.turns[use_case.turn_id]
             proposal = turn.correction_proposal
             if not proposal:
-                raise UseCaseException(
+                raise UseCaseError(
                     code="PROPOSAL_NOT_FOUND",
                     message="There's no correction proposal for this turn.",
                     status_code=404,
                 )
             if user_id in proposal.votes:
-                raise UseCaseException(
+                raise UseCaseError(
                     code="ALREADY_VOTED",
                     message="You have already voted for this proposal.",
                     status_code=400,

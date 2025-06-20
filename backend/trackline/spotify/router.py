@@ -8,7 +8,6 @@ from trackline.core.schemas import EntityResponse
 from trackline.spotify.schemas import SpotifyAccessToken
 from trackline.spotify.use_cases import GetAccessToken, RefreshAccessToken
 
-
 router = APIRouter(
     prefix="/spotify",
     tags=["Spotify"],
@@ -30,7 +29,8 @@ async def refresh_access_token(
     use_case: RefreshAccessToken,
     auth_user_id: AuthUserId,
     handler: Annotated[
-        RefreshAccessToken.Handler, Injected(RefreshAccessToken.Handler)
+        RefreshAccessToken.Handler,
+        Injected(RefreshAccessToken.Handler),
     ],
 ) -> EntityResponse[SpotifyAccessToken]:
     user = await handler.execute(use_case)

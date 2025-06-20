@@ -25,7 +25,9 @@ class ScoreTurn(BaseModel):
             self._notifier = notifier
 
         async def execute(
-            self, user_id: ResourceId, use_case: "ScoreTurn"
+            self,
+            user_id: ResourceId,
+            use_case: "ScoreTurn",
         ) -> TurnScoringOut:
             game_id = use_case.game_id
             turn_id = use_case.turn_id

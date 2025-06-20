@@ -18,7 +18,6 @@ from .start_game import StartGame
 from .unregister_notification_channel import UnregisterNotificationChannel
 from .vote_correction import VoteCorrection
 
-
 __all__ = [
     "AbortGame",
     "BuyTrack",

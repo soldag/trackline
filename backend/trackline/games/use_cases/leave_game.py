@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from trackline.constants import MIN_PLAYER_COUNT
 from trackline.core.db.repository import Repository
-from trackline.core.exceptions import UseCaseException
+from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
 from trackline.games.models import GameState, Turn
 from trackline.games.schemas import GameAborted, PlayerLeft, TurnOut
@@ -31,7 +31,7 @@ class LeaveGame(BaseModel):
 
             game_master = next((p for p in game.players if p.is_game_master), None)
             if game_master and game_master.user_id == user_id:
-                raise UseCaseException(
+                raise UseCaseError(
                     code="GAME_MASTER_CANNOT_LEAVE",
                     message="The game master cannot leave the game.",
                     status_code=400,

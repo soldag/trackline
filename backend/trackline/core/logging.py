@@ -34,7 +34,7 @@ def get_log_config(settings: Settings) -> dict:
     }
 
 
-def initialize_sentry(settings: Settings):
+def initialize_sentry(settings: Settings) -> None:
     if settings.sentry_dsn:
         sentry_sdk.init(
             dsn=settings.sentry_dsn,

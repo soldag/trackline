@@ -1,5 +1,5 @@
 import abc
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from uuid import uuid4
 
@@ -47,7 +47,7 @@ class Player(BaseModel):
     user_id: ResourceId
     is_game_master: bool = False
     tokens: int = 0
-    timeline: list[Track] = []
+    timeline: list[Track] = Field(default_factory=list)
 
     def add_to_timeline(self, track: Track) -> None:
         index = next(
@@ -133,7 +133,7 @@ class Turn(BaseModel):
     passes: dict[ResourceId, TurnPass] = {}
     scoring: TurnScoring | None = None
     correction_proposal: CorrectionProposal | None = None
-    completed_by: list[ResourceId] = []
+    completed_by: list[ResourceId] = Field(default_factory=list)
 
 
 class Playlist(BaseModel):
@@ -158,12 +158,15 @@ class Game(BaseDocument):
     completion_time: datetime | None = None
     settings: GameSettings
     state: GameState = GameState.WAITING_FOR_PLAYERS
-    turns: list[Turn] = []
-    players: list[Player] = []
-    discarded_track_ids: list[str] = []
+    turns: list[Turn] = Field(default_factory=list)
+    players: list[Player] = Field(default_factory=list)
+    discarded_track_ids: list[str] = Field(default_factory=list)
 
-    def get_player(self, user_id: ResourceId) -> Player | None:
-        return next((p for p in self.players if p.user_id == user_id), None)
+    def get_player(self, user_id: ResourceId) -> Player:
+        try:
+            return next(p for p in self.players if p.user_id == user_id)
+        except StopIteration as e:
+            raise ValueError("Player not found") from e
 
     def get_active_player(self) -> Player | None:
         if not self.turns:
@@ -177,16 +180,13 @@ class Game(BaseDocument):
             raise ValueError("This game has no players")
 
         active_player = self.get_active_player()
-        if active_player:
-            active_user_index = self.players.index(active_player)
-        else:
-            active_user_index = -1
+        active_user_index = self.players.index(active_player) if active_player else -1
 
         return self.players[(active_user_index + 1) % len(self.players)]
 
     def complete(self, state: GameState) -> None:
         self.state = state
-        self.completion_time = datetime.now(timezone.utc)
+        self.completion_time = datetime.now(UTC)
 
     class Settings(BaseDocument.Settings):
         name = "game"

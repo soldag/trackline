@@ -33,7 +33,9 @@ class ExchangeTrack(BaseModel):
             self._notifier = notifier
 
         async def execute(
-            self, user_id: ResourceId, use_case: "ExchangeTrack"
+            self,
+            user_id: ResourceId,
+            use_case: "ExchangeTrack",
         ) -> TrackExchangeOut:
             game = await self._get_game(use_case.game_id)
             self._assert_is_player(game, user_id)
@@ -42,9 +44,6 @@ class ExchangeTrack(BaseModel):
             self._assert_is_active_player(game, use_case.turn_id, user_id)
             self._assert_has_not_passed(game, use_case.turn_id, user_id)
             self._assert_has_tokens(game, user_id, TOKEN_COST_EXCHANGE_TRACK)
-
-            current_player = game.get_player(user_id)
-            assert current_player
 
             turn = game.turns[use_case.turn_id]
             token_delta = defaultdict(

@@ -1,15 +1,10 @@
 from typing import Annotated
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    WebSocket,
-    WebSocketDisconnect,
-)
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from fastapi_injector import Injected
 
 from trackline.auth.deps import AuthUserId
-from trackline.core.exceptions import RequestException
+from trackline.core.exceptions import RequestError
 from trackline.core.fields import ResourceId
 from trackline.core.schemas import EntityResponse, Response
 from trackline.core.utils.binding import Bind
@@ -48,7 +43,6 @@ from trackline.games.use_cases import (
     VoteCorrection,
 )
 from trackline.users.schemas import UserOut
-
 
 router = APIRouter(
     prefix="/games",
@@ -91,7 +85,7 @@ async def join_game(
     auth_user_id: AuthUserId,
     use_case: Annotated[JoinGame, Depends()],
     handler: Annotated[JoinGame.Handler, Injected(JoinGame.Handler)],
-):
+) -> Response:
     await handler.execute(auth_user_id, use_case)
     return Response()
 
@@ -104,8 +98,10 @@ async def leave_game(
     handler: Annotated[LeaveGame.Handler, Injected(LeaveGame.Handler)],
 ) -> Response:
     if user_id != auth_user_id:
-        raise RequestException(
-            "FORBIDDEN", "You can only remove yourself from a game", 403
+        raise RequestError(
+            code="FORBIDDEN",
+            message="You can only remove yourself from a game",
+            status_code=403,
         )
 
     await handler.execute(auth_user_id, use_case)
@@ -150,7 +146,8 @@ async def create_release_year_guess(
         Bind(CreateReleaseYearGuess, body=["turn_revision_id", "position", "year"]),
     ],
     handler: Annotated[
-        CreateReleaseYearGuess.Handler, Injected(CreateReleaseYearGuess.Handler)
+        CreateReleaseYearGuess.Handler,
+        Injected(CreateReleaseYearGuess.Handler),
     ],
 ) -> EntityResponse[ReleaseYearGuessOut]:
     guess_out = await handler.execute(auth_user_id, use_case)
@@ -165,7 +162,8 @@ async def create_credits_guess(
         Bind(CreateCreditsGuess, body=["turn_revision_id", "artists", "title"]),
     ],
     handler: Annotated[
-        CreateCreditsGuess.Handler, Injected(CreateCreditsGuess.Handler)
+        CreateCreditsGuess.Handler,
+        Injected(CreateCreditsGuess.Handler),
     ],
 ) -> EntityResponse[CreditsGuessOut]:
     guess_out = await handler.execute(auth_user_id, use_case)
@@ -233,7 +231,11 @@ async def buy_track(
     handler: Annotated[BuyTrack.Handler, Injected(BuyTrack.Handler)],
 ) -> EntityResponse[TrackPurchaseReceiptOut]:
     if user_id != auth_user_id:
-        raise RequestException("FORBIDDEN", "You can only buy tracks for yourself", 403)
+        raise RequestError(
+            code="FORBIDDEN",
+            message="You can only buy tracks for yourself",
+            status_code=403,
+        )
 
     receipt_out = await handler.execute(auth_user_id, use_case)
     return EntityResponse(data=receipt_out)
@@ -262,7 +264,7 @@ async def notifications(
         UnregisterNotificationChannel.Handler,
         Injected(UnregisterNotificationChannel.Handler),
     ],
-):
+) -> None:
     register_use_case = RegisterNotificationChannel(game_id=game_id, channel=websocket)
     await register_handler.execute(auth_user_id, register_use_case)
 

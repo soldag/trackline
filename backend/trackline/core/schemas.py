@@ -1,8 +1,6 @@
-from typing import Annotated, Generic, Literal, TypeVar
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, StringConstraints
-
-DataT = TypeVar("DataT")
 
 
 class ErrorDetail(BaseModel):
@@ -20,9 +18,9 @@ class Response(BaseModel):
     status: Literal["ok", "error"] = "ok"
 
 
-class EntityResponse(Response, Generic[DataT]):
+class EntityResponse[TData](Response):
     status: Literal["ok"] = "ok"
-    data: DataT
+    data: TData
 
 
 class ErrorResponse(Response):

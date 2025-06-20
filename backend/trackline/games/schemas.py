@@ -77,7 +77,8 @@ class ReleaseYearGuessOut(GuessOut):
 
     @staticmethod
     def from_model(
-        model: ReleaseYearGuess, user_id: ResourceId
+        model: ReleaseYearGuess,
+        user_id: ResourceId,
     ) -> "ReleaseYearGuessOut":
         return ReleaseYearGuessOut(
             user_id=user_id,
@@ -217,7 +218,8 @@ class CorrectionProposalVoteOut(BaseModel):
 
     @staticmethod
     def from_model(
-        user_id: ResourceId, model: CorrectionProposalVote
+        user_id: ResourceId,
+        model: CorrectionProposalVote,
     ) -> "CorrectionProposalVoteOut":
         return CorrectionProposalVoteOut(
             user_id=user_id,

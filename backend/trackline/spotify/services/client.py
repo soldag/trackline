@@ -17,13 +17,12 @@ from trackline.core.settings import Settings
 from trackline.spotify.models import SpotifyTrack
 
 
-class InvalidTokenException(Exception):
-    def __init__(self, raw_error) -> None:
+class InvalidTokenError(Exception):
+    def __init__(self) -> None:
         super().__init__("The specified authorization token is invalid")
-        self.raw_error = raw_error
 
 
-class PlaylistNotFoundException(Exception):
+class PlaylistNotFoundError(Exception):
     def __init__(self, playlist_id: str) -> None:
         super().__init__(f"The playlist {playlist_id} was not found")
         self.playlist_id = playlist_id
@@ -38,48 +37,51 @@ class SpotifyClient:
 
         self._client = SpotifyApiClient(
             ClientCredentialsFlow(
-                self._settings.spotify_client_id, self._settings.spotify_client_secret
+                self._settings.spotify_client_id,
+                self._settings.spotify_client_secret,
             ),
             hold_authentication=True,
         )
 
-    async def initialize(self):
+    async def initialize(self) -> None:
         await self._client.get_auth_token_with_client_credentials()
         await self._client.create_new_client()
 
-    async def close(self):
+    async def close(self) -> None:
         if self._client:
             await self._client.close_client()
 
-    def get_auth_url(self):
+    def get_auth_url(self) -> str:
         return self._get_auth_client().build_authorization_url()
 
     async def get_access_token(self, code: str) -> tuple[str, str]:
         try:
             token = await self._get_auth_client().get_auth_token_with_code(code)
         except SpotifyError as e:
-            raise InvalidTokenException(e.message)
+            raise InvalidTokenError from e
 
         return token.access_token, token.refresh_token
 
     async def refresh_access_token(self, refresh_token: str) -> tuple[str, str]:
         try:
             token = await self._get_auth_client().refresh_token(
-                SpotifyAuthorisationToken(refresh_token=refresh_token)
+                SpotifyAuthorisationToken(refresh_token=refresh_token),
             )
         except SpotifyError as e:
-            raise InvalidTokenException(e.message)
+            raise InvalidTokenError from e
 
         return token.access_token, token.refresh_token
 
     async def get_current_user(self, access_token: str) -> dict:
         async with self._get_user_client(access_token) as client:
             return await client.user.me(
-                SpotifyAuthorisationToken(access_token=access_token)
+                SpotifyAuthorisationToken(access_token=access_token),
             )
 
     async def get_playlist_total_tracks(
-        self, playlist_id: str, market: str | None = None
+        self,
+        playlist_id: str,
+        market: str | None = None,
     ) -> int:
         await self._get_auth_token_if_needed()
 
@@ -89,7 +91,7 @@ class SpotifyClient:
             market=market,
         )
         if not playlist:
-            raise PlaylistNotFoundException(playlist_id)
+            raise PlaylistNotFoundError(playlist_id)
 
         return playlist["tracks"]["total"]
 
@@ -105,7 +107,10 @@ class SpotifyClient:
         tracks: list[SpotifyTrack] = []
         while True:
             params = {
-                "fields": "items(track(id,is_playable,name,artists(name),album(release_date,images))),total",
+                "fields": (
+                    "items(track(id,is_playable,name,artists(name),album(release_date,images))),"
+                    "total"
+                ),
                 "offset": offset,
                 "limit": limit - len(tracks) if limit else self.MAX_LIMIT,
             }
@@ -141,7 +146,7 @@ class SpotifyClient:
                         release_year=release_year,
                         is_playable=is_playable,
                         image_url=images[0]["url"] if images else None,
-                    )
+                    ),
                 )
 
             offset += len(items)
@@ -153,15 +158,22 @@ class SpotifyClient:
         return tracks
 
     async def get_playlist_track(
-        self, playlist_id: str, index: int, market: str | None = None
+        self,
+        playlist_id: str,
+        index: int,
+        market: str | None = None,
     ) -> SpotifyTrack | None:
         tracks = await self.get_playlist_tracks(
-            playlist_id, offset=index, limit=1, market=market
+            playlist_id,
+            offset=index,
+            limit=1,
+            market=market,
         )
         return tracks[0] if tracks else None
 
     def _get_auth_client(
-        self, auth_token: SpotifyAuthorisationToken | None = None
+        self,
+        auth_token: SpotifyAuthorisationToken | None = None,
     ) -> SpotifyApiClient:
         return SpotifyApiClient(
             AuthorizationCodeFlow(
@@ -169,17 +181,20 @@ class SpotifyClient:
                 self._settings.spotify_client_secret,
                 redirect_url=self._settings.spotify_redirect_url,
             ),
-            spotify_authorisation_token=auth_token,  # type: ignore
+            spotify_authorisation_token=auth_token,  # type: ignore[reportArgumentType]
         )
 
     @asynccontextmanager
     async def _get_user_client(
-        self, access_token: str | None = None, refresh_token: str | None = None
+        self,
+        access_token: str | None = None,
+        refresh_token: str | None = None,
     ) -> AsyncIterator[SpotifyApiClient]:
         auth_token: SpotifyAuthorisationToken | None = None
         if access_token or refresh_token:
             auth_token = SpotifyAuthorisationToken(
-                access_token=access_token, refresh_token=refresh_token  # type: ignore
+                access_token=access_token,  # type: ignore[reportArgumentType]
+                refresh_token=refresh_token,  # type: ignore[reportArgumentType]
             )
 
         client = self._get_auth_client(auth_token)
@@ -193,6 +208,6 @@ class SpotifyClient:
     async def _get_auth_token_if_needed(self) -> None:
         if (
             not self._client.spotify_authorization_token
-            or not not self._client.spotify_authorization_token.valid
+            or self._client.spotify_authorization_token.valid
         ):
             await self._client.get_auth_token_with_client_credentials()

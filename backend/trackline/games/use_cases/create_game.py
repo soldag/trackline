@@ -14,7 +14,7 @@ from trackline.constants import (
     DEFAULT_TITLE_MATCH_MODE,
 )
 from trackline.core.db.repository import Repository
-from trackline.core.exceptions import UseCaseException
+from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import Fraction, ResourceId
 from trackline.games.models import (
     ArtistsMatchMode,
@@ -26,7 +26,7 @@ from trackline.games.models import (
 )
 from trackline.games.schemas import GameOut
 from trackline.games.use_cases.base import BaseHandler
-from trackline.spotify.services.client import PlaylistNotFoundException, SpotifyClient
+from trackline.spotify.services.client import PlaylistNotFoundError, SpotifyClient
 
 
 class CreateGame(BaseModel):
@@ -42,14 +42,17 @@ class CreateGame(BaseModel):
 
     class Handler(BaseHandler):
         def __init__(
-            self, repository: Inject[Repository], spotify_client: Inject[SpotifyClient]
+            self,
+            repository: Inject[Repository],
+            spotify_client: Inject[SpotifyClient],
         ) -> None:
             super().__init__(repository)
             self._spotify_client = spotify_client
 
         async def execute(self, user_id: ResourceId, use_case: "CreateGame") -> GameOut:
             playlists = await self._get_playlists(
-                use_case.playlist_ids, use_case.spotify_market
+                use_case.playlist_ids,
+                use_case.spotify_market,
             )
 
             game = Game(
@@ -77,7 +80,9 @@ class CreateGame(BaseModel):
             return GameOut.from_model(game)
 
         async def _get_playlists(
-            self, playlist_ids: list[str], spotify_market: str
+            self,
+            playlist_ids: list[str],
+            spotify_market: str,
         ) -> list[Playlist]:
             playlists = []
             for playlist_id in playlist_ids:
@@ -86,11 +91,11 @@ class CreateGame(BaseModel):
                         playlist_id,
                         market=spotify_market,
                     )
-                except PlaylistNotFoundException:
-                    raise UseCaseException(
+                except PlaylistNotFoundError as e:
+                    raise UseCaseError(
                         code="PLAYLIST_NOT_FOUND",
                         message=f"The playlist {playlist_id} does not exist.",
-                    )
+                    ) from e
 
                 playlist = Playlist(
                     spotify_id=playlist_id,
@@ -98,4 +103,5 @@ class CreateGame(BaseModel):
                 )
                 playlists.append(playlist)
 
+            return playlists
             return playlists

@@ -7,10 +7,11 @@ from pymongo.errors import OperationFailure
 
 from trackline.core.db.client import DatabaseClient
 from trackline.core.db.models import BaseDocument
-from trackline.core.exceptions import RequestException
+from trackline.core.exceptions import RequestError
 from trackline.core.fields import ResourceId
 from trackline.core.settings import Settings
 
+WRITE_CONFLICT_ERROR_CODE = 112
 
 type Key = tuple[type, ResourceId]
 
@@ -44,18 +45,21 @@ class UnitOfWork:
             try:
                 return await self._save_changes(session)
             except OperationFailure as e:
-                if e.code != 112:
-                    raise e
+                if e.code != WRITE_CONFLICT_ERROR_CODE:
+                    raise
 
                 base_interval = self._settings.db_txn_retries_min_interval * 2**attempt
-                jitter = random.randrange(0, self._settings.db_txn_retries_jitter)
+                jitter = random.randrange(0, self._settings.db_txn_retries_jitter)  # noqa: S311
                 interval = (base_interval + jitter) / 1000
                 await asyncio.sleep(interval)
 
-        raise RequestException(
-            status_code=409,
+        raise RequestError(
             code="REQUEST_CONFLICT",
-            message="The request could not be executed due to a conflict with another request.",
+            message=(
+                "The request could not be executed due "
+                "to a conflict with another request."
+            ),
+            status_code=409,
         )
 
     async def _save_changes(self, session: AsyncIOMotorClientSession) -> None:

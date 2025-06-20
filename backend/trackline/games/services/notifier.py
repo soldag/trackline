@@ -1,8 +1,9 @@
 import asyncio
+import logging
 from collections import defaultdict
 from collections.abc import Iterable
-import logging
-from typing import Any, Generic, Protocol, runtime_checkable, TypeVar
+from contextlib import suppress
+from typing import Any, Protocol, runtime_checkable
 
 from fastapi import WebSocketDisconnect
 from fastapi.encoders import jsonable_encoder
@@ -12,52 +13,51 @@ from trackline.core.fields import ResourceId
 from trackline.core.utils import to_snake_case
 from trackline.games.models import Game
 
-
 log = logging.getLogger(__name__)
 
 
 class Notification(BaseModel):
-    def get_type(self):
+    def get_type(self) -> str:
         return to_snake_case(self.__class__.__name__)
 
 
-NotificationT = TypeVar("NotificationT", bound=Notification)
-
-
-class NotificationEnvelope(BaseModel, Generic[NotificationT]):
+class NotificationEnvelope[NotificationT: Notification](BaseModel):
     type: str
     payload: NotificationT
 
     @classmethod
     def for_notification(
-        cls, notification: NotificationT
+        cls,
+        notification: NotificationT,
     ) -> "NotificationEnvelope[NotificationT]":
         return cls(type=notification.get_type(), payload=notification)
 
 
 @runtime_checkable
 class NotificationChannel(Protocol):
-    async def send_json(self, data: Any) -> None:
+    async def send_json(self, data: Any) -> None:  # noqa: ANN401
         pass
 
 
 class Notifier:
-    def __init__(self):
+    def __init__(self) -> None:
         self._channels: dict[
-            tuple[ResourceId, ResourceId], list[NotificationChannel]
+            tuple[ResourceId, ResourceId],
+            list[NotificationChannel],
         ] = defaultdict(list)
 
     def add_channel(
-        self, game_id: ResourceId, player_id: ResourceId, channel: NotificationChannel
+        self,
+        game_id: ResourceId,
+        player_id: ResourceId,
+        channel: NotificationChannel,
     ) -> None:
         self._channels[game_id, player_id].append(channel)
 
     def remove_channel(self, channel: NotificationChannel) -> None:
         for channels in self._channels.values():
-            try:
+            with suppress(ValueError):
                 channels.remove(channel)
-            except ValueError:
-                pass
 
     async def notify(
         self,
@@ -83,14 +83,18 @@ class Notifier:
         game_id: ResourceId,
         player_ids: Iterable[ResourceId],
         envelope: NotificationEnvelope,
-    ):
+    ) -> None:
         channels: list[NotificationChannel] = []
         for player_id in player_ids:
             channels += self._channels.get((game_id, player_id), [])
 
         await asyncio.gather(*(self._send(channel, envelope) for channel in channels))
 
-    async def _send(self, channel: NotificationChannel, envelope: NotificationEnvelope):
+    async def _send(
+        self,
+        channel: NotificationChannel,
+        envelope: NotificationEnvelope,
+    ) -> None:
         try:
             await channel.send_json(jsonable_encoder(envelope))
         except WebSocketDisconnect:

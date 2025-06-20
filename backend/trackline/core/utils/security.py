@@ -15,6 +15,7 @@ def verify_password(password: str, password_hash: str) -> tuple[bool, str | None
 
     try:
         hasher.verify(password_hash, password)
-        return True, new_hash
     except argon2.exceptions.VerifyMismatchError:
         return False, new_hash
+    else:
+        return True, new_hash

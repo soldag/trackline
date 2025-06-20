@@ -1,6 +1,6 @@
+import logging
 from collections.abc import Collection
 from functools import reduce
-import logging
 
 from httpx import AsyncClient, HTTPError
 from injector import Inject
@@ -26,7 +26,9 @@ class MusicBrainzClient:
         await self._client.aclose()
 
     async def get_release_year(
-        self, artists: Collection[str], title: str
+        self,
+        artists: Collection[str],
+        title: str,
     ) -> int | None:
         sub_queries = (
             *(Q("artist", artist) for artist in artists),
@@ -42,15 +44,13 @@ class MusicBrainzClient:
         except HTTPError:
             log.exception(
                 "MusicBrainz request failed due to HTTP error",
-                exc_info=True,
             )
             return None
 
-        if response.status_code != 200:
+        if not response.is_success:
             log.exception(
                 "MusicBrainz request failed with status code %s",
                 response.status_code,
-                exc_info=True,
             )
             return None
 
@@ -74,7 +74,7 @@ class MusicBrainzClient:
 
         return min(release_years) if release_years else None
 
-    def _get_user_agent(self):
+    def _get_user_agent(self) -> str:
         user_agent = APP_NAME
 
         app_version = get_version()

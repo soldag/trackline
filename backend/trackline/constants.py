@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from trackline.games.models import ArtistsMatchMode, TitleMatchMode
 
-
 APP_NAME = "trackline"
 
 SESSION_TOKEN_LENGTH = 32

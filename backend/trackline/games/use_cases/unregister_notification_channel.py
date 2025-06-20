@@ -13,7 +13,9 @@ class UnregisterNotificationChannel(BaseModel):
 
     class Handler(BaseHandler):
         def __init__(
-            self, repository: Inject[Repository], notifier: Inject[Notifier]
+            self,
+            repository: Inject[Repository],
+            notifier: Inject[Notifier],
         ) -> None:
             super().__init__(repository)
             self._notifier = notifier

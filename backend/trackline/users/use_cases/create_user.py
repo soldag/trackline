@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from pymongo.errors import DuplicateKeyError
 
 from trackline.core.db.repository import Repository
-from trackline.core.exceptions import UseCaseException
+from trackline.core.exceptions import UseCaseError
 from trackline.core.utils.security import hash_password
 from trackline.users.models import User
 from trackline.users.schemas import UserOut
@@ -25,11 +25,11 @@ class CreateUser(BaseModel):
 
             try:
                 await self._repository.create(user)
-            except DuplicateKeyError:
-                raise UseCaseException(
+            except DuplicateKeyError as e:
+                raise UseCaseError(
                     code="USERNAME_EXISTS",
                     message="A user with this username already exists.",
                     status_code=400,
-                )
+                ) from e
 
             return UserOut.from_model(user)

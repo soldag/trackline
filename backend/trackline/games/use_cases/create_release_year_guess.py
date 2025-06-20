@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from pydantic import BaseModel
 
 from trackline.constants import TOKEN_COST_YEAR_GUESS
-from trackline.core.exceptions import UseCaseException
+from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
 from trackline.games.models import Guess, ReleaseYearGuess, Turn
 from trackline.games.schemas import ReleaseYearGuessCreated, ReleaseYearGuessOut
@@ -23,31 +23,39 @@ class CreateReleaseYearGuess(BaseModel):
             return turn.guesses.release_year
 
         async def execute(
-            self, user_id: ResourceId, use_case: "CreateReleaseYearGuess"
+            self,
+            user_id: ResourceId,
+            use_case: "CreateReleaseYearGuess",
         ) -> ReleaseYearGuessOut:
             game = await self._get_game(use_case.game_id)
             token_cost = self._get_token_cost(user_id, game, TOKEN_COST_YEAR_GUESS)
             self._assert_can_guess(
-                user_id, game, use_case.turn_id, use_case.turn_revision_id, token_cost
+                user_id,
+                game,
+                use_case.turn_id,
+                use_case.turn_revision_id,
+                token_cost,
             )
-
-            current_player = game.get_player(user_id)
-            assert current_player
 
             active_player = game.get_active_player()
             if active_player and use_case.position > len(active_player.timeline):
-                raise UseCaseException(
+                raise UseCaseError(
                     code="INVALID_POSITION",
                     message="This position exceeds the boundaries of the timeline.",
                     status_code=400,
                 )
 
             if active_player and not is_valid_release_year(
-                active_player.timeline, use_case.position, use_case.year
+                active_player.timeline,
+                use_case.position,
+                use_case.year,
             ):
-                raise UseCaseException(
+                raise UseCaseError(
                     code="INVALID_RELEASE_YEAR",
-                    message="This release year is not within the boundaries determined by the position.",
+                    message=(
+                        "This release year is not within the boundaries "
+                        "determined by the position."
+                    ),
                     status_code=400,
                 )
 
@@ -59,6 +67,7 @@ class CreateReleaseYearGuess(BaseModel):
             game.turns[use_case.turn_id].guesses.release_year[user_id] = guess
 
             if token_cost > 0:
+                current_player = game.get_player(user_id)
                 current_player.tokens -= guess.token_cost
 
             guess_out = ReleaseYearGuessOut.from_model(guess, user_id)
