@@ -13,6 +13,7 @@ auto_rollback = true
 
 [env]
 DB_NAME = "trackline"
+HOST = "0.0.0.0"
 PRIMARY_REGION = "fra"
 SPOTIFY_REDIRECT_URL = "https://trackline.fly.dev/spotify/callback"
 UVICORN_WORKERS = "3"
