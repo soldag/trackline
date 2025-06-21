@@ -1,10 +1,11 @@
 from injector import inject
 from pydantic import BaseModel
 
-from trackline.constants import SPOTIFY_PRODUCT_PREMIUM
 from trackline.core.exceptions import UseCaseError
 from trackline.spotify.schemas import SpotifyAccessToken
 from trackline.spotify.services.client import InvalidTokenError, SpotifyClient
+
+SPOTIFY_PRODUCT_PREMIUM = "premium"
 
 
 class GetAccessToken(BaseModel):

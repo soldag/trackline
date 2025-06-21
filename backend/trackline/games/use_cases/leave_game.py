@@ -1,10 +1,10 @@
 from injector import inject
 from pydantic import BaseModel
 
-from trackline.constants import MIN_PLAYER_COUNT
 from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
+from trackline.games.constants import MIN_PLAYER_COUNT
 from trackline.games.models import GameState, Turn
 from trackline.games.schemas import GameAborted, PlayerLeft, TurnOut
 from trackline.games.services.notifier import Notifier

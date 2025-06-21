@@ -6,11 +6,13 @@ from httpx import AsyncClient, HTTPError
 from injector import inject
 from lucenequerybuilder import Q
 
-from trackline.constants import APP_NAME, MUSICBRAINZ_MIN_SCORE
+from trackline.constants import APP_NAME
 from trackline.core.settings import Settings
 from trackline.core.utils.version import get_version
 
 log = logging.getLogger(__name__)
+
+MIN_SCORE = 70
 
 
 class MusicBrainzClient:
@@ -57,7 +59,7 @@ class MusicBrainzClient:
 
         release_years: list[int] = []
         for recording in response.json().get("recordings", []):
-            if recording["score"] < MUSICBRAINZ_MIN_SCORE:
+            if recording["score"] < MIN_SCORE:
                 continue
 
             try:

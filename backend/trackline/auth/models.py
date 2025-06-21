@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import Field
 
-from trackline.constants import SESSION_EXPIRY_INTERVAL, SESSION_TOKEN_LENGTH
+from trackline.auth.constants import SESSION_EXPIRY_INTERVAL, SESSION_TOKEN_LENGTH
 from trackline.core.db.models import BaseDocument
 from trackline.core.fields import ResourceId
 from trackline.core.utils.datetime import utcnow

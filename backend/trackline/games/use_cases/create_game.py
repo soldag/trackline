@@ -4,15 +4,6 @@ from annotated_types import Len
 from injector import inject
 from pydantic import BaseModel
 
-from trackline.constants import (
-    DEFAULT_ARTISTS_MATCH_MODE,
-    DEFAULT_CREDITS_SIMILARITY_THRESHOLD,
-    DEFAULT_GUESS_TIMEOUT,
-    DEFAULT_INITIAL_TOKENS,
-    DEFAULT_MAX_TOKENS,
-    DEFAULT_TIMELINE_LENGTH,
-    DEFAULT_TITLE_MATCH_MODE,
-)
 from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import Fraction, ResourceId
@@ -32,13 +23,13 @@ from trackline.spotify.services.client import PlaylistNotFoundError, SpotifyClie
 class CreateGame(BaseModel):
     playlist_ids: Annotated[list[str], Len(min_length=1)]
     spotify_market: str
-    initial_tokens: int = DEFAULT_INITIAL_TOKENS
-    max_tokens: int = DEFAULT_MAX_TOKENS
-    timeline_length: int = DEFAULT_TIMELINE_LENGTH
-    guess_timeout: int = DEFAULT_GUESS_TIMEOUT
-    artists_match_mode: ArtistsMatchMode = DEFAULT_ARTISTS_MATCH_MODE
-    title_match_mode: TitleMatchMode = DEFAULT_TITLE_MATCH_MODE
-    credits_similarity_threshold: Fraction = DEFAULT_CREDITS_SIMILARITY_THRESHOLD
+    initial_tokens: int = 2
+    max_tokens: int = 5
+    timeline_length: int = 10
+    guess_timeout: int = 30000
+    artists_match_mode: ArtistsMatchMode = ArtistsMatchMode.ONE
+    title_match_mode: TitleMatchMode = TitleMatchMode.MAIN
+    credits_similarity_threshold: Fraction = 0.9
 
     class Handler(BaseHandler):
         @inject

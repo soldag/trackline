@@ -2,13 +2,14 @@ from collections.abc import Mapping
 
 from pydantic import BaseModel
 
-from trackline.constants import TOKEN_COST_YEAR_GUESS
 from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
 from trackline.games.models import Guess, ReleaseYearGuess, Turn
 from trackline.games.schemas import ReleaseYearGuessCreated, ReleaseYearGuessOut
 from trackline.games.use_cases.base import CreateGuessBaseHandler
 from trackline.games.utils import is_valid_release_year
+
+TOKEN_COST = 1
 
 
 class CreateReleaseYearGuess(BaseModel):
@@ -28,7 +29,7 @@ class CreateReleaseYearGuess(BaseModel):
             use_case: "CreateReleaseYearGuess",
         ) -> ReleaseYearGuessOut:
             game = await self._get_game(use_case.game_id)
-            token_cost = self._get_token_cost(user_id, game, TOKEN_COST_YEAR_GUESS)
+            token_cost = self._get_token_cost(user_id, game, TOKEN_COST)
             self._assert_can_guess(
                 user_id,
                 game,

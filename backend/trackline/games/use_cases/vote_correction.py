@@ -1,7 +1,6 @@
 from injector import inject
 from pydantic import BaseModel
 
-from trackline.constants import CORRECTION_PROPOSAL_MIN_VOTES
 from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
@@ -19,6 +18,8 @@ from trackline.games.schemas import (
 from trackline.games.services.notifier import Notifier
 from trackline.games.services.scoring_service import ScoringService
 from trackline.games.use_cases.base import BaseHandler
+
+MIN_VOTES = 0.5
 
 
 class VoteCorrection(BaseModel):
@@ -69,9 +70,9 @@ class VoteCorrection(BaseModel):
             all_votes = proposal.votes.values()
             accepted_share = sum(v.agree for v in all_votes) / len(game.players)
             rejected_share = sum(not v.agree for v in all_votes) / len(game.players)
-            if accepted_share > CORRECTION_PROPOSAL_MIN_VOTES:
+            if accepted_share > MIN_VOTES:
                 proposal.state = CorrectionProposalState.ACCEPTED
-            elif rejected_share >= 1 - CORRECTION_PROPOSAL_MIN_VOTES:
+            elif rejected_share >= 1 - MIN_VOTES:
                 proposal.state = CorrectionProposalState.REJECTED
 
             scoring_out: TurnScoringOut | None = None

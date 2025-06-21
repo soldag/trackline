@@ -1,7 +1,6 @@
 import re
 from typing import Protocol
 
-from trackline.constants import TOKEN_GAIN_CREDITS_GUESS, TOKEN_GAIN_YEAR_GUESS
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
     ArtistsMatchMode,
@@ -20,6 +19,9 @@ from trackline.games.models import (
     TurnScoring,
 )
 from trackline.games.utils import compare_strings, is_valid_release_year
+
+TOKEN_GAIN_YEAR_GUESS = 1
+TOKEN_GAIN_CREDITS_GUESS = 1
 
 
 class Credits(Protocol):

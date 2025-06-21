@@ -2,11 +2,12 @@ from collections.abc import Mapping
 
 from pydantic import BaseModel
 
-from trackline.constants import TOKEN_COST_CREDITS_GUESS
 from trackline.core.fields import ResourceId
 from trackline.games.models import CreditsGuess, Guess, Turn
 from trackline.games.schemas import CreditsGuessCreated, CreditsGuessOut
 from trackline.games.use_cases.base import CreateGuessBaseHandler
+
+TOKEN_COST = 1
 
 
 class CreateCreditsGuess(BaseModel):
@@ -26,7 +27,7 @@ class CreateCreditsGuess(BaseModel):
             use_case: "CreateCreditsGuess",
         ) -> CreditsGuessOut:
             game = await self._get_game(use_case.game_id)
-            token_cost = self._get_token_cost(user_id, game, TOKEN_COST_CREDITS_GUESS)
+            token_cost = self._get_token_cost(user_id, game, TOKEN_COST)
             self._assert_can_guess(
                 user_id,
                 game,

@@ -4,7 +4,6 @@ from uuid import uuid4
 from injector import inject
 from pydantic import BaseModel
 
-from trackline.constants import TOKEN_COST_EXCHANGE_TRACK
 from trackline.core.db.repository import Repository
 from trackline.core.fields import ResourceId
 from trackline.games.schemas import (
@@ -16,6 +15,8 @@ from trackline.games.schemas import (
 from trackline.games.services.notifier import Notifier
 from trackline.games.services.track_provider import TrackProvider
 from trackline.games.use_cases.base import TrackProvidingBaseHandler
+
+TOKEN_COST = 1
 
 
 class ExchangeTrack(BaseModel):
@@ -44,13 +45,13 @@ class ExchangeTrack(BaseModel):
             self._assert_is_active_turn(game, use_case.turn_id)
             self._assert_is_active_player(game, use_case.turn_id, user_id)
             self._assert_has_not_passed(game, use_case.turn_id, user_id)
-            self._assert_has_tokens(game, user_id, TOKEN_COST_EXCHANGE_TRACK)
+            self._assert_has_tokens(game, user_id, TOKEN_COST)
 
             turn = game.turns[use_case.turn_id]
             token_delta = defaultdict(
                 lambda: 0,
                 {
-                    user_id: -TOKEN_COST_EXCHANGE_TRACK,
+                    user_id: -TOKEN_COST,
                 },
             )
             for guess_user_id, release_year_guess in turn.guesses.release_year.items():
