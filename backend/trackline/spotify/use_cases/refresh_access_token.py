@@ -1,4 +1,4 @@
-from injector import Inject
+from injector import inject
 from pydantic import BaseModel
 
 from trackline.core.exceptions import UseCaseError
@@ -10,7 +10,8 @@ class RefreshAccessToken(BaseModel):
     refresh_token: str
 
     class Handler:
-        def __init__(self, spotify_client: Inject[SpotifyClient]) -> None:
+        @inject
+        def __init__(self, spotify_client: SpotifyClient) -> None:
             self._spotify_client = spotify_client
 
         async def execute(self, use_case: "RefreshAccessToken") -> SpotifyAccessToken:

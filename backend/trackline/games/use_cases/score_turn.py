@@ -1,4 +1,4 @@
-from injector import Inject
+from injector import inject
 from pydantic import BaseModel
 
 from trackline.core.db.repository import Repository
@@ -14,11 +14,12 @@ class ScoreTurn(BaseModel):
     turn_id: int
 
     class Handler(BaseHandler):
+        @inject
         def __init__(
             self,
-            repository: Inject[Repository],
-            scoring_service: Inject[ScoringService],
-            notifier: Inject[Notifier],
+            repository: Repository,
+            scoring_service: ScoringService,
+            notifier: Notifier,
         ) -> None:
             super().__init__(repository)
             self._scoring_service = scoring_service

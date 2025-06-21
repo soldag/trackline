@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from annotated_types import Len
-from injector import Inject
+from injector import inject
 from pydantic import BaseModel
 
 from trackline.constants import (
@@ -41,10 +41,11 @@ class CreateGame(BaseModel):
     credits_similarity_threshold: Fraction = DEFAULT_CREDITS_SIMILARITY_THRESHOLD
 
     class Handler(BaseHandler):
+        @inject
         def __init__(
             self,
-            repository: Inject[Repository],
-            spotify_client: Inject[SpotifyClient],
+            repository: Repository,
+            spotify_client: SpotifyClient,
         ) -> None:
             super().__init__(repository)
             self._spotify_client = spotify_client

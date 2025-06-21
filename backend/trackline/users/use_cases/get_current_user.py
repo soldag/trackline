@@ -1,4 +1,4 @@
-from injector import Inject
+from injector import inject
 from pydantic import BaseModel
 
 from trackline.core.db.repository import Repository
@@ -10,7 +10,8 @@ from trackline.users.schemas import UserOut
 
 class GetCurrentUser(BaseModel):
     class Handler:
-        def __init__(self, repository: Inject[Repository]) -> None:
+        @inject
+        def __init__(self, repository: Repository) -> None:
             self._repository = repository
 
         async def execute(

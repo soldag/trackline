@@ -11,7 +11,7 @@ from async_spotify.authentification.spotify_authorization_token import (
     SpotifyAuthorisationToken,
 )
 from async_spotify.spotify_errors import SpotifyError
-from injector import Inject
+from injector import inject
 
 from trackline.core.settings import Settings
 from trackline.spotify.models import SpotifyTrack
@@ -32,7 +32,8 @@ class SpotifyClient:
     MAX_LIMIT = 50
     REQUEST_THROTTLE_TIME = 0.2
 
-    def __init__(self, settings: Inject[Settings]) -> None:
+    @inject
+    def __init__(self, settings: Settings) -> None:
         self._settings = settings
 
         self._client = SpotifyApiClient(

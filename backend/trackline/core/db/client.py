@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
 from beanie import init_beanie
-from injector import Inject
+from injector import inject
 from motor.motor_asyncio import (
     AsyncIOMotorClient,
     AsyncIOMotorClientSession,
@@ -22,7 +22,8 @@ session_ctx: ContextVar[AsyncIOMotorClientSession | None] = ContextVar(
 
 
 class DatabaseClient:
-    def __init__(self, settings: Inject[Settings]) -> None:
+    @inject
+    def __init__(self, settings: Settings) -> None:
         self._client: AsyncIOMotorClient = AsyncIOMotorClient(
             settings.db_uri,
             tz_aware=True,

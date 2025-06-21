@@ -1,7 +1,7 @@
 import asyncio
 import random
 
-from injector import Inject
+from injector import inject
 from motor.motor_asyncio import AsyncIOMotorClientSession
 from pymongo.errors import OperationFailure
 
@@ -17,10 +17,11 @@ type Key = tuple[type, ResourceId]
 
 
 class UnitOfWork:
+    @inject
     def __init__(
         self,
-        db_client: Inject[DatabaseClient],
-        settings: Inject[Settings],
+        db_client: DatabaseClient,
+        settings: Settings,
     ) -> None:
         self._db_client = db_client
         self._settings = settings

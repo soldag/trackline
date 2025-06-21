@@ -3,7 +3,7 @@ from collections.abc import Collection
 from functools import reduce
 
 from httpx import AsyncClient, HTTPError
-from injector import Inject
+from injector import inject
 from lucenequerybuilder import Q
 
 from trackline.constants import APP_NAME, MUSICBRAINZ_MIN_SCORE
@@ -14,7 +14,8 @@ log = logging.getLogger(__name__)
 
 
 class MusicBrainzClient:
-    def __init__(self, settings: Inject[Settings]) -> None:
+    @inject
+    def __init__(self, settings: Settings) -> None:
         self._settings = settings
 
         self._client = AsyncClient(

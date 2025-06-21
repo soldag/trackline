@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 from typing import Any, overload
 
-from injector import Inject
+from injector import inject
 from motor.motor_asyncio import AsyncIOMotorClientSession
 from pymongo.results import DeleteResult
 
@@ -14,10 +14,11 @@ type Query = Mapping[str, Any]
 
 
 class Repository:
+    @inject
     def __init__(
         self,
-        db_client: Inject[DatabaseClient],
-        unit_of_work: Inject[UnitOfWork],
+        db_client: DatabaseClient,
+        unit_of_work: UnitOfWork,
     ) -> None:
         self._db_client = db_client
         self._unit_of_work = unit_of_work

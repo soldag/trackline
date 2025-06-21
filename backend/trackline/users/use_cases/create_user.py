@@ -1,4 +1,4 @@
-from injector import Inject
+from injector import inject
 from pydantic import BaseModel
 from pymongo.errors import DuplicateKeyError
 
@@ -14,7 +14,8 @@ class CreateUser(BaseModel):
     password: str
 
     class Handler:
-        def __init__(self, repository: Inject[Repository]) -> None:
+        @inject
+        def __init__(self, repository: Repository) -> None:
             self._repository = repository
 
         async def execute(self, use_case: "CreateUser") -> UserOut:

@@ -1,4 +1,4 @@
-from injector import Inject
+from injector import inject
 from pydantic import BaseModel, ConfigDict
 
 from trackline.core.db.repository import Repository
@@ -12,10 +12,11 @@ class UnregisterNotificationChannel(BaseModel):
     channel: NotificationChannel
 
     class Handler(BaseHandler):
+        @inject
         def __init__(
             self,
-            repository: Inject[Repository],
-            notifier: Inject[Notifier],
+            repository: Repository,
+            notifier: Notifier,
         ) -> None:
             super().__init__(repository)
             self._notifier = notifier

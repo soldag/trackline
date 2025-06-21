@@ -1,7 +1,7 @@
 import abc
 from collections.abc import Collection, Mapping
 
-from injector import Inject
+from injector import inject
 
 from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseError
@@ -13,7 +13,8 @@ from trackline.games.services.track_provider import TrackProvider
 
 
 class BaseHandler:
-    def __init__(self, repository: Inject[Repository]) -> None:
+    @inject
+    def __init__(self, repository: Repository) -> None:
         self._repository = repository
 
     def _assert_is_player(self, game: Game, user_id: ResourceId) -> None:
@@ -124,10 +125,11 @@ class BaseHandler:
 
 
 class TrackProvidingBaseHandler(BaseHandler):
+    @inject
     def __init__(
         self,
-        repository: Inject[Repository],
-        track_provider: Inject[TrackProvider],
+        repository: Repository,
+        track_provider: TrackProvider,
     ) -> None:
         super().__init__(repository)
         self._track_provider = track_provider
@@ -156,10 +158,11 @@ class TrackProvidingBaseHandler(BaseHandler):
 
 
 class CreateGuessBaseHandler(BaseHandler, abc.ABC):
+    @inject
     def __init__(
         self,
-        repository: Inject[Repository],
-        notifier: Inject[Notifier],
+        repository: Repository,
+        notifier: Notifier,
     ) -> None:
         super().__init__(repository)
         self._notifier = notifier

@@ -1,6 +1,6 @@
 from collections.abc import Collection, Iterable
 
-from injector import Inject
+from injector import inject
 
 from trackline.core.utils import shuffle
 from trackline.games.models import Playlist, Track
@@ -10,11 +10,12 @@ from trackline.spotify.services.client import SpotifyClient
 
 
 class TrackProvider:
+    @inject
     def __init__(
         self,
-        spotify_client: Inject[SpotifyClient],
-        music_brainz_client: Inject[MusicBrainzClient],
-        track_cleaner: Inject[TrackCleaner],
+        spotify_client: SpotifyClient,
+        music_brainz_client: MusicBrainzClient,
+        track_cleaner: TrackCleaner,
     ) -> None:
         self._spotify_client = spotify_client
         self._music_brainz_client = music_brainz_client

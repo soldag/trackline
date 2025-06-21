@@ -1,4 +1,4 @@
-from injector import Inject
+from injector import inject
 from pydantic import BaseModel
 
 from trackline.constants import MIN_PLAYER_COUNT
@@ -15,11 +15,12 @@ class StartGame(BaseModel):
     game_id: ResourceId
 
     class Handler(TrackProvidingBaseHandler):
+        @inject
         def __init__(
             self,
-            repository: Inject[Repository],
-            track_provider: Inject[TrackProvider],
-            notifier: Inject[Notifier],
+            repository: Repository,
+            track_provider: TrackProvider,
+            notifier: Notifier,
         ) -> None:
             super().__init__(repository, track_provider)
             self._notifier = notifier

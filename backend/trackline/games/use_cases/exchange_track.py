@@ -1,7 +1,7 @@
 from collections import defaultdict
 from uuid import uuid4
 
-from injector import Inject
+from injector import inject
 from pydantic import BaseModel
 
 from trackline.constants import TOKEN_COST_EXCHANGE_TRACK
@@ -23,11 +23,12 @@ class ExchangeTrack(BaseModel):
     turn_id: int
 
     class Handler(TrackProvidingBaseHandler):
+        @inject
         def __init__(
             self,
-            repository: Inject[Repository],
-            track_provider: Inject[TrackProvider],
-            notifier: Inject[Notifier],
+            repository: Repository,
+            track_provider: TrackProvider,
+            notifier: Notifier,
         ) -> None:
             super().__init__(repository, track_provider)
             self._notifier = notifier
