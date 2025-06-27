@@ -4,7 +4,7 @@ from injector import inject
 
 from trackline.core.utils import shuffle
 from trackline.games.models import Playlist, Track
-from trackline.games.services.music_brainz import MusicBrainzClient
+from trackline.games.services.music_brainz_lookup import MusicBrainzLookup
 from trackline.games.services.track_cleaner import TrackCleaner
 from trackline.spotify.services.client import SpotifyClient
 
@@ -14,11 +14,11 @@ class TrackProvider:
     def __init__(
         self,
         spotify_client: SpotifyClient,
-        music_brainz_client: MusicBrainzClient,
+        music_brainz_lookup: MusicBrainzLookup,
         track_cleaner: TrackCleaner,
     ) -> None:
         self._spotify_client = spotify_client
-        self._music_brainz_client = music_brainz_client
+        self._music_brainz_lookup = music_brainz_lookup
         self._track_cleaner = track_cleaner
 
     async def get_random_tracks(
@@ -72,7 +72,7 @@ class TrackProvider:
 
             clean_title = self._track_cleaner.cleanup_title(track.title)
 
-            mb_release_year = await self._music_brainz_client.get_release_year(
+            mb_release_year = await self._music_brainz_lookup.get_release_year(
                 track.artists,
                 clean_title,
             )
