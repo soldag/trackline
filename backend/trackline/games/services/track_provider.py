@@ -72,10 +72,7 @@ class TrackProvider:
 
             metadata = self._track_metadata_parser.parse(track.artists, track.title)
 
-            mb_release_year = await self._music_brainz_lookup.get_release_year(
-                track.artists,
-                metadata.clean_title,
-            )
+            mb_release_year = await self._music_brainz_lookup.get_release_year(metadata)
             if mb_release_year is not None:
                 release_year = min(track.release_year, mb_release_year)
             else:
