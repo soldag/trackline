@@ -21,6 +21,10 @@ def normalize_string(value: str) -> str:
     return unidecode(value)
 
 
+def tokenize_string(value: str) -> set[str]:
+    return {normalize_string(token) for token in re.split(r"\W+", value) if token}
+
+
 def is_valid_release_year(
     timeline: list[Track],
     position: int,
