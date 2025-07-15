@@ -68,7 +68,7 @@
     "type-fest": "^4.35.0",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.24.0",
-    "vite": "^6.1.0"
+    "vite": "^7.0.4"
   },
   "scripts": {
     "start": "vite dev",
