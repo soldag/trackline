@@ -79,6 +79,34 @@ class SpotifyClient:
                 SpotifyAuthorisationToken(access_token=access_token),
             )
 
+    async def get_track(self, track_id: str) -> SpotifyTrack:
+        await self._get_auth_token_if_needed()
+
+        track = await self._client.track.get_one(track_id)
+
+        release_date = track["album"]["release_date"]
+        is_playable = track.get("is_playable", True)
+
+        try:
+            release_year = int(release_date[:4])
+        except (TypeError, IndexError, ValueError):
+            release_year = None
+
+        images = sorted(
+            track["album"]["images"],
+            key=lambda x: x["height"] * x["width"],
+            reverse=True,
+        )
+
+        return SpotifyTrack(
+            id=track["id"],
+            title=track["name"],
+            artists=[a["name"] for a in track["artists"]],
+            release_year=release_year,
+            is_playable=is_playable,
+            image_url=images[0]["url"] if images else None,
+        )
+
     async def get_playlist_total_tracks(
         self,
         playlist_id: str,
@@ -125,6 +153,9 @@ class SpotifyClient:
 
             for item in items:
                 track = item["track"]
+                if track["id"] is None:
+                    continue
+
                 release_date = track["album"]["release_date"]
                 is_playable = track.get("is_playable", True)
 
