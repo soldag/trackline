@@ -4,7 +4,7 @@ import os
 from collections.abc import Iterable, Mapping
 from dataclasses import asdict
 from io import StringIO
-from typing import Annotated
+from typing import Annotated, Any
 
 import anyio
 import typer
@@ -75,37 +75,38 @@ class MusicbrainzPlaylistLookupCli:
             await self._spotify_client.close()
 
         buffer = StringIO()
+        writer = csv.DictWriter(
+            buffer,
+            fieldnames=[
+                "id",
+                "spotify_artists",
+                "spotify_title",
+                "primary_title",
+                "secondary_titles",
+                "artists",
+                "version",
+                "spotify_release_year",
+                "mb_release_year",
+            ],
+        )
+        writer.writeheader()
+
+        for i, track in enumerate(tracks):
+            print(f"Checking release year of track {i + 1}/{len(tracks)}...")
+
+            metadata = self._track_metadata_parser.parse(track.artists, track.title)
+            mb_release_year = await self._mb_lookup.get_release_year(metadata)
+
+            writer.writerow(self._format_row(track, metadata, mb_release_year))
+
+            await asyncio.sleep(1)
+
         async with await anyio.open_file(file_name, "w") as csv_file:
-            writer = csv.DictWriter(
-                buffer,
-                fieldnames=[
-                    "id",
-                    "spotify_artists",
-                    "spotify_title",
-                    "primary_title",
-                    "secondary_titles",
-                    "artists",
-                    "version",
-                    "spotify_release_year",
-                    "mb_release_year",
-                ],
-            )
-            writer.writeheader()
-
-            for i, track in enumerate(tracks):
-                print(f"Checking release year of track {i + 1}/{len(tracks)}...")
-
-                metadata = self._track_metadata_parser.parse(track.artists, track.title)
-                mb_release_year = await self._mb_lookup.get_release_year(metadata)
-
-                writer.writerow(self._format_row(track, metadata, mb_release_year))
-                await csv_file.write(buffer.getvalue())
-
-                await asyncio.sleep(1)
+            await csv_file.write(buffer.getvalue())
 
     def _format_row(
         self, track: SpotifyTrack, metadata: TrackMetadata, mb_release_year: int | None
-    ) -> Mapping[str, str]:
+    ) -> Mapping[str, Any]:
         formatted_artists: list[str] = []
         for artist in metadata.artists:
             result = artist.primary_name
@@ -125,8 +126,8 @@ class MusicbrainzPlaylistLookupCli:
                 f"{version.description} ({version.version_type})"
                 for version in metadata.versions
             ),
-            "spotify_release_year": str(track.release_year),
-            "mb_release_year": str(mb_release_year),
+            "spotify_release_year": track.release_year,
+            "mb_release_year": mb_release_year,
         }
 
     def _format_iterable(self, iterable: Iterable[str]) -> str:
