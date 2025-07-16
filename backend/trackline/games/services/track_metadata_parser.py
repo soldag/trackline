@@ -92,15 +92,13 @@ class TrackMetadataParser:
             r"Anniversary\s+Edition",
             r"Intro",
             r"^(Re-)?Recorded",
+            r"(Theme\s+)?From\s+(.+)",
             r"(.+)Version",
         ],
     }
     FEATURING_PATTERNS: Collection[FeaturingPattern] = [
         FeaturingPattern(r"^with\s+(?P<artist>.+)", is_trusted=False),
         FeaturingPattern(r"feat(\.|uring)\s+(?P<artist>.+)", is_trusted=True),
-    ]
-    IGNORED_SEGMENT_PATTERNS: Collection[str] = [
-        r"(Theme\s+)?From\s+(.+)",
     ]
 
     def parse(self, raw_artists: Sequence[str], raw_title: str) -> TrackMetadata:
@@ -120,9 +118,6 @@ class TrackMetadataParser:
 
             if not primary_title and not segment.is_annotation:
                 primary_title = text
-                continue
-
-            if self._search_all(self.IGNORED_SEGMENT_PATTERNS, text):
                 continue
 
             if featuring_artists := self._extract_featuring(text, artists):
