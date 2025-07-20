@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from typing import Any, overload
 
 from injector import inject
-from motor.motor_asyncio import AsyncIOMotorClientSession
+from pymongo.asynchronous.client_session import AsyncClientSession
 from pymongo.results import DeleteResult
 
 from trackline.core.db.client import DatabaseClient
@@ -24,7 +24,7 @@ class Repository:
         self._unit_of_work = unit_of_work
 
     @property
-    def _session(self) -> AsyncIOMotorClientSession | None:
+    def _session(self) -> AsyncClientSession | None:
         return self._db_client.session
 
     async def get[T: BaseDocument](

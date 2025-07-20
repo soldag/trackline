@@ -2,7 +2,7 @@ import asyncio
 import random
 
 from injector import inject
-from motor.motor_asyncio import AsyncIOMotorClientSession
+from pymongo.asynchronous.client_session import AsyncClientSession
 from pymongo.errors import OperationFailure
 
 from trackline.core.db.client import DatabaseClient
@@ -63,8 +63,8 @@ class UnitOfWork:
             status_code=409,
         )
 
-    async def _save_changes(self, session: AsyncIOMotorClientSession) -> None:
-        async with session.start_transaction():
+    async def _save_changes(self, session: AsyncClientSession) -> None:
+        async with await session.start_transaction():
             for document in self._documents.values():
                 if document.is_changed:
                     await document.save_changes(session=session)

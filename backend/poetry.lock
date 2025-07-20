@@ -273,34 +273,34 @@ tests-mypy = ["mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" a
 
 [[package]]
 name = "beanie"
-version = "1.30.0"
+version = "2.0.0"
 description = "Asynchronous Python ODM for MongoDB"
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "beanie-1.30.0-py3-none-any.whl", hash = "sha256:385f1b850b36a19dd221aeb83e838c83ec6b47bbf6aeac4e5bf8b8d40bfcfe51"},
-    {file = "beanie-1.30.0.tar.gz", hash = "sha256:33ead17ff2742144c510b4b24e188f6b316dd1b614d86b57a3cfe20bc7b768c9"},
+    {file = "beanie-2.0.0-py3-none-any.whl", hash = "sha256:0d5c0e0de09f2a316c74d17bbba1ceb68ebcbfd3046ae5be69038b2023682372"},
+    {file = "beanie-2.0.0.tar.gz", hash = "sha256:07982e42618cea01722f62d2b4028514a508a2c2c2c71ff85f07f6009112ffb3"},
 ]
 
 [package.dependencies]
 click = ">=7"
-lazy-model = "0.2.0"
-motor = ">=2.5.0,<4.0.0"
+lazy-model = "0.3.0"
 pydantic = ">=1.10.18,<3.0"
+pymongo = ">=4.11.0,<5.0.0"
 typing-extensions = ">=4.7"
 
 [package.extras]
-aws = ["motor[aws] (>=2.5.0,<4.0.0)"]
+aws = ["pymongo[aws] (>=4.11.0,<5.0.0)"]
 ci = ["requests", "tomli (>=2.2.1,<3.0.0) ; python_version < \"3.11\"", "tomli-w (>=1.0.0,<2.0.0)", "types-requests"]
 doc = ["Markdown (>=3.3)", "Pygments (>=2.8.0)", "jinja2 (>=3.0.3)", "mkdocs (>=1.4)", "mkdocs-material (>=9.0)", "pydoc-markdown (>=4.8)"]
-encryption = ["motor[encryption] (>=2.5.0,<4.0.0)"]
-gssapi = ["motor[gssapi] (>=2.5.0,<4.0.0)"]
-ocsp = ["motor[ocsp] (>=2.5.0,<4.0.0)"]
+encryption = ["pymongo[encryption] (>=4.11.0,<5.0.0)"]
+gssapi = ["pymongo[gssapi] (>=4.11.0,<5.0.0)"]
+ocsp = ["pymongo[ocsp] (>=4.11.0,<5.0.0)"]
 queue = ["beanie-batteries-queue (>=0.2)"]
-snappy = ["motor[snappy] (>=2.5.0,<4.0.0)"]
+snappy = ["pymongo[snappy] (>=4.11.0,<5.0.0)"]
 test = ["asgi-lifespan (>=1.0.1)", "dnspython (>=2.1.0)", "fastapi (>=0.100)", "httpx (>=0.23.0)", "pre-commit (>=3.5.0)", "pydantic-extra-types (>=2)", "pydantic-settings (>=2)", "pydantic[email]", "pyright (>=0)", "pytest (>=8.3.3)", "pytest-asyncio (>=0.24.0)", "pytest-cov (>=5.0.0)"]
-zstd = ["motor[zstd] (>=2.5.0,<4.0.0)"]
+zstd = ["pymongo[zstd] (>=4.11.0,<5.0.0)"]
 
 [[package]]
 name = "certifi"
@@ -843,14 +843,14 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "lazy-model"
-version = "0.2.0"
+version = "0.3.0"
 description = ""
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = "<4.0,>=3.8"
 groups = ["main"]
 files = [
-    {file = "lazy-model-0.2.0.tar.gz", hash = "sha256:57c0e91e171530c4fca7aebc3ac05a163a85cddd941bf7527cc46c0ddafca47c"},
-    {file = "lazy_model-0.2.0-py3-none-any.whl", hash = "sha256:5a3241775c253e36d9069d236be8378288a93d4fc53805211fd152e04cc9c342"},
+    {file = "lazy-model-0.3.0.tar.gz", hash = "sha256:e425a189897dc926cc79af196a7cb385d1fd3ac7a7bccb4436fc93661f63b811"},
+    {file = "lazy_model-0.3.0-py3-none-any.whl", hash = "sha256:67c112cad3fbc1816d32c070bf3b3ac1f48aefeb4e46e9eb70e12acc92c6859d"},
 ]
 
 [package.dependencies]
@@ -1081,31 +1081,6 @@ files = [
     {file = "mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"},
     {file = "mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba"},
 ]
-
-[[package]]
-name = "motor"
-version = "3.7.1"
-description = "Non-blocking MongoDB driver for Tornado or asyncio"
-optional = false
-python-versions = ">=3.9"
-groups = ["main"]
-files = [
-    {file = "motor-3.7.1-py3-none-any.whl", hash = "sha256:8a63b9049e38eeeb56b4fdd57c3312a6d1f25d01db717fe7d82222393c410298"},
-    {file = "motor-3.7.1.tar.gz", hash = "sha256:27b4d46625c87928f331a6ca9d7c51c2f518ba0e270939d395bc1ddc89d64526"},
-]
-
-[package.dependencies]
-pymongo = ">=4.9,<5.0"
-
-[package.extras]
-aws = ["pymongo[aws] (>=4.5,<5)"]
-docs = ["aiohttp", "furo (==2024.8.6)", "readthedocs-sphinx-search (>=0.3,<1.0)", "sphinx (>=5.3,<8)", "sphinx-rtd-theme (>=2,<3)", "tornado"]
-encryption = ["pymongo[encryption] (>=4.5,<5)"]
-gssapi = ["pymongo[gssapi] (>=4.5,<5)"]
-ocsp = ["pymongo[ocsp] (>=4.5,<5)"]
-snappy = ["pymongo[snappy] (>=4.5,<5)"]
-test = ["aiohttp (>=3.8.7)", "cffi (>=1.17.0rc1) ; python_version == \"3.13\"", "mockupdb", "pymongo[encryption] (>=4.5,<5)", "pytest (>=7)", "pytest-asyncio", "tornado (>=5)"]
-zstd = ["pymongo[zstd] (>=4.5,<5)"]
 
 [[package]]
 name = "multidict"
@@ -2772,4 +2747,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "e58f87138c183cb1126591cb08db5b192f14f9b9c1fa526abb283ef107ddc8df"
+content-hash = "459b431a0ad4bc9c5f49ddea677c985cb0dc1fa0f72a11301ee8cdee56464c17"

@@ -4,18 +4,15 @@ from contextvars import ContextVar
 
 from beanie import init_beanie
 from injector import inject
-from motor.motor_asyncio import (
-    AsyncIOMotorClient,
-    AsyncIOMotorClientSession,
-    AsyncIOMotorDatabase,
-)
+from pymongo import AsyncMongoClient
+from pymongo.asynchronous.client_session import AsyncClientSession
 
 from trackline.auth.models import Session
 from trackline.core.settings import Settings
 from trackline.games.models import Game
 from trackline.users.models import User
 
-session_ctx: ContextVar[AsyncIOMotorClientSession | None] = ContextVar(
+session_ctx: ContextVar[AsyncClientSession | None] = ContextVar(
     "db_session",
     default=None,
 )
@@ -24,14 +21,14 @@ session_ctx: ContextVar[AsyncIOMotorClientSession | None] = ContextVar(
 class DatabaseClient:
     @inject
     def __init__(self, settings: Settings) -> None:
-        self._client: AsyncIOMotorClient = AsyncIOMotorClient(
+        self._client: AsyncMongoClient = AsyncMongoClient(
             settings.db_uri,
             tz_aware=True,
         )
-        self._database: AsyncIOMotorDatabase = self._client[settings.db_name]
+        self._database = self._client[settings.db_name]
 
     @property
-    def session(self) -> AsyncIOMotorClientSession | None:
+    def session(self) -> AsyncClientSession | None:
         return session_ctx.get()
 
     async def initialize(self) -> None:
@@ -42,8 +39,8 @@ class DatabaseClient:
         )
 
     @asynccontextmanager
-    async def start_session(self) -> AsyncIterator[AsyncIOMotorClientSession]:
-        async with await self._client.start_session() as session:
+    async def start_session(self) -> AsyncIterator[AsyncClientSession]:
+        async with self._client.start_session() as session:
             token = session_ctx.set(session)
             try:
                 yield session
