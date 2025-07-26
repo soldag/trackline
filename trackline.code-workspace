@@ -1,0 +1,17 @@
+{
+    "folders": [
+        {
+            "path": "backend"
+        },
+        {
+            "path": "database"
+        },
+        {
+            "path": "frontend"
+        }
+    ],
+    "settings": {
+        "editor.formatOnSave": true,
+        "cSpell.words": ["trackline"]
+    }
+}
