@@ -2,10 +2,9 @@ from injector import inject
 from pydantic import BaseModel
 
 from trackline.core.exceptions import UseCaseError
+from trackline.spotify.models import SpotifyProduct
 from trackline.spotify.schemas import SpotifyAccessToken
 from trackline.spotify.services.client import InvalidTokenError, SpotifyClient
-
-SPOTIFY_PRODUCT_PREMIUM = "premium"
 
 
 class GetAccessToken(BaseModel):
@@ -30,7 +29,7 @@ class GetAccessToken(BaseModel):
                 ) from e
 
             user = await self._spotify_client.get_current_user(access_token)
-            if user.get("product") != SPOTIFY_PRODUCT_PREMIUM:
+            if user.product != SpotifyProduct.PREMIUM:
                 raise UseCaseError(
                     code="UNSUPPORTED_SPOTIFY_PRODUCT",
                     message="Spotify Premium is required.",

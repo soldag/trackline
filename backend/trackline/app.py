@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator:
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     log.info("Waiting for application startup.")
 
     initialize_sentry(injector.get(Settings))

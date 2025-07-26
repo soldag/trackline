@@ -6,7 +6,7 @@ from fastapi_injector import Injected
 from trackline.auth.deps import AuthToken, AuthUserId
 from trackline.auth.schemas import SessionOut
 from trackline.auth.use_cases import CreateSession, DeleteSession
-from trackline.core.schemas import EntityResponse, Response
+from trackline.core.schemas import EmptyResponse, EntityResponse
 
 router = APIRouter(
     prefix="/auth",
@@ -28,7 +28,7 @@ async def logout(
     token: AuthToken,
     auth_user_id: AuthUserId,
     handler: Annotated[DeleteSession.Handler, Injected(DeleteSession.Handler)],
-) -> Response:
+) -> EmptyResponse:
     use_case = DeleteSession(token=token)
     await handler.execute(use_case)
-    return Response()
+    return EmptyResponse()

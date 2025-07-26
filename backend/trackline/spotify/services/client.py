@@ -1,6 +1,13 @@
+# pyright: reportUnknownVariableType=false
+# pyright: reportUnknownParameterType=false
+# pyright: reportUnknownMemberType=false
+# pyright: reportUnknownArgumentType=false
+# pyright: reportUnknownLambdaType=false
+
 import asyncio
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterable
 from contextlib import asynccontextmanager
+from typing import NotRequired, TypedDict
 
 from async_spotify import SpotifyApiClient
 from async_spotify.authentification.authorization_flows import (
@@ -14,7 +21,14 @@ from async_spotify.spotify_errors import SpotifyError
 from injector import inject
 
 from trackline.core.settings import Settings
-from trackline.spotify.models import SpotifyTrack
+from trackline.spotify.models import SpotifyProduct, SpotifyTrack, SpotifyUser
+
+
+class GetPlaylistTracksParams(TypedDict):
+    fields: Iterable[str]
+    offset: int
+    limit: int
+    market: NotRequired[str]
 
 
 class InvalidTokenError(Exception):
@@ -73,10 +87,17 @@ class SpotifyClient:
 
         return token.access_token, token.refresh_token
 
-    async def get_current_user(self, access_token: str) -> dict:
+    async def get_current_user(self, access_token: str) -> SpotifyUser:
         async with self._get_user_client(access_token) as client:
-            return await client.user.me(
+            user = await client.user.me(
                 SpotifyAuthorisationToken(access_token=access_token),
+            )
+
+            user_product = user.get("product")
+
+            return SpotifyUser(
+                id=user["id"],
+                product=SpotifyProduct(user_product) if user_product else None,
             )
 
     async def get_track(self, track_id: str) -> SpotifyTrack:
@@ -135,7 +156,7 @@ class SpotifyClient:
 
         tracks: list[SpotifyTrack] = []
         while True:
-            params = {
+            params: GetPlaylistTracksParams = {
                 "fields": (
                     "items(track(id,is_playable,name,artists(name),album(release_date,images))),"
                     "total"

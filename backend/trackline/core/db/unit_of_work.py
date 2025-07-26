@@ -64,7 +64,7 @@ class UnitOfWork:
         )
 
     async def _save_changes(self, session: AsyncClientSession) -> None:
-        async with await session.start_transaction():
+        async with await session.start_transaction():  # type: ignore[reportUnknownMemberType]
             for document in self._documents.values():
                 if document.is_changed:
                     await document.save_changes(session=session)

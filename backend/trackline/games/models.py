@@ -47,7 +47,7 @@ class Player(BaseModel):
     user_id: ResourceId
     is_game_master: bool = False
     tokens: int = 0
-    timeline: list[Track] = Field(default_factory=list)
+    timeline: list[Track] = Field(default_factory=list[Track])
 
     def add_to_timeline(self, track: Track) -> None:
         index = next(
@@ -133,7 +133,7 @@ class Turn(BaseModel):
     passes: dict[ResourceId, TurnPass] = {}
     scoring: TurnScoring | None = None
     correction_proposal: CorrectionProposal | None = None
-    completed_by: list[ResourceId] = Field(default_factory=list)
+    completed_by: list[ResourceId] = Field(default_factory=list[ResourceId])
 
 
 class Playlist(BaseModel):
@@ -158,9 +158,9 @@ class Game(BaseDocument):
     completion_time: datetime | None = None
     settings: GameSettings
     state: GameState = GameState.WAITING_FOR_PLAYERS
-    turns: list[Turn] = Field(default_factory=list)
-    players: list[Player] = Field(default_factory=list)
-    discarded_track_ids: list[str] = Field(default_factory=list)
+    turns: list[Turn] = Field(default_factory=list[Turn])
+    players: list[Player] = Field(default_factory=list[Player])
+    discarded_track_ids: list[str] = Field(default_factory=list[str])
 
     def get_player(self, user_id: ResourceId) -> Player:
         try:

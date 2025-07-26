@@ -1,8 +1,9 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
+from typing import Any
 
-from beanie import init_beanie
+from beanie import init_beanie  # type: ignore[reportUnknownVariableType]
 from injector import inject
 from pymongo import AsyncMongoClient
 from pymongo.asynchronous.client_session import AsyncClientSession
@@ -21,7 +22,7 @@ session_ctx: ContextVar[AsyncClientSession | None] = ContextVar(
 class DatabaseClient:
     @inject
     def __init__(self, settings: Settings) -> None:
-        self._client: AsyncMongoClient = AsyncMongoClient(
+        self._client: AsyncMongoClient[dict[str, Any]] = AsyncMongoClient(
             settings.db_uri,
             tz_aware=True,
         )

@@ -6,7 +6,7 @@ from fastapi_injector import Injected
 from trackline.auth.deps import AuthUserId
 from trackline.core.exceptions import RequestError
 from trackline.core.fields import ResourceId
-from trackline.core.schemas import EntityResponse, Response
+from trackline.core.schemas import EmptyResponse, EntityResponse
 from trackline.core.utils.binding import Bind
 from trackline.games.schemas import (
     CorrectionProposalOut,
@@ -85,9 +85,9 @@ async def join_game(
     auth_user_id: AuthUserId,
     use_case: Annotated[JoinGame, Depends()],
     handler: Annotated[JoinGame.Handler, Injected(JoinGame.Handler)],
-) -> Response:
+) -> EmptyResponse:
     await handler.execute(auth_user_id, use_case)
-    return Response()
+    return EmptyResponse()
 
 
 @router.delete("/{game_id}/players/{user_id}")
@@ -96,7 +96,7 @@ async def leave_game(
     auth_user_id: AuthUserId,
     use_case: Annotated[LeaveGame, Depends()],
     handler: Annotated[LeaveGame.Handler, Injected(LeaveGame.Handler)],
-) -> Response:
+) -> EmptyResponse:
     if user_id != auth_user_id:
         raise RequestError(
             code="FORBIDDEN",
@@ -105,7 +105,7 @@ async def leave_game(
         )
 
     await handler.execute(auth_user_id, use_case)
-    return Response()
+    return EmptyResponse()
 
 
 @router.post("/{game_id}/start")
@@ -123,9 +123,9 @@ async def abort_game(
     auth_user_id: AuthUserId,
     use_case: Annotated[AbortGame, Depends()],
     handler: Annotated[AbortGame.Handler, Injected(AbortGame.Handler)],
-) -> Response:
+) -> EmptyResponse:
     await handler.execute(auth_user_id, use_case)
-    return Response()
+    return EmptyResponse()
 
 
 @router.post("/{game_id}/turns")

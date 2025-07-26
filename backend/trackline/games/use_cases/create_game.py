@@ -76,7 +76,7 @@ class CreateGame(BaseModel):
             playlist_ids: list[str],
             spotify_market: str,
         ) -> list[Playlist]:
-            playlists = []
+            playlists: list[Playlist] = []
             for playlist_id in playlist_ids:
                 try:
                     track_count = await self._spotify_client.get_playlist_total_tracks(
@@ -95,5 +95,4 @@ class CreateGame(BaseModel):
                 )
                 playlists.append(playlist)
 
-            return playlists
             return playlists

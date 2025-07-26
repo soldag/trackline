@@ -1,3 +1,5 @@
+from typing import Any
+
 import sentry_sdk
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 from sentry_sdk.integrations.asyncio import AsyncioIntegration
@@ -6,7 +8,7 @@ from sentry_sdk.integrations.pymongo import PyMongoIntegration
 from trackline.core.settings import Settings
 
 
-def get_log_config(settings: Settings) -> dict:
+def get_log_config(settings: Settings) -> dict[str, Any]:
     return {
         "version": 1,
         "formatters": {

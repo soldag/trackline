@@ -59,11 +59,11 @@ class Notifier:
             with suppress(ValueError):
                 channels.remove(channel)
 
-    async def notify(
+    async def notify[TNotification: Notification](
         self,
         user_id: ResourceId | None,
         game: Game,
-        notification: Notification,
+        notification: TNotification,  # type: ignore[reportInvalidTypeVarUse]
     ) -> None:
         if not game.id:
             raise ValueError("The game must have an id")
@@ -71,18 +71,15 @@ class Notifier:
         if not recipient_ids:
             return
 
-        notification_type = type(notification)
-        envelope = NotificationEnvelope[
-            notification_type  # type: ignore[valid-type]
-        ].for_notification(notification)
+        envelope = NotificationEnvelope[TNotification].for_notification(notification)
 
         await self._send_multicast(game.id, recipient_ids, envelope)
 
-    async def _send_multicast(
+    async def _send_multicast[NotificationT: Notification](
         self,
         game_id: ResourceId,
         player_ids: Iterable[ResourceId],
-        envelope: NotificationEnvelope,
+        envelope: NotificationEnvelope[NotificationT],
     ) -> None:
         channels: list[NotificationChannel] = []
         for player_id in player_ids:
@@ -90,10 +87,10 @@ class Notifier:
 
         await asyncio.gather(*(self._send(channel, envelope) for channel in channels))
 
-    async def _send(
+    async def _send[NotificationT: Notification](
         self,
         channel: NotificationChannel,
-        envelope: NotificationEnvelope,
+        envelope: NotificationEnvelope[NotificationT],
     ) -> None:
         try:
             await channel.send_json(jsonable_encoder(envelope))

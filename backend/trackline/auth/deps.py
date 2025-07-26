@@ -27,8 +27,8 @@ _auth = OptionalHTTPBearer(auto_error=False)
 
 
 def get_auth_token(
-    auth: Annotated[HTTPAuthorizationCredentials, Depends(_auth)],
-    session_token: str | None = Query(default=None, include_in_schema=False),
+    auth: Annotated[HTTPAuthorizationCredentials | None, Depends(_auth)],
+    session_token: str | None = Query(default=None, include_in_schema=False),  # type: ignore[reportCallInDefaultInitializer]
 ) -> str:
     if auth:
         return auth.credentials

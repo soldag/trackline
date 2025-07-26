@@ -39,7 +39,7 @@ trackline = "main:main"
 requires-poetry = '>=2.0.0,<3.0.0'
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.4.1"
+pyright = "^1.1.403"
 ruff = "^0.12.0"
 typer = "^0.16.0"
 types-decorator = "^5.1.8.1"
@@ -50,13 +50,19 @@ rich = "^14.0.0"
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.mypy]
-plugins = ["pydantic.mypy"]
-check_untyped_defs = true
-
-[[tool.mypy.overrides]]
-module = ["async_spotify.*", "jaro.*", "lucenequerybuilder.*", "sentry_sdk.*"]
-ignore_missing_imports = true
+[tool.pyright]
+typeCheckingMode = "strict"
+deprecateTypingAliases = true
+reportCallInDefaultInitializer = "error"
+reportImplicitStringConcatenation = "error"
+reportImportCycles = "error"
+reportMatchNotExhaustive = "none"
+reportMissingTypeStubs = "none"
+reportPropertyTypeMismatch = "error"
+reportShadowedImports = "error"
+reportUninitializedInstanceVariable = "error"
+reportUnnecessaryTypeIgnoreComment = "error"
+reportUnreachable = "error"
 
 [tool.ruff]
 extend-exclude = [

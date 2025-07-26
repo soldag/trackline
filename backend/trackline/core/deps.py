@@ -7,7 +7,7 @@ from starlette.requests import HTTPConnection
 log = logging.getLogger(__name__)
 
 
-def websocket_logger(connection: HTTPConnection) -> Iterator:
+def websocket_logger(connection: HTTPConnection) -> Iterator[None]:
     if not isinstance(connection, WebSocket):
         yield
         return

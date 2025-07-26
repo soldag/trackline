@@ -14,15 +14,15 @@ class Error(BaseModel):
     details: list[ErrorDetail] | None = None
 
 
-class Response(BaseModel):
-    status: Literal["ok", "error"] = "ok"
+class EmptyResponse(BaseModel):
+    status: Literal["ok"] = "ok"
 
 
-class EntityResponse[TData](Response):
+class EntityResponse[TData](BaseModel):
     status: Literal["ok"] = "ok"
     data: TData
 
 
-class ErrorResponse(Response):
+class ErrorResponse(BaseModel):
     status: Literal["error"] = "error"
     error: Error

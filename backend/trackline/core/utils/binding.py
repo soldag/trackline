@@ -47,7 +47,7 @@ def Bind[TModel: BaseModel](  # noqa: N802
             (
                 field_name,
                 field_type,
-                field(**field_kwargs),
+                field(**field_kwargs),  # type: ignore[reportUnknownArgumentType]
             ),
         )
 
@@ -56,7 +56,10 @@ def Bind[TModel: BaseModel](  # noqa: N802
         fields=fields,
     )
 
-    async def unwrap(request: Request, wrapper: Any = Depends(ModelWrapper)) -> TModel:  # noqa: ANN401
+    async def unwrap(
+        request: Request,
+        wrapper: Annotated[Any, Depends(ModelWrapper)],  # noqa: ANN401
+    ) -> TModel:
         try:
             return model_type(**asdict(wrapper))
         except ValidationError as e:
