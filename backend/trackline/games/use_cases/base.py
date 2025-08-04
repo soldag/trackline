@@ -1,18 +1,23 @@
 import abc
 from collections.abc import Collection, Mapping
+from typing import Any, TypeVar
 
 from injector import inject
 
 from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
+from trackline.core.use_cases import AuthenticatedUseCase, AuthenticatedUseCaseHandler
 from trackline.games.models import Game, Guess, Track, Turn
 from trackline.games.schemas import GameState
 from trackline.games.services.notifier import Notifier
 from trackline.games.services.track_provider import TrackProvider
 
+TResult = TypeVar("TResult", default=None)
+TUseCase = TypeVar("TUseCase", bound=AuthenticatedUseCase[Any])
 
-class BaseHandler:
+
+class BaseHandler(AuthenticatedUseCaseHandler[TUseCase, TResult]):
     @inject
     def __init__(self, repository: Repository) -> None:
         self._repository = repository
@@ -124,7 +129,7 @@ class BaseHandler:
         return game
 
 
-class TrackProvidingBaseHandler(BaseHandler):
+class TrackProvidingBaseHandler(BaseHandler[TUseCase, TResult]):
     @inject
     def __init__(
         self,
@@ -157,7 +162,7 @@ class TrackProvidingBaseHandler(BaseHandler):
         return track
 
 
-class CreateGuessBaseHandler(BaseHandler, abc.ABC):
+class CreateGuessBaseHandler(BaseHandler[TUseCase, TResult]):
     @inject
     def __init__(
         self,

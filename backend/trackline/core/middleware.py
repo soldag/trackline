@@ -5,7 +5,6 @@ from collections.abc import Awaitable, Callable, Sequence
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from injector import Injector
 from sentry_sdk import capture_exception
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -13,8 +12,6 @@ from starlette.responses import Response
 from starlette.types import ASGIApp, Receive, Scope, Send
 from starlette.websockets import WebSocket
 
-from trackline.core.db.client import DatabaseClient
-from trackline.core.db.unit_of_work import UnitOfWork
 from trackline.core.exceptions import RequestError
 from trackline.core.schemas import Error, ErrorDetail, ErrorResponse
 from trackline.core.utils import list_or_none
@@ -142,22 +139,3 @@ class ExceptionHandlingMiddleware:
             error=Error(code=code, message=message, details=list_or_none(details)),
         )
         return JSONResponse(jsonable_encoder(content, exclude_none=True), status_code)
-
-
-class UnitOfWorkMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: ASGIApp, injector: Injector) -> None:
-        super().__init__(app)
-        self._injector = injector
-
-    async def dispatch(
-        self,
-        request: Request,
-        call_next: Callable[[Request], Awaitable[Response]],
-    ) -> Response:
-        db_client = self._injector.get(DatabaseClient)
-        unit_of_work = self._injector.get(UnitOfWork)
-
-        async with db_client.start_session():
-            response = await call_next(request)
-            await unit_of_work.save_changes()
-            return response

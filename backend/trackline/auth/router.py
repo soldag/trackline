@@ -7,6 +7,7 @@ from trackline.auth.deps import AuthToken, AuthUserId
 from trackline.auth.schemas import SessionOut
 from trackline.auth.use_cases import CreateSession, DeleteSession
 from trackline.core.schemas import EmptyResponse, EntityResponse
+from trackline.core.use_cases import UseCaseExecutor
 
 router = APIRouter(
     prefix="/auth",
@@ -17,9 +18,9 @@ router = APIRouter(
 @router.post("/login", status_code=201)
 async def login(
     use_case: CreateSession,
-    handler: Annotated[CreateSession.Handler, Injected(CreateSession.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[SessionOut]:
-    session = await handler.execute(use_case)
+    session = await use_case_executor.execute(use_case)
     return EntityResponse(data=session)
 
 
@@ -27,8 +28,8 @@ async def login(
 async def logout(
     token: AuthToken,
     auth_user_id: AuthUserId,
-    handler: Annotated[DeleteSession.Handler, Injected(DeleteSession.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EmptyResponse:
     use_case = DeleteSession(token=token)
-    await handler.execute(use_case)
+    await use_case_executor.execute(use_case)
     return EmptyResponse()

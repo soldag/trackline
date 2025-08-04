@@ -8,6 +8,7 @@ from fastapi_injector import Injected
 from trackline.auth.use_cases import GetSessionUser
 from trackline.core.exceptions import RequestError
 from trackline.core.fields import ResourceId
+from trackline.core.use_cases import UseCaseExecutor
 
 log = logging.getLogger(__name__)
 
@@ -47,9 +48,9 @@ AuthToken = Annotated[str, Depends(get_auth_token)]
 
 async def get_auth_user_id(
     token: Annotated[str, Depends(get_auth_token)],
-    handler: Annotated[GetSessionUser.Handler, Injected(GetSessionUser.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> ResourceId:
-    user_id = await handler.execute(GetSessionUser(token=token))
+    user_id = await use_case_executor.execute(GetSessionUser(token=token))
     if not user_id:
         raise RequestError(
             code="INVALID_TOKEN",

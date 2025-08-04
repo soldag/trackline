@@ -16,7 +16,6 @@ from trackline.core.middleware import (
     LoggingMiddleware,
     NoIndexMiddleware,
     ServerTimeMiddleware,
-    UnitOfWorkMiddleware,
 )
 from trackline.core.schemas import ErrorResponse
 from trackline.core.settings import Settings
@@ -63,7 +62,6 @@ app = FastAPI(
 )
 attach_injector(app, injector)
 
-app.add_middleware(UnitOfWorkMiddleware, injector=injector)
 app.add_middleware(InjectorMiddleware, injector=injector)
 app.add_middleware(ExceptionHandlingMiddleware)
 app.add_middleware(ServerTimeMiddleware)

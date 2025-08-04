@@ -41,7 +41,10 @@ class DatabaseClient:
 
     @asynccontextmanager
     async def start_session(self) -> AsyncIterator[AsyncClientSession]:
-        async with self._client.start_session() as session:
+        async with (
+            self._client.start_session() as session,
+            await session.start_transaction(),  # type: ignore[reportUnknownMemberType]
+        ):
             token = session_ctx.set(session)
             try:
                 yield session

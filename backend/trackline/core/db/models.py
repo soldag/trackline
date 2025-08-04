@@ -24,4 +24,5 @@ class BaseDocument(Document):
         )
 
     class Settings:
+        use_revision = True
         use_state_management = True

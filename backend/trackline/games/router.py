@@ -7,6 +7,7 @@ from trackline.auth.deps import AuthUserId
 from trackline.core.exceptions import RequestError
 from trackline.core.fields import ResourceId
 from trackline.core.schemas import EmptyResponse, EntityResponse
+from trackline.core.use_cases import UseCaseExecutor
 from trackline.core.utils.binding import Bind
 from trackline.games.schemas import (
     CorrectionProposalOut,
@@ -54,9 +55,9 @@ router = APIRouter(
 async def create_game(
     auth_user_id: AuthUserId,
     use_case: CreateGame,
-    handler: Annotated[CreateGame.Handler, Injected(CreateGame.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[GameOut]:
-    game = await handler.execute(auth_user_id, use_case)
+    game = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=game)
 
 
@@ -64,9 +65,9 @@ async def create_game(
 async def get_game(
     auth_user_id: AuthUserId,
     use_case: Annotated[GetGame, Depends()],
-    handler: Annotated[GetGame.Handler, Injected(GetGame.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[GameOut]:
-    game = await handler.execute(auth_user_id, use_case)
+    game = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=game)
 
 
@@ -74,9 +75,9 @@ async def get_game(
 async def get_game_users(
     auth_user_id: AuthUserId,
     use_case: Annotated[GetGameUsers, Depends()],
-    handler: Annotated[GetGameUsers.Handler, Injected(GetGameUsers.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[list[UserOut]]:
-    users = await handler.execute(auth_user_id, use_case)
+    users = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=users)
 
 
@@ -84,9 +85,9 @@ async def get_game_users(
 async def join_game(
     auth_user_id: AuthUserId,
     use_case: Annotated[JoinGame, Depends()],
-    handler: Annotated[JoinGame.Handler, Injected(JoinGame.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EmptyResponse:
-    await handler.execute(auth_user_id, use_case)
+    await use_case_executor.execute(use_case, auth_user_id)
     return EmptyResponse()
 
 
@@ -95,7 +96,7 @@ async def leave_game(
     user_id: ResourceId,
     auth_user_id: AuthUserId,
     use_case: Annotated[LeaveGame, Depends()],
-    handler: Annotated[LeaveGame.Handler, Injected(LeaveGame.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EmptyResponse:
     if user_id != auth_user_id:
         raise RequestError(
@@ -104,7 +105,7 @@ async def leave_game(
             status_code=403,
         )
 
-    await handler.execute(auth_user_id, use_case)
+    await use_case_executor.execute(use_case, auth_user_id)
     return EmptyResponse()
 
 
@@ -112,9 +113,9 @@ async def leave_game(
 async def start_game(
     auth_user_id: AuthUserId,
     use_case: Annotated[StartGame, Depends()],
-    handler: Annotated[StartGame.Handler, Injected(StartGame.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[GameOut]:
-    game = await handler.execute(auth_user_id, use_case)
+    game = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=game)
 
 
@@ -122,9 +123,9 @@ async def start_game(
 async def abort_game(
     auth_user_id: AuthUserId,
     use_case: Annotated[AbortGame, Depends()],
-    handler: Annotated[AbortGame.Handler, Injected(AbortGame.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EmptyResponse:
-    await handler.execute(auth_user_id, use_case)
+    await use_case_executor.execute(use_case, auth_user_id)
     return EmptyResponse()
 
 
@@ -132,9 +133,9 @@ async def abort_game(
 async def create_turn(
     auth_user_id: AuthUserId,
     use_case: Annotated[CreateTurn, Depends()],
-    handler: Annotated[CreateTurn.Handler, Injected(CreateTurn.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[TurnOut]:
-    turn_out = await handler.execute(auth_user_id, use_case)
+    turn_out = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=turn_out)
 
 
@@ -145,12 +146,9 @@ async def create_release_year_guess(
         CreateReleaseYearGuess,
         Bind(CreateReleaseYearGuess, body=["turn_revision_id", "position", "year"]),
     ],
-    handler: Annotated[
-        CreateReleaseYearGuess.Handler,
-        Injected(CreateReleaseYearGuess.Handler),
-    ],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[ReleaseYearGuessOut]:
-    guess_out = await handler.execute(auth_user_id, use_case)
+    guess_out = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=guess_out)
 
 
@@ -161,12 +159,9 @@ async def create_credits_guess(
         CreateCreditsGuess,
         Bind(CreateCreditsGuess, body=["turn_revision_id", "artists", "title"]),
     ],
-    handler: Annotated[
-        CreateCreditsGuess.Handler,
-        Injected(CreateCreditsGuess.Handler),
-    ],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[CreditsGuessOut]:
-    guess_out = await handler.execute(auth_user_id, use_case)
+    guess_out = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=guess_out)
 
 
@@ -174,9 +169,9 @@ async def create_credits_guess(
 async def pass_turn(
     auth_user_id: AuthUserId,
     use_case: Annotated[PassTurn, Depends()],
-    handler: Annotated[PassTurn.Handler, Injected(PassTurn.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[TurnPassOut]:
-    turn_pass_out = await handler.execute(auth_user_id, use_case)
+    turn_pass_out = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=turn_pass_out)
 
 
@@ -184,9 +179,9 @@ async def pass_turn(
 async def score_turn(
     auth_user_id: AuthUserId,
     use_case: Annotated[ScoreTurn, Depends()],
-    handler: Annotated[ScoreTurn.Handler, Injected(ScoreTurn.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[TurnScoringOut]:
-    turn_scoring_out = await handler.execute(auth_user_id, use_case)
+    turn_scoring_out = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=turn_scoring_out)
 
 
@@ -197,9 +192,9 @@ async def propose_correction(
         ProposeCorrection,
         Bind(ProposeCorrection, body=["release_year"]),
     ],
-    handler: Annotated[ProposeCorrection.Handler, Injected(ProposeCorrection.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[CorrectionProposalOut]:
-    proposal_out = await handler.execute(auth_user_id, use_case)
+    proposal_out = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=proposal_out)
 
 
@@ -207,9 +202,9 @@ async def propose_correction(
 async def vote_correction(
     auth_user_id: AuthUserId,
     use_case: Annotated[VoteCorrection, Bind(VoteCorrection, body=["agree"])],
-    handler: Annotated[VoteCorrection.Handler, Injected(VoteCorrection.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[CorrectionProposalVoteResultOut]:
-    vote_out = await handler.execute(auth_user_id, use_case)
+    vote_out = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=vote_out)
 
 
@@ -217,9 +212,9 @@ async def vote_correction(
 async def complete_turn(
     auth_user_id: AuthUserId,
     use_case: Annotated[CompleteTurn, Depends()],
-    handler: Annotated[CompleteTurn.Handler, Injected(CompleteTurn.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[TurnCompletionOut]:
-    turn_completion_out = await handler.execute(auth_user_id, use_case)
+    turn_completion_out = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=turn_completion_out)
 
 
@@ -228,7 +223,7 @@ async def buy_track(
     user_id: ResourceId,
     auth_user_id: AuthUserId,
     use_case: Annotated[BuyTrack, Depends()],
-    handler: Annotated[BuyTrack.Handler, Injected(BuyTrack.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[TrackPurchaseReceiptOut]:
     if user_id != auth_user_id:
         raise RequestError(
@@ -237,7 +232,7 @@ async def buy_track(
             status_code=403,
         )
 
-    receipt_out = await handler.execute(auth_user_id, use_case)
+    receipt_out = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=receipt_out)
 
 
@@ -245,9 +240,9 @@ async def buy_track(
 async def exchange_track(
     auth_user_id: AuthUserId,
     use_case: Annotated[ExchangeTrack, Depends()],
-    handler: Annotated[ExchangeTrack.Handler, Injected(ExchangeTrack.Handler)],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[TrackExchangeOut]:
-    track_exchange_out = await handler.execute(auth_user_id, use_case)
+    track_exchange_out = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=track_exchange_out)
 
 
@@ -256,17 +251,10 @@ async def notifications(
     game_id: ResourceId,
     websocket: WebSocket,
     auth_user_id: AuthUserId,
-    register_handler: Annotated[
-        RegisterNotificationChannel.Handler,
-        Injected(RegisterNotificationChannel.Handler),
-    ],
-    unregister_handler: Annotated[
-        UnregisterNotificationChannel.Handler,
-        Injected(UnregisterNotificationChannel.Handler),
-    ],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> None:
     register_use_case = RegisterNotificationChannel(game_id=game_id, channel=websocket)
-    await register_handler.execute(auth_user_id, register_use_case)
+    await use_case_executor.execute(register_use_case, auth_user_id)
 
     await websocket.accept()
     try:
@@ -276,4 +264,4 @@ async def notifications(
         pass
     finally:
         unregister_use_case = UnregisterNotificationChannel(channel=websocket)
-        await unregister_handler.execute(unregister_use_case)
+        await use_case_executor.execute(unregister_use_case, auth_user_id)
