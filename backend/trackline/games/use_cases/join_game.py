@@ -8,7 +8,7 @@ from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
 from trackline.games.models import GameState, Player
 from trackline.games.schemas import PlayerJoined, PlayerOut
-from trackline.games.services.notifier import Notifier
+from trackline.games.services.notifications import Notifier
 from trackline.games.use_cases.base import BaseHandler
 from trackline.users.models import User
 from trackline.users.schemas import UserOut

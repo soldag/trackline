@@ -4,7 +4,7 @@ from trackline.core.db.repository import Repository
 from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
 from trackline.games.schemas import GameAborted, GameState
-from trackline.games.services.notifier import Notifier
+from trackline.games.services.notifications import Notifier
 from trackline.games.use_cases.base import BaseHandler
 
 

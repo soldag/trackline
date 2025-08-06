@@ -11,7 +11,7 @@ from trackline.games.models import (
     GameState,
 )
 from trackline.games.schemas import CorrectionProposalOut, CorrectionProposed
-from trackline.games.services.notifier import Notifier
+from trackline.games.services.notifications import Notifier
 from trackline.games.use_cases.base import BaseHandler
 
 

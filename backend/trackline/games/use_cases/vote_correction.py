@@ -15,7 +15,7 @@ from trackline.games.schemas import (
     CorrectionVoted,
     TurnScoringOut,
 )
-from trackline.games.services.notifier import Notifier
+from trackline.games.services.notifications import Notifier
 from trackline.games.services.scoring_service import ScoringService
 from trackline.games.use_cases.base import BaseHandler
 

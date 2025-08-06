@@ -6,7 +6,7 @@ from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
 from trackline.games.models import Game
 from trackline.games.schemas import GameState, TurnCompleted, TurnCompletionOut
-from trackline.games.services.notifier import Notifier
+from trackline.games.services.notifications import Notifier
 from trackline.games.use_cases.base import BaseHandler
 
 

@@ -12,7 +12,7 @@ from trackline.games.schemas import (
     TrackExchangeOut,
     TrackOut,
 )
-from trackline.games.services.notifier import Notifier
+from trackline.games.services.notifications import Notifier
 from trackline.games.services.track_provider import TrackProvider
 from trackline.games.use_cases.base import TrackProvidingBaseHandler
 

@@ -10,7 +10,7 @@ from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase, AuthenticatedUseCaseHandler
 from trackline.games.models import Game, Guess, Track, Turn
 from trackline.games.schemas import GameState
-from trackline.games.services.notifier import Notifier
+from trackline.games.services.notifications import Notifier
 from trackline.games.services.track_provider import TrackProvider
 
 TResult = TypeVar("TResult", default=None)

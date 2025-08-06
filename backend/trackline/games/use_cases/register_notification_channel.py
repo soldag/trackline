@@ -4,7 +4,10 @@ from pydantic import ConfigDict
 from trackline.core.db.repository import Repository
 from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
-from trackline.games.services.notifier import NotificationChannel, Notifier
+from trackline.games.services.notifications import (
+    NotificationChannel,
+    NotificationChannelManager,
+)
 from trackline.games.use_cases.base import BaseHandler
 
 
@@ -21,10 +24,10 @@ class Handler(BaseHandler[RegisterNotificationChannel]):
     def __init__(
         self,
         repository: Repository,
-        notifier: Notifier,
+        channel_manager: NotificationChannelManager,
     ) -> None:
         super().__init__(repository)
-        self._notifier = notifier
+        self._channel_manager = channel_manager
 
     async def execute(
         self, user_id: ResourceId, use_case: RegisterNotificationChannel
@@ -32,4 +35,4 @@ class Handler(BaseHandler[RegisterNotificationChannel]):
         game = await self._get_game(use_case.game_id)
         self._assert_is_player(game, user_id)
 
-        self._notifier.add_channel(use_case.game_id, user_id, use_case.channel)
+        self._channel_manager.register(use_case.game_id, user_id, use_case.channel)
