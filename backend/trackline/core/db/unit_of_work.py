@@ -48,6 +48,7 @@ class UnitOfWork:
         except OperationFailure as e:
             if e.code == WRITE_CONFLICT_ERROR_CODE:
                 raise TransactionConflictError from e
+            raise
         except RevisionIdWasChanged as e:
             raise TransactionConflictError from e
 
