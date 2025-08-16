@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import random
 from typing import Any, ClassVar, Protocol, Self, overload
 
@@ -11,6 +12,8 @@ from trackline.core.exceptions import RequestError
 from trackline.core.fields import ResourceId
 from trackline.core.notifications.notifier import Notifier
 from trackline.core.settings import Settings
+
+log = logging.getLogger(__name__)
 
 
 class AnonymousUseCase[TResult = None](BaseModel):
@@ -86,28 +89,32 @@ class UseCaseExecutor:
         use_case: AnonymousUseCase[TResult] | AuthenticatedUseCase[TResult],
         user_id: ResourceId | None = None,
     ) -> TResult:
-        for attempt in range(self._settings.db_txn_retries_max_attempts):
+        attempts = 0
+        while True:
+            attempts += 1
             try:
                 async with self._db_client.start_session():
                     result = await self._execute_use_case(use_case, user_id)
                     await self._unit_of_work.save_changes()
-            except TransactionConflictError:
+            except TransactionConflictError as e:
+                if attempts >= self._settings.db_txn_retries_max_attempts:
+                    log.exception("Failed to save changes to database due to conflicts")
+                    raise RequestError(
+                        code="REQUEST_CONFLICT",
+                        message=(
+                            "The request could not be executed due "
+                            "to a conflict with another request."
+                        ),
+                        status_code=409,
+                    ) from e
+
                 self._notifier.clear()
-                await asyncio.sleep(self._get_retry_interval(attempt))
+                await asyncio.sleep(self._get_retry_interval(attempts))
+
                 continue
 
             await self._notifier.flush()
-
             return result
-
-        raise RequestError(
-            code="REQUEST_CONFLICT",
-            message=(
-                "The request could not be executed due "
-                "to a conflict with another request."
-            ),
-            status_code=409,
-        )
 
     async def _execute_use_case[TResult](
         self,
@@ -134,7 +141,7 @@ class UseCaseExecutor:
 
         return result
 
-    def _get_retry_interval(self, attempt: int) -> float:
-        base_interval = self._settings.db_txn_retries_min_interval * 2**attempt
+    def _get_retry_interval(self, attempts: int) -> float:
+        base_interval = self._settings.db_txn_retries_min_interval * 2 ** (attempts - 1)
         jitter = random.randrange(0, self._settings.db_txn_retries_jitter)  # noqa: S311
         return (base_interval + jitter) / 1000

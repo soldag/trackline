@@ -1,5 +1,3 @@
-import logging
-
 from beanie.exceptions import RevisionIdWasChanged
 from injector import inject
 from pymongo.asynchronous.client_session import AsyncClientSession
@@ -9,8 +7,6 @@ from trackline.core.db.client import DatabaseClient
 from trackline.core.db.models import BaseDocument
 from trackline.core.fields import ResourceId
 from trackline.core.settings import Settings
-
-log = logging.getLogger(__name__)
 
 WRITE_CONFLICT_ERROR_CODE = 112
 
@@ -50,11 +46,9 @@ class UnitOfWork:
         try:
             return await self._save_changes(session)
         except OperationFailure as e:
-            log.exception("Saving changes failed")
             if e.code == WRITE_CONFLICT_ERROR_CODE:
                 raise TransactionConflictError from e
         except RevisionIdWasChanged as e:
-            log.exception("Saving changes failed")
             raise TransactionConflictError from e
 
     async def _save_changes(self, session: AsyncClientSession) -> None:
