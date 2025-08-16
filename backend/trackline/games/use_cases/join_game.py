@@ -8,7 +8,7 @@ from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
 from trackline.games.models import GameState, Player
 from trackline.games.schemas import PlayerJoined, PlayerOut
-from trackline.games.services.notifications import Notifier
+from trackline.games.services.game_notifier import GameNotifier
 from trackline.games.use_cases.base import BaseHandler
 from trackline.users.models import User
 from trackline.users.schemas import UserOut
@@ -24,7 +24,7 @@ class Handler(BaseHandler[JoinGame, PlayerOut]):
     def __init__(
         self,
         repository: Repository,
-        notifier: Notifier,
+        notifier: GameNotifier,
     ) -> None:
         super().__init__(repository)
         self._notifier = notifier

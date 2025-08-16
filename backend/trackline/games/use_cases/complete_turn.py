@@ -6,7 +6,7 @@ from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
 from trackline.games.models import Game
 from trackline.games.schemas import GameState, TurnCompleted, TurnCompletionOut
-from trackline.games.services.notifications import Notifier
+from trackline.games.services.game_notifier import GameNotifier
 from trackline.games.use_cases.base import BaseHandler
 
 
@@ -18,7 +18,7 @@ class CompleteTurn(AuthenticatedUseCase[TurnCompletionOut]):
 @CompleteTurn.register_handler
 class CompleteTurnHandler(BaseHandler[CompleteTurn, TurnCompletionOut]):
     @inject
-    def __init__(self, repository: Repository, notifier: Notifier) -> None:
+    def __init__(self, repository: Repository, notifier: GameNotifier) -> None:
         super().__init__(repository)
         self._notifier = notifier
 

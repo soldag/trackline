@@ -4,7 +4,7 @@ from trackline.core.db.repository import Repository
 from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
 from trackline.games.schemas import GameState, TurnScored, TurnScoringOut
-from trackline.games.services.notifications import Notifier
+from trackline.games.services.game_notifier import GameNotifier
 from trackline.games.services.scoring_service import ScoringService
 from trackline.games.use_cases.base import BaseHandler
 
@@ -21,7 +21,7 @@ class Handler(BaseHandler[ScoreTurn, TurnScoringOut]):
         self,
         repository: Repository,
         scoring_service: ScoringService,
-        notifier: Notifier,
+        notifier: GameNotifier,
     ) -> None:
         super().__init__(repository)
         self._scoring_service = scoring_service

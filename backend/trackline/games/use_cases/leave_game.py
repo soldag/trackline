@@ -7,7 +7,7 @@ from trackline.core.use_cases import AuthenticatedUseCase
 from trackline.games.constants import MIN_PLAYER_COUNT
 from trackline.games.models import GameState, Turn
 from trackline.games.schemas import GameAborted, PlayerLeft, TurnOut
-from trackline.games.services.notifications import Notifier
+from trackline.games.services.game_notifier import GameNotifier
 from trackline.games.services.track_provider import TrackProvider
 from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
@@ -23,7 +23,7 @@ class Handler(TrackProvidingBaseHandler[LeaveGame]):
         self,
         repository: Repository,
         track_provider: TrackProvider,
-        notifier: Notifier,
+        notifier: GameNotifier,
     ) -> None:
         super().__init__(repository, track_provider)
         self._notifier = notifier

@@ -20,7 +20,6 @@ from trackline.core.middleware import (
 from trackline.core.schemas import ErrorResponse
 from trackline.core.settings import Settings
 from trackline.di import injector
-from trackline.games.middleware import NotifierMiddleware
 from trackline.games.router import router as games_router
 from trackline.spotify.router import router as spotify_router
 from trackline.spotify.services.client import SpotifyClient
@@ -63,7 +62,6 @@ app = FastAPI(
 )
 attach_injector(app, injector)
 
-app.add_middleware(NotifierMiddleware, injector=injector)
 app.add_middleware(InjectorMiddleware, injector=injector)
 app.add_middleware(ExceptionHandlingMiddleware)
 app.add_middleware(ServerTimeMiddleware)

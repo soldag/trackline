@@ -9,6 +9,7 @@ from trackline.core.db.client import DatabaseClient
 from trackline.core.db.unit_of_work import TransactionConflictError, UnitOfWork
 from trackline.core.exceptions import RequestError
 from trackline.core.fields import ResourceId
+from trackline.core.notifications.notifier import Notifier
 from trackline.core.settings import Settings
 
 
@@ -62,11 +63,13 @@ class UseCaseExecutor:
         db_client: DatabaseClient,
         settings: Settings,
         unit_of_work: UnitOfWork,
+        notifier: Notifier,
     ) -> None:
         self._injector = injector
         self._db_client = db_client
         self._settings = settings
         self._unit_of_work = unit_of_work
+        self._notifier = notifier
 
     @overload
     async def execute[TResult](
@@ -89,8 +92,11 @@ class UseCaseExecutor:
                     result = await self._execute_use_case(use_case, user_id)
                     await self._unit_of_work.save_changes()
             except TransactionConflictError:
+                self._notifier.clear()
                 await asyncio.sleep(self._get_retry_interval(attempt))
                 continue
+
+            await self._notifier.flush()
 
             return result
 

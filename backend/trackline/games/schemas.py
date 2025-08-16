@@ -5,6 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from trackline.core.fields import ResourceId
+from trackline.core.notifications import Notification
 from trackline.games.models import (
     ArtistsMatchMode,
     CorrectionProposal,
@@ -27,7 +28,6 @@ from trackline.games.models import (
     TurnPass,
     TurnScoring,
 )
-from trackline.games.services.notifications import Notification
 from trackline.users.schemas import UserOut
 
 

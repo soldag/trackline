@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from collections import deque
+from collections.abc import Iterable
 from typing import NamedTuple
 
 from fastapi import WebSocketDisconnect
@@ -8,20 +9,17 @@ from fastapi.encoders import jsonable_encoder
 from injector import inject
 from pydantic import BaseModel
 
-from trackline.core.fields import ResourceId
-from trackline.games.models import Game
-from trackline.games.services.notifications.channel_manager import (
+from trackline.core.notifications.channel_manager import (
     NotificationChannel,
     NotificationChannelManager,
 )
-from trackline.games.services.notifications.notification import Notification
+from trackline.core.notifications.notification import Notification
 
 log = logging.getLogger(__name__)
 
 
 class BufferedNotification(NamedTuple):
-    game_id: ResourceId
-    recipient_ids: list[ResourceId]
+    channel_keys: list[tuple[str, ...]]
     notification: Notification
 
 
@@ -45,32 +43,24 @@ class Notifier:
         self._buffer: deque[BufferedNotification] = deque()
 
     async def notify(
-        self, user_id: ResourceId, game: Game, notification: Notification
+        self, channel_keys: Iterable[tuple[str, ...]], notification: Notification
     ) -> None:
-        if not game.id:
-            raise ValueError("The game must have an id")
-
-        recipient_ids = [p.user_id for p in game.players if p.user_id != user_id]
-        if not recipient_ids:
-            return
-
         buffered_notification = BufferedNotification(
-            game_id=game.id,
-            recipient_ids=recipient_ids,
+            channel_keys=list(channel_keys),
             notification=notification,
         )
         self._buffer.append(buffered_notification)
 
     async def flush(self) -> None:
         while self._buffer:
-            game_id, recipient_ids, notification = self._buffer.popleft()
+            channel_keys, notification = self._buffer.popleft()
 
             notification_type = type(notification)
             envelope = NotificationEnvelope[notification_type].for_notification(
                 notification
             )
 
-            channels = self._channel_manager.get_of_players(game_id, recipient_ids)
+            channels = self._channel_manager.get_all(channel_keys)
             await asyncio.gather(
                 *(self._send(channel, envelope) for channel in channels)
             )

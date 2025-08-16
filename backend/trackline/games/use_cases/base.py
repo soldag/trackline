@@ -10,7 +10,7 @@ from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase, AuthenticatedUseCaseHandler
 from trackline.games.models import Game, Guess, Track, Turn
 from trackline.games.schemas import GameState
-from trackline.games.services.notifications import Notifier
+from trackline.games.services.game_notifier import GameNotifier
 from trackline.games.services.track_provider import TrackProvider
 
 TResult = TypeVar("TResult", default=None)
@@ -167,7 +167,7 @@ class CreateGuessBaseHandler(BaseHandler[TUseCase, TResult]):
     def __init__(
         self,
         repository: Repository,
-        notifier: Notifier,
+        notifier: GameNotifier,
     ) -> None:
         super().__init__(repository)
         self._notifier = notifier

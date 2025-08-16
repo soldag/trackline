@@ -9,7 +9,7 @@ from trackline.games.schemas import (
     TrackOut,
     TrackPurchaseReceiptOut,
 )
-from trackline.games.services.notifications import Notifier
+from trackline.games.services.game_notifier import GameNotifier
 from trackline.games.services.track_provider import TrackProvider
 from trackline.games.use_cases.base import TrackProvidingBaseHandler
 
@@ -27,7 +27,7 @@ class Handler(TrackProvidingBaseHandler[BuyTrack, TrackPurchaseReceiptOut]):
         self,
         repository: Repository,
         track_provider: TrackProvider,
-        notifier: Notifier,
+        notifier: GameNotifier,
     ) -> None:
         super().__init__(repository, track_provider)
         self._notifier = notifier

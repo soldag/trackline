@@ -15,7 +15,7 @@ from trackline.games.schemas import (
     CorrectionVoted,
     TurnScoringOut,
 )
-from trackline.games.services.notifications import Notifier
+from trackline.games.services.game_notifier import GameNotifier
 from trackline.games.services.scoring_service import ScoringService
 from trackline.games.use_cases.base import BaseHandler
 
@@ -35,7 +35,7 @@ class Handler(BaseHandler[VoteCorrection, CorrectionProposalVoteResultOut]):
         self,
         repository: Repository,
         scoring_service: ScoringService,
-        notifier: Notifier,
+        notifier: GameNotifier,
     ) -> None:
         super().__init__(repository)
         self._scoring_service = scoring_service

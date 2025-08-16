@@ -11,7 +11,7 @@ from trackline.games.models import (
     GameState,
 )
 from trackline.games.schemas import CorrectionProposalOut, CorrectionProposed
-from trackline.games.services.notifications import Notifier
+from trackline.games.services.game_notifier import GameNotifier
 from trackline.games.use_cases.base import BaseHandler
 
 
@@ -27,7 +27,7 @@ class Handler(BaseHandler[ProposeCorrection, CorrectionProposalOut]):
     def __init__(
         self,
         repository: Repository,
-        notifier: Notifier,
+        notifier: GameNotifier,
     ) -> None:
         super().__init__(repository)
         self._notifier = notifier
