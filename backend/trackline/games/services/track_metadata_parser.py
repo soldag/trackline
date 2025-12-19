@@ -152,7 +152,7 @@ class TrackMetadataParser:
             segments += self._split_in_segments(text[last_end : match.start()])
             last_end = match.end()
 
-            if segment := match.group(1):
+            if segment := match.group(1) or match.group(2):
                 segments.append(Segment(text=segment, is_annotation=True))
 
         remaining_text = text[last_end:]

@@ -157,7 +157,12 @@ class TrackMetadataParserCli:
         pprint(track.model_dump())
         print()
         print("Parsed metadata")
-        pprint(asdict(metadata))
+        pprint(
+            {
+                **asdict(metadata),
+                "clean_title": metadata.clean_title,
+            }
+        )
 
 
 @app.command()
