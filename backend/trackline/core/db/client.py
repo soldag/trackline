@@ -43,7 +43,7 @@ class DatabaseClient:
     async def start_session(self) -> AsyncIterator[AsyncClientSession]:
         async with (
             self._client.start_session() as session,
-            await session.start_transaction(),  # type: ignore[reportUnknownMemberType]
+            await session.start_transaction(),
         ):
             token = session_ctx.set(session)
             try:

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "migrate-mongo": "^12.0.0",
-    "uuid": "^11.0.3"
+    "migrate-mongo": "^14.0.7",
+    "uuid": "^13.0.0"
   },
   "scripts": {
     "migrate": "migrate-mongo"

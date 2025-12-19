@@ -2,17 +2,16 @@ import { forwardRef, useState } from "react";
 
 import { Autocomplete, AutocompleteProps } from "@mui/joy";
 
-interface ChipInputProps<DisableClearable extends boolean>
-  extends Omit<
-    AutocompleteProps<string, true, DisableClearable, true>,
-    | "freeSolo"
-    | "inputValue"
-    | "multiple"
-    | "onChange"
-    | "onInputChange"
-    | "options"
-    | "slotProps"
-  > {
+interface ChipInputProps<DisableClearable extends boolean> extends Omit<
+  AutocompleteProps<string, true, DisableClearable, true>,
+  | "freeSolo"
+  | "inputValue"
+  | "multiple"
+  | "onChange"
+  | "onInputChange"
+  | "options"
+  | "slotProps"
+> {
   onChange: (value: string[]) => void;
 }
 
