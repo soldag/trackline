@@ -30,7 +30,7 @@ services:
     environment:
       DB_URI: mongodb://trackline:trackline@mongo:27017
       DB_NAME: trackline
-      SPOTIFY_REDIRECT_URL: http://localhost:8001/spotify/callback
+      SPOTIFY_REDIRECT_URL: http://127.0.0.1:8001/spotify/callback
     env_file:
       - ./docker-compose.env
     depends_on:

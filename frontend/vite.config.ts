@@ -23,4 +23,7 @@ export default {
       disable: !isCI || !isMainBranch,
     }),
   ],
+  server: {
+    host: "127.0.0.1",
+  },
 };
