@@ -23,6 +23,16 @@ const ChipInput = forwardRef<HTMLInputElement, ChipInputProps<boolean>>(
   ) {
     const [inputValue, setInputValue] = useState("");
 
+    const handleInputChange = (newInputValue: string) => {
+      if (newInputValue.endsWith(",")) {
+        onChange([...(value ?? []), newInputValue.slice(0, -1)]);
+        setInputValue("");
+        return;
+      }
+
+      setInputValue(newInputValue);
+    };
+
     const handleBlur: React.FocusEventHandler<HTMLDivElement> = (e) => {
       if (inputValue && value != null && !value.includes(inputValue)) {
         onChange([...value, inputValue]);
@@ -42,7 +52,7 @@ const ChipInput = forwardRef<HTMLInputElement, ChipInputProps<boolean>>(
         value={value}
         inputValue={inputValue}
         onChange={(_, value) => onChange(value)}
-        onInputChange={(_, value) => setInputValue(value)}
+        onInputChange={(_, value) => handleInputChange(value)}
         onBlur={handleBlur}
       />
     );
