@@ -80,7 +80,7 @@ class TrackMetadataParser:
         ],
         TrackVersionType.REMIX: [
             r"(.+)(\s|-)(Edit|Mix)",
-            r"^(?P<artist>.+)\s(Remix|Rmx)",
+            r"^((?P<artist>.+)\s)?(Remix|Rmx)",
         ],
         TrackVersionType.REMASTER: [
             r"Remaster(ed)?",
@@ -92,7 +92,7 @@ class TrackMetadataParser:
             r"Anniversary\s+Edition",
             r"Intro",
             r"Mono",
-            r"^(Re-)?Recorded",
+            r"^(Re-?)?Recorded",
             r"(Theme\s+)?From\s+(.+)",
             r"(.+)Version",
         ],
