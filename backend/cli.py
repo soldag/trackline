@@ -1,7 +1,8 @@
 import asyncio
 import csv
 import os
-from collections.abc import Iterable, Mapping
+from collections import defaultdict
+from collections.abc import Collection, Iterable, Mapping
 from dataclasses import asdict
 from io import StringIO
 from typing import Annotated, Any
@@ -10,6 +11,7 @@ import anyio
 import typer
 from injector import inject
 from rich import print  # noqa: A004
+from rich.console import Console
 from rich.pretty import pprint
 from rich.table import Table
 
@@ -141,8 +143,8 @@ class TrackMetadataParserCli:
         spotify_client: SpotifyClient,
         track_metadata_parser: TrackMetadataParser,
     ) -> None:
-        self._track_metadata_parser = track_metadata_parser
         self._spotify_client = spotify_client
+        self._track_metadata_parser = track_metadata_parser
 
     async def run(self, track_id: str) -> None:
         await self._spotify_client.initialize()
@@ -163,6 +165,84 @@ class TrackMetadataParserCli:
                 "clean_title": metadata.clean_title,
             }
         )
+
+
+class PlaylistTrackDeduplicatorCli:
+    @inject
+    def __init__(
+        self,
+        spotify_client: SpotifyClient,
+        track_metadata_parser: TrackMetadataParser,
+    ) -> None:
+        self._spotify_client = spotify_client
+        self._track_metadata_parser = track_metadata_parser
+
+    async def run(self, playlist_id: str, access_token: str, *, dry_run: bool) -> None:
+        print(f"Fetching playlist {playlist_id} from Spotify...")
+        await self._spotify_client.initialize()
+        try:
+            tracks = await self._spotify_client.get_playlist_tracks(playlist_id)
+
+            duplicate_tracks: list[SpotifyTrack] = []
+            for tracks_group in self._group_tracks(tracks):
+                sorted_tracks_group = sorted(
+                    tracks_group, key=lambda t: (t.release_year or 0)
+                )
+                duplicate_tracks += sorted_tracks_group[1:]
+
+            print("Deleting duplicate tracks from playlist...")
+            await asyncio.sleep(5)
+            await self._delete_tracks_from_playlist(
+                playlist_id,
+                duplicate_tracks,
+                access_token,
+                dry_run=dry_run,
+            )
+
+        finally:
+            await self._spotify_client.close()
+
+    def _group_tracks(self, tracks: list[SpotifyTrack]) -> list[list[SpotifyTrack]]:
+        grouped_tracks: dict[tuple[str, tuple[str, ...]], list[SpotifyTrack]] = (
+            defaultdict(list)
+        )
+        for track in tracks:
+            metadata = self._track_metadata_parser.parse(track.artists, track.title)
+            key = (
+                metadata.primary_title,
+                tuple(a.primary_name for a in metadata.artists),
+            )
+            grouped_tracks[key].append(track)
+
+        return list(grouped_tracks.values())
+
+    async def _delete_tracks_from_playlist(
+        self,
+        playlist_id: str,
+        tracks: Collection[SpotifyTrack],
+        access_token: str,
+        *,
+        dry_run: bool = False,
+    ) -> None:
+        if dry_run:
+            sorted_tracks = sorted(tracks, key=lambda t: (t.artists, t.title))
+            console = Console()
+            with console.pager():
+                for track in sorted_tracks:
+                    console.print(
+                        "- {id}: {artists} - {title}".format(
+                            id=track.id,
+                            artists=", ".join(track.artists),
+                            title=track.title,
+                        )
+                    )
+        else:
+            await self._spotify_client.remove_tracks_from_playlist(
+                playlist_id,
+                [track.id for track in tracks],
+                access_token,
+            )
+            print(f"Removed {len(tracks)} duplicate tracks.")
 
 
 @app.command()
@@ -187,6 +267,23 @@ def track_metadata(track_id: str) -> None:
     """Parse metadata of a Spotify track."""
     cli = injector.get(TrackMetadataParserCli)
     asyncio.run(cli.run(track_id))
+
+
+@app.command()
+def deduplicate_playlist(
+    playlist_id: str,
+    access_token: str,
+    *,
+    dry_run: Annotated[
+        bool,
+        typer.Option(
+            "--dry-run", help="Only print tracks to delete, don't remove them."
+        ),
+    ] = False,
+) -> None:
+    """Remove duplicate tracks from a Spotify playlist."""
+    cli = injector.get(PlaylistTrackDeduplicatorCli)
+    asyncio.run(cli.run(playlist_id, access_token, dry_run=dry_run))
 
 
 def main() -> None:

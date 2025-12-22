@@ -5,7 +5,7 @@
 # pyright: reportUnknownLambdaType=false
 
 import asyncio
-from collections.abc import AsyncIterator, Iterable
+from collections.abc import AsyncIterator, Iterable, Sequence
 from contextlib import asynccontextmanager
 from typing import NotRequired, TypedDict
 
@@ -223,6 +223,27 @@ class SpotifyClient:
             market=market,
         )
         return tracks[0] if tracks else None
+
+    async def remove_tracks_from_playlist(
+        self, playlist_id: str, track_ids: Sequence[str], access_token: str
+    ) -> None:
+        """
+        Remove multiple tracks from a Spotify playlist in batches of up to 100 items.
+        """
+        async with self._get_user_client(access_token) as client:
+            for i in range(0, len(track_ids), self.MAX_LIMIT):
+                track_ids_chunk = track_ids[i : i + self.MAX_LIMIT]
+                await client.playlists.remove_tracks(
+                    playlist_id,
+                    {
+                        "tracks": [
+                            {"uri": f"spotify:track:{track_id}"}
+                            for track_id in track_ids_chunk
+                        ]
+                    },
+                    SpotifyAuthorisationToken(access_token=access_token),
+                )
+                await asyncio.sleep(self.REQUEST_THROTTLE_TIME)
 
     def _get_auth_client(
         self,
