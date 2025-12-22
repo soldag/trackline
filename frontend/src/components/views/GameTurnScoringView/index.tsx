@@ -6,6 +6,7 @@ import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import { Button, Stack } from "@mui/joy";
 
 import TrackCard from "@/components/common/TrackCard";
+import BuyTrackReminderModal from "@/components/views/GameTurnScoringView/components/BuyTrackReminderModal";
 import View from "@/components/views/View";
 import { TOKEN_COST_BUY_TRACK } from "@/constants";
 import {
@@ -31,6 +32,8 @@ import ScoringTabs from "./components/ScoringTabs";
 
 const GameTurnScoringView = () => {
   const [buyTrackModalOpen, setBuyTrackModelOpen] = useState(false);
+  const [buyTrackReminderModalOpen, setBuyTrackReminderModalOpen] =
+    useState(false);
   const [correctionProposalModalOpen, setCorrectionProposalModalOpen] =
     useState(false);
   const [correctionVotingModalOpen, setCorrectionVotingModalOpen] =
@@ -94,6 +97,14 @@ const GameTurnScoringView = () => {
     }
   }, [correctionProposal?.state]);
 
+  const handleCompleteTurn = () => {
+    if (currentPlayer && currentPlayer.tokens > TOKEN_COST_BUY_TRACK) {
+      setBuyTrackReminderModalOpen(true);
+    } else {
+      dispatch(completeTurn({ gameId, turnId }));
+    }
+  };
+
   return (
     <View
       appBar={{
@@ -106,6 +117,12 @@ const GameTurnScoringView = () => {
         open={buyTrackModalOpen}
         onConfirm={() => dispatch(buyTrack({ gameId, userId }))}
         onClose={() => setBuyTrackModelOpen(false)}
+      />
+
+      <BuyTrackReminderModal
+        open={buyTrackReminderModalOpen}
+        onConfirm={() => dispatch(completeTurn({ gameId, turnId }))}
+        onClose={() => setBuyTrackReminderModalOpen(false)}
       />
 
       <CorrectionProposalModal
@@ -168,7 +185,7 @@ const GameTurnScoringView = () => {
               sx={{ flexGrow: 1 }}
               loading={loadingCompleteTurn}
               disabled={loadingCompleteTurn || hasCompletedTurn}
-              onClick={() => dispatch(completeTurn({ gameId, turnId }))}
+              onClick={handleCompleteTurn}
             >
               {hasCompletedTurn ? (
                 <FormattedMessage
