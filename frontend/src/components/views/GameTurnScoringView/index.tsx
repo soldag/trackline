@@ -11,6 +11,7 @@ import View from "@/components/views/View";
 import { TOKEN_COST_BUY_TRACK } from "@/constants";
 import {
   buyTrack,
+  clearBoughtTrack,
   completeTurn,
   proposeCorrection,
   voteCorrection,
@@ -29,6 +30,7 @@ import CorrectionProposalModal from "./components/CorrectionProposalModal";
 import CorrectionProposalVotingModal from "./components/CorrectionProposalVotingModal";
 import MaxTokenWarningSnackbar from "./components/MaxTokenWarningSnackbar";
 import ScoringTabs from "./components/ScoringTabs";
+import TrackBoughtPopup from "./components/TrackBoughtPopup";
 
 const GameTurnScoringView = () => {
   const [buyTrackModalOpen, setBuyTrackModelOpen] = useState(false);
@@ -44,6 +46,7 @@ const GameTurnScoringView = () => {
   const user = useAppSelector((state) => state.auth.user)!;
   const game = useAppSelector((state) => state.games.game)!;
   const users = useAppSelector((state) => state.games.users);
+  const boughtTrack = useAppSelector((state) => state.games.boughtTrack);
 
   const loadingBuyTrack = useLoadingSelector(buyTrack);
   const loadingCompleteTurn = useLoadingSelector(completeTurn);
@@ -153,6 +156,12 @@ const GameTurnScoringView = () => {
         limit={game.settings.maxTokens}
         open={showMaxTokenSnackbar}
         onClose={() => setShowMaxTokenSnackbar(false)}
+      />
+
+      <TrackBoughtPopup
+        open={!!boughtTrack}
+        track={boughtTrack}
+        onClose={() => dispatch(clearBoughtTrack())}
       />
 
       <Stack

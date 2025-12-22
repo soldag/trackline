@@ -11,7 +11,7 @@ const getOpacity = (state: TransitionStatus): number =>
 const getBackdropFilter = (state: TransitionStatus): string =>
   ["entering", "entered"].includes(state) ? "blur(8px)" : "none";
 
-interface PopupProps {
+export interface PopupProps {
   open?: boolean;
   onClose?: () => void;
   autoClose?: boolean;

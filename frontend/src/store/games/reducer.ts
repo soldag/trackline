@@ -1,4 +1,4 @@
-import { createReducer, isAnyOf } from "@reduxjs/toolkit";
+import { createReducer, isAnyOf, isFulfilled } from "@reduxjs/toolkit";
 import { Draft } from "immer";
 
 import { TOKEN_COST_BUY_TRACK } from "@/constants";
@@ -9,6 +9,7 @@ import { aggregateTokenGains } from "@/utils/games";
 import invariant from "@/utils/invariant";
 
 import {
+  clearBoughtTrack,
   clearGame,
   correctionProposed,
   correctionVoted,
@@ -48,11 +49,13 @@ import {
 interface GamesState {
   game: Game | null;
   users: User[];
+  boughtTrack: Track | null;
 }
 
 const initialState: GamesState = {
   game: null,
   users: [],
+  boughtTrack: null,
 };
 
 const getCurrentTurn = (state: Draft<GamesState>): Draft<Turn> => {
@@ -124,6 +127,10 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(clearGame, (state) => {
       state.game = null;
       state.users = [];
+    })
+
+    .addCase(clearBoughtTrack, (state) => {
+      state.boughtTrack = null;
     })
 
     .addCase(playerJoined, (state, { payload: { user, player, position } }) => {
@@ -329,6 +336,11 @@ const reducer = createReducer(initialState, (builder) => {
         }
       },
     )
+
+    .addMatcher(isFulfilled(buyTrack), (state, { payload }) => {
+      const { track } = payload.receipt;
+      state.boughtTrack = track;
+    })
 
     .addMatcher(
       isAnyOf(exchangeTrack.fulfilled, trackExchanged),

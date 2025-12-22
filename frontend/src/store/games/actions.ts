@@ -17,6 +17,7 @@ import { User } from "@/types/users";
 import { PREFIX } from "./constants";
 
 export const clearGame = createAction(`${PREFIX}/clearGame`);
+export const clearBoughtTrack = createAction(`${PREFIX}/clearBoughtTrack`);
 
 interface PlayerJoinedPayload {
   user: User;
