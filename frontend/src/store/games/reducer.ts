@@ -66,6 +66,15 @@ const getTrackPosition = (timeline: Track[], track: Track) => {
   return position < 0 ? timeline.length : position;
 };
 
+const applyTokenDelta = (
+  game: Game,
+  tokenDelta: { [userId: string]: number },
+) => {
+  for (const player of game.players) {
+    player.tokens += tokenDelta[player.userId] ?? 0;
+  }
+};
+
 const applyScoring = (game: Game, scoring: TurnScoring) => {
   const turn = game.turns.at(-1);
   invariant(turn);
@@ -191,6 +200,8 @@ const reducer = createReducer(initialState, (builder) => {
 
         state.game.state = GameState.Guessing;
         state.game.turns.push(turn);
+
+        applyTokenDelta(state.game, turn.catchUpTokenGain);
       },
     )
 
@@ -208,12 +219,7 @@ const reducer = createReducer(initialState, (builder) => {
           guess,
         ];
 
-        const player = state.game.players.find(
-          (p) => p.userId === guess.userId,
-        );
-        if (player) {
-          player.tokens -= guess.tokenCost;
-        }
+        applyTokenDelta(state.game, { [guess.userId]: -guess.tokenCost });
       },
     )
 
@@ -229,12 +235,7 @@ const reducer = createReducer(initialState, (builder) => {
           guess,
         ];
 
-        const player = state.game.players.find(
-          (p) => p.userId === guess.userId,
-        );
-        if (player) {
-          player.tokens -= guess.tokenCost;
-        }
+        applyTokenDelta(state.game, { [guess.userId]: -guess.tokenCost });
       },
     )
 
@@ -341,9 +342,7 @@ const reducer = createReducer(initialState, (builder) => {
         turn.guesses.credits = [];
         turn.guesses.releaseYear = [];
 
-        for (const player of state.game.players) {
-          player.tokens += tokenDelta[player.userId] || 0;
-        }
+        applyTokenDelta(state.game, tokenDelta);
       },
     );
 });

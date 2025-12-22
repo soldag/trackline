@@ -3,12 +3,11 @@ from collections.abc import Mapping
 from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
+from trackline.games.constants import TOKEN_COST_GUESS_RELEASE_YEAR
 from trackline.games.models import Guess, ReleaseYearGuess, Turn
 from trackline.games.schemas import ReleaseYearGuessCreated, ReleaseYearGuessOut
 from trackline.games.use_cases.base import CreateGuessBaseHandler
 from trackline.games.utils import is_valid_release_year
-
-TOKEN_COST = 1
 
 
 class CreateReleaseYearGuess(AuthenticatedUseCase[ReleaseYearGuessOut]):
@@ -28,7 +27,7 @@ class Handler(CreateGuessBaseHandler[CreateReleaseYearGuess, ReleaseYearGuessOut
         self, user_id: ResourceId, use_case: CreateReleaseYearGuess
     ) -> ReleaseYearGuessOut:
         game = await self._get_game(use_case.game_id)
-        token_cost = self._get_token_cost(user_id, game, TOKEN_COST)
+        token_cost = self._get_token_cost(user_id, game, TOKEN_COST_GUESS_RELEASE_YEAR)
         self._assert_can_guess(
             user_id,
             game,

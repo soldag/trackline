@@ -260,6 +260,7 @@ class TurnOut(BaseModel):
     creation_time: datetime
     active_user_id: ResourceId
     track: TrackOut
+    catch_up_token_gain: Mapping[ResourceId, int]
     guesses: TurnGuessesOut
     passes: list[TurnPassOut]
     scoring: TurnScoringOut | None
@@ -273,6 +274,7 @@ class TurnOut(BaseModel):
             creation_time=model.creation_time,
             active_user_id=model.active_user_id,
             track=TrackOut.from_model(model.track),
+            catch_up_token_gain=model.catch_up_token_gain,
             guesses=TurnGuessesOut.from_model(model.guesses),
             passes=[
                 TurnPassOut.from_model(user_id, turn_pass)

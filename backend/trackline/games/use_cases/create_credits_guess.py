@@ -2,11 +2,10 @@ from collections.abc import Mapping
 
 from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
+from trackline.games.constants import TOKEN_COST_GUESS_CREDITS
 from trackline.games.models import CreditsGuess, Guess, Turn
 from trackline.games.schemas import CreditsGuessCreated, CreditsGuessOut
 from trackline.games.use_cases.base import CreateGuessBaseHandler
-
-TOKEN_COST = 1
 
 
 class CreateCreditsGuess(AuthenticatedUseCase[CreditsGuessOut]):
@@ -28,7 +27,7 @@ class Handler(CreateGuessBaseHandler[CreateCreditsGuess, CreditsGuessOut]):
         use_case: CreateCreditsGuess,
     ) -> CreditsGuessOut:
         game = await self._get_game(use_case.game_id)
-        token_cost = self._get_token_cost(user_id, game, TOKEN_COST)
+        token_cost = self._get_token_cost(user_id, game, TOKEN_COST_GUESS_CREDITS)
         self._assert_can_guess(
             user_id,
             game,

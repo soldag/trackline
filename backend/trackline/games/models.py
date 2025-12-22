@@ -129,6 +129,7 @@ class Turn(BaseModel):
     creation_time: datetime = Field(default_factory=utcnow)
     active_user_id: ResourceId
     track: Track
+    catch_up_token_gain: dict[ResourceId, int] = {}
     guesses: TurnGuesses = TurnGuesses()
     passes: dict[ResourceId, TurnPass] = {}
     scoring: TurnScoring | None = None
@@ -151,6 +152,7 @@ class GameSettings(BaseModel):
     artists_match_mode: ArtistsMatchMode
     title_match_mode: TitleMatchMode
     credits_similarity_threshold: float
+    enable_catchup: bool
 
 
 class Game(BaseDocument):

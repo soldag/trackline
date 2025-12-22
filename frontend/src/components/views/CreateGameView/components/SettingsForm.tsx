@@ -9,6 +9,8 @@ import {
   Select,
   Slider,
   Stack,
+  Switch,
+  Typography,
 } from "@mui/joy";
 
 import {
@@ -27,10 +29,12 @@ interface SettingsFormProps {
   maxTokens: number;
   timelineLength: number;
   creditsStrictness: CreditsStrictness;
+  enableCatchUp: boolean;
   onInitialTokensChange: (value: number) => void;
   onMaxTokensChange: (value: number) => void;
   onTimelineLengthChange: (value: number) => void;
   onCreditsStrictnessChange: (value: CreditsStrictness) => void;
+  onEnableCatchUpChange?: (value: boolean) => void;
 }
 
 const SettingsForm = ({
@@ -38,10 +42,12 @@ const SettingsForm = ({
   maxTokens,
   timelineLength,
   creditsStrictness,
+  enableCatchUp,
   onInitialTokensChange,
   onMaxTokensChange,
   onTimelineLengthChange,
   onCreditsStrictnessChange,
+  onEnableCatchUpChange,
 }: SettingsFormProps) => {
   const intl = useIntl();
 
@@ -184,6 +190,30 @@ const SettingsForm = ({
             )}
           </span>
         </FormHelperText>
+      </FormControl>
+      <FormControl>
+        <FormLabel>
+          <FormattedMessage
+            id="CreateGameView.SettingsForm.enableCatchUp.label"
+            defaultMessage="Catch-up boost"
+          />
+        </FormLabel>
+        <Typography
+          level="body-sm"
+          component="label"
+          startDecorator={
+            <Switch
+              sx={{ mr: 0.5 }}
+              checked={enableCatchUp}
+              onChange={(e) => onEnableCatchUpChange?.(e.target.checked)}
+            />
+          }
+        >
+          <FormattedMessage
+            id="CreateGameView.SettingsForm.enableCatchUp.helpText"
+            defaultMessage="Players who are behind receive a small token boost at the start of each round."
+          />
+        </Typography>
       </FormControl>
     </Stack>
   );

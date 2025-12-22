@@ -82,6 +82,7 @@ const CreateGameView = () => {
   const [creditsStrictness, setCreditsStrictness] = useState(
     DEFAULT_CREDITS_STRICTNESS,
   );
+  const [enableCatchUp, setEnableCatchUp] = useState(true);
 
   useErrorToast(createGame);
 
@@ -112,6 +113,7 @@ const CreateGameView = () => {
         initialTokens,
         maxTokens,
         timelineLength,
+        enableCatchUp,
         ...CREDITS_STRICTNESS_VALUES[creditsStrictness],
       }),
     );
@@ -122,6 +124,7 @@ const CreateGameView = () => {
     initialTokens,
     maxTokens,
     timelineLength,
+    enableCatchUp,
     creditsStrictness,
   ]);
 
@@ -182,10 +185,12 @@ const CreateGameView = () => {
       maxTokens={maxTokens}
       timelineLength={timelineLength}
       creditsStrictness={creditsStrictness}
+      enableCatchUp={enableCatchUp}
       onInitialTokensChange={setInitialTokens}
       onMaxTokensChange={setMaxTokens}
       onTimelineLengthChange={setTimelineLength}
       onCreditsStrictnessChange={setCreditsStrictness}
+      onEnableCatchUpChange={setEnableCatchUp}
     />
   );
 

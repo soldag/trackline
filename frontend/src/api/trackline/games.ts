@@ -27,6 +27,7 @@ export const create = async ({
   artistsMatchMode,
   titleMatchMode,
   creditsSimilarityThreshold,
+  enableCatchUp,
 }: {
   playlistIds: string[];
   spotifyMarket: string;
@@ -36,6 +37,7 @@ export const create = async ({
   artistsMatchMode: ArtistMatchMode;
   titleMatchMode: TitleMatchMode;
   creditsSimilarityThreshold: number;
+  enableCatchUp: boolean;
 }): Promise<Game> => {
   const {
     data: { data: game },
@@ -48,6 +50,7 @@ export const create = async ({
     artistsMatchMode,
     titleMatchMode,
     creditsSimilarityThreshold,
+    enableCatchUp,
   });
 
   return game;

@@ -111,6 +111,7 @@ export interface Turn {
   creationTime: string;
   activeUserId: string;
   track: Track;
+  catchUpTokenGain: { [userId: string]: number };
   guesses: {
     releaseYear: ReleaseYearGuess[];
     credits: CreditsGuess[];
