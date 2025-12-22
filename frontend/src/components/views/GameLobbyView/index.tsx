@@ -7,13 +7,14 @@ import { Box, Button, Stack, Typography } from "@mui/joy";
 import ButtonFooter from "@/components/common/ButtonFooter";
 import ResponsiveQrCode from "@/components/common/ResponsiveQrCode";
 import View from "@/components/views/View";
-import { MIN_PLAYER_COUNT } from "@/constants";
+import { LOBBY_TRACK_ID, MIN_PLAYER_COUNT } from "@/constants";
 import { abortGame, leaveGame, startGame } from "@/store/games";
 import {
   useAppDispatch,
   useAppSelector,
   useErrorToast,
   useLoadingSelector,
+  useSpotifyPlayback,
 } from "@/utils/hooks";
 
 import PlayersList from "./components/PlayersList";
@@ -36,14 +37,22 @@ const GameLobbyView = () => {
   const gameId = game?.id;
   const userId = user?.id;
   const gameMasterId = game?.players.find((p) => p.isGameMaster)?.userId;
+  const isGameMaster = user?.id === gameMasterId;
   const joinUrl = `${document.location.origin}/games/join/${gameId}`;
+
+  useSpotifyPlayback({
+    isEnabled: isGameMaster,
+    trackId: LOBBY_TRACK_ID,
+  });
 
   if (!gameId || !userId) {
     return <Navigate to="/" />;
   }
 
   return (
-    <View appBar={{ showTitle: true, showLogout: true }}>
+    <View
+      appBar={{ showTitle: true, showPlaybackControls: true, showLogout: true }}
+    >
       <QrCodeModal
         joinUrl={joinUrl}
         open={qrCodeModalOpen}
@@ -105,7 +114,7 @@ const GameLobbyView = () => {
           </Stack>
         </Stack>
 
-        {user?.id === gameMasterId ? (
+        {isGameMaster ? (
           <ButtonFooter>
             <Button
               color="danger"

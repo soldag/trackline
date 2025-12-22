@@ -96,5 +96,5 @@ export const RECOMMENDED_PLAYLIST_IDS = [
   "1t5w9AS3kaImejMM2o4yf3", // Hitster
 ];
 
-export const LOBBY_TRACK_ID = "5WIHTBujvgqKbbOp1mWQiz";
+export const LOBBY_TRACK_ID = "71wc2McPHycCEESSMwP98h";
 export const GAME_COMPLETION_TRACK_ID = "1ZfbMOw5VSh5Qqr8hgLCkJ";

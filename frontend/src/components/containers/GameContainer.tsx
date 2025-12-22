@@ -68,7 +68,7 @@ const GameContainer = () => {
 
   useUnmountEffect(() => {
     if (isGameMaster) {
-      return () => dispatch(pause());
+      dispatch(pause());
     }
   });
 

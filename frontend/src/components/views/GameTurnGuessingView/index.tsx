@@ -15,7 +15,6 @@ import {
   passTurn,
   scoreTurn,
 } from "@/store/games";
-import { play } from "@/store/spotify";
 import { Game, Player, Track, Turn } from "@/types/games.ts";
 import {
   useAppDispatch,
@@ -24,6 +23,7 @@ import {
   useErrorToast,
   useInterval,
   useLoadingSelector,
+  useSpotifyPlayback,
 } from "@/utils/hooks";
 
 import BottomMenu from "./components/BottomMenu.tsx";
@@ -88,9 +88,6 @@ const GameTurnGuessingView = () => {
   const users = useAppSelector((state) => state.games.users);
   const timeDeviation = useAppSelector(
     (state) => state.timing.timeDeviation.trackline,
-  );
-  const playbackTrackId = useAppSelector(
-    (state) => state.spotify.playback.trackId,
   );
 
   const loadingReleaseYearGuess = useLoadingSelector(guessTrackReleaseYear);
@@ -244,11 +241,11 @@ const GameTurnGuessingView = () => {
     turnId,
   ]);
 
-  useEffect(() => {
-    if (isGameMaster && playbackTrackId !== track.spotifyId) {
-      dispatch(play({ trackId: track.spotifyId }));
-    }
-  }, [dispatch, track.spotifyId, isGameMaster, playbackTrackId]);
+  useSpotifyPlayback({
+    isEnabled: isGameMaster,
+    trackId: track.spotifyId,
+    pauseOnUnmount: false,
+  });
 
   const handleGuessReleaseYear = ({
     position,

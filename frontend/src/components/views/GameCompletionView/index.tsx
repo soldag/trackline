@@ -7,16 +7,18 @@ import { Box, Button, Stack } from "@mui/joy";
 import GameScoringTable from "@/components/common/GameScoringTable";
 import View from "@/components/views/View";
 import { GAME_COMPLETION_TRACK_ID } from "@/constants";
-import { play } from "@/store/spotify";
 import { useFireworks } from "@/utils/confetti";
-import { useAppDispatch, useAppSelector, useMountEffect } from "@/utils/hooks";
+import {
+  useAppSelector,
+  useMountEffect,
+  useSpotifyPlayback,
+} from "@/utils/hooks";
 
 import WinnerTrophy from "./components/WinnerTrophy";
 
 const GameCompletionView = () => {
   const { start: startFireworks } = useFireworks({ duration: 60 * 1000 });
 
-  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
   const game = useAppSelector((state) => state.games.game);
   const users = useAppSelector((state) => state.games.users);
@@ -29,10 +31,11 @@ const GameCompletionView = () => {
 
   useMountEffect(() => {
     startFireworks();
+  });
 
-    if (isGameMaster) {
-      dispatch(play({ trackId: GAME_COMPLETION_TRACK_ID }));
-    }
+  useSpotifyPlayback({
+    isEnabled: isGameMaster,
+    trackId: GAME_COMPLETION_TRACK_ID,
   });
 
   return (

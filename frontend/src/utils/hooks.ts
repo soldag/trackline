@@ -17,6 +17,7 @@ import { Breakpoints } from "@mui/system";
 
 import SpotifyContext from "@/components/contexts/SpotifyContext";
 import { dismissError } from "@/store/errors/actions";
+import { pause, play } from "@/store/spotify";
 import { AppError } from "@/types/errors";
 import { AnyAsyncThunk, AppDispatch, RootState } from "@/types/store";
 import { getErrorMessage } from "@/utils/errors";
@@ -200,4 +201,32 @@ export const useSpotify = ({
 
   useMountEffect(() => () => setIsRequired(false));
   useEffect(() => setIsRequired(requireAuth), [requireAuth, setIsRequired]);
+};
+
+export const useSpotifyPlayback = ({
+  trackId,
+  isEnabled = true,
+  pauseOnUnmount = true,
+}: {
+  trackId?: string;
+  isEnabled?: boolean;
+  pauseOnUnmount?: boolean;
+}) => {
+  const dispatch = useAppDispatch();
+
+  const playbackTrackId = useAppSelector(
+    (state) => state.spotify.playback.trackId,
+  );
+
+  useEffect(() => {
+    if (trackId && isEnabled && playbackTrackId !== trackId) {
+      dispatch(play({ trackId }));
+    }
+  }, [dispatch, isEnabled, trackId, playbackTrackId]);
+
+  useUnmountEffect(() => {
+    if (isEnabled && pauseOnUnmount && playbackTrackId === trackId) {
+      dispatch(pause());
+    }
+  });
 };
