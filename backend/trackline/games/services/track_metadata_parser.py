@@ -76,7 +76,7 @@ class TrackMetadataParser:
     TRACK_VERSION_PATTERNS: Mapping[TrackVersionType, list[str]] = {
         TrackVersionType.ORIGINAL: [
             r"^((The|Das)\s+)?Original$",
-            r"^((Original|Radio)\s+)?(Edit|Mix|Version)?$",
+            r"^((Original|Radio|Single)\s+)?(Edit|Mix|Version)?$",
         ],
         TrackVersionType.REMIX: [
             r"(.+)(\s|-)(Edit|Mix)",
