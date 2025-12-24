@@ -1,5 +1,7 @@
-import re
+from collections.abc import Iterable
 from typing import Protocol
+
+from injector import inject
 
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
@@ -18,6 +20,10 @@ from trackline.games.models import (
     Turn,
     TurnScoring,
 )
+from trackline.games.services.track_metadata_parser import (
+    TrackMetadata,
+    TrackMetadataParser,
+)
 from trackline.games.utils import compare_strings, is_valid_release_year
 
 TOKEN_GAIN_YEAR_GUESS = 1
@@ -33,6 +39,10 @@ class Credits(Protocol):
 
 
 class ScoringService:
+    @inject
+    def __init__(self, track_metadata_parser: TrackMetadataParser) -> None:
+        self._track_metadata_parser = track_metadata_parser
+
     async def score_turn(self, game: Game, turn_id: int) -> TurnScoring:
         turn = game.turns[turn_id]
         if turn.scoring:
@@ -230,31 +240,90 @@ class ScoringService:
         reference: Credits,
         settings: GameSettings,
     ) -> float:
-        sim_all_artists = [
-            max(
-                compare_strings(candidate_artist, reference_artist)
-                for candidate_artist in candidate.artists
-            )
-            for reference_artist in reference.artists
-        ]
-        match settings.artists_match_mode:
-            case ArtistsMatchMode.ALL:
-                sim_artists = sum(sim_all_artists) / len(reference.artists)
-            case ArtistsMatchMode.ONE:
-                sim_artists = max(sim_all_artists)
-
-        sim_title = compare_strings(
-            self._transform_title(reference.title, settings.title_match_mode),
-            self._transform_title(candidate.title, settings.title_match_mode),
+        candidate_metadata = self._track_metadata_parser.parse(
+            candidate.artists, candidate.title
         )
-        return (sim_artists + sim_title) / 2
+        reference_metadata = self._track_metadata_parser.parse(
+            reference.artists, reference.title
+        )
 
-    def _transform_title(self, original_title: str, match_mode: TitleMatchMode) -> str:
+        similarity_artists = self._get_artists_similarity(
+            candidate_metadata,
+            reference_metadata,
+            settings.artists_match_mode,
+        )
+        similarity_title = self._get_title_similarity(
+            candidate_metadata,
+            reference_metadata,
+            settings.title_match_mode,
+        )
+
+        return (similarity_artists + similarity_title) / 2
+
+    def _get_artists_similarity(
+        self,
+        candidate_metadata: TrackMetadata,
+        reference_metadata: TrackMetadata,
+        match_mode: ArtistsMatchMode,
+    ) -> float:
+        if len(reference_metadata.artists) == 0:
+            return 0
+
+        similarities: list[float] = []
+        for reference_artist in reference_metadata.artists:
+            similarity = max(
+                self._get_max_similarity(
+                    [
+                        candidate.full_name,
+                        candidate.primary_name,
+                        *candidate.secondary_names,
+                    ],
+                    [
+                        reference_artist.full_name,
+                        reference_artist.primary_name,
+                        *reference_artist.secondary_names,
+                    ],
+                )
+                for candidate in candidate_metadata.artists
+            )
+            similarities.append(similarity)
+
         match match_mode:
-            case TitleMatchMode.FULL:
-                return original_title
-            case TitleMatchMode.MAIN:
-                return re.sub(r"\([^\)]+\)", "", original_title).strip()
+            case ArtistsMatchMode.ALL:
+                return sum(similarities) / len(reference_metadata.artists)
+            case ArtistsMatchMode.ONE:
+                return max(similarities)
+
+    def _get_title_similarity(
+        self,
+        candidate_metadata: TrackMetadata,
+        reference_metadata: TrackMetadata,
+        match_mode: TitleMatchMode,
+    ) -> float:
+        candidates = [
+            candidate_metadata.full_title,
+            candidate_metadata.primary_title,
+            *candidate_metadata.secondary_titles,
+        ]
+
+        references = [
+            reference_metadata.full_title,
+            reference_metadata.clean_title,
+        ]
+        if match_mode == TitleMatchMode.MAIN:
+            references.append(reference_metadata.primary_title)
+            references += reference_metadata.secondary_titles
+
+        return self._get_max_similarity(candidates, references)
+
+    def _get_max_similarity(
+        self, candidates: Iterable[str], references: Iterable[str]
+    ) -> float:
+        return max(
+            compare_strings(candidate, reference)
+            for candidate in candidates
+            for reference in references
+        )
 
     def _apply_token_limit(self, game: Game, turn_scoring: TurnScoring) -> None:
         scorings = (
