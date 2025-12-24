@@ -68,5 +68,5 @@ export const setVolume = async (volume: number): Promise<void> => {
 };
 
 export const setRepeatMode = async (mode: RepeatMode): Promise<void> => {
-  await instance.put("me/player/repeat", { state: mode });
+  await instance.put("me/player/repeat", null, { params: { state: mode } });
 };

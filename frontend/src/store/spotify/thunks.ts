@@ -2,6 +2,7 @@ import spotifyApi from "@/api/spotify";
 import tracklineApi from "@/api/trackline";
 import { RECOMMENDED_PLAYLIST_IDS } from "@/constants";
 import { createSafeAsyncThunk } from "@/store/utils/thunks";
+import { RepeatMode } from "@/types/spotify";
 import invariant from "@/utils/invariant";
 
 import { setAccessToken } from "./actions";
@@ -91,6 +92,7 @@ export const play = createSafeAsyncThunk(
   "play",
   async ({ trackId }: PlayPayload | undefined = {}) => {
     await spotifyApi.player.play({ trackId });
+    await spotifyApi.player.setRepeatMode(RepeatMode.Track);
     return { trackId };
   },
 );
