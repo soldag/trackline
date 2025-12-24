@@ -29,6 +29,7 @@ import {
 import BottomMenu from "./components/BottomMenu.tsx";
 import CountdownSnackbar from "./components/CountdownSnackbar.tsx";
 import ExchangeTrackModal from "./components/ExchangeTrackModal.tsx";
+import FinalPhaseAlert from "./components/FInalPhaseAlert.tsx";
 import GuessCreditsModal from "./components/GuessCreditsModal.tsx";
 import GuessReleaseYearModal from "./components/GuessReleaseYearModal.tsx";
 import PassTurnModal from "./components/PassTurnModal.tsx";
@@ -336,6 +337,8 @@ const GameTurnGuessingView = () => {
         onClose={() => setWasCountdownToastDismissed(true)}
       />
 
+      <FinalPhaseAlert game={game} />
+
       <Box
         sx={{
           display: "flex",
@@ -354,7 +357,6 @@ const GameTurnGuessingView = () => {
             onPassTurn={() => setPassTurnModalOpen(true)}
           />
         )}
-
         <TimelineContainer
           sx={(theme) => ({
             ml: { sm: `calc(-5px - ${theme.spacing(1)})` },

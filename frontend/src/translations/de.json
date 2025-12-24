@@ -85,6 +85,7 @@
   "GameTurnGuessingView.CountdownSnackbar.remainingTime": "Du hast nur noch {seconds}s um zu raten.",
   "GameTurnGuessingView.ExchangeTrackModal.content": "Möchtest du den aktuellen Song gegen einen neuen für {cost, plural, =1 {#{nbsp}Token} other {#{nbsp}Tokens}} austauschen?",
   "GameTurnGuessingView.ExchangeTrackModal.header": "Aktuellen Song tauschen",
+  "GameTurnGuessingView.FinalPhaseAlert.title": "Finale Phase",
   "GameTurnGuessingView.GuessCreditsModal.artists.label": "Interpreten",
   "GameTurnGuessingView.GuessCreditsModal.header": "Titel & Interpret raten",
   "GameTurnGuessingView.GuessCreditsModal.title.label": "Titel",
