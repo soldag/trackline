@@ -50,17 +50,10 @@ class TrackVersion:
 class TrackMetadata:
     artists: tuple[Artist, ...]
     full_title: str
+    clean_title: str
     primary_title: str
     secondary_titles: tuple[str, ...]
     versions: tuple[TrackVersion, ...]
-
-    @property
-    def clean_title(self) -> str:
-        clean_title = self.full_title
-        for version in self.versions:
-            clean_title = clean_title.replace(version.description, "")
-
-        return re.sub(r"\s[\(\)\[\]\-/_ ]+$", " ", clean_title).strip()
 
 
 class TrackMetadataParser:
@@ -104,8 +97,9 @@ class TrackMetadataParser:
 
     def parse(self, raw_artists: Sequence[str], raw_title: str) -> TrackMetadata:
         artists: list[Artist] = []
-        primary_title: str = ""
-        secondary_titles: list[str] = []
+        primary_title = ""
+        secondary_titles_pre: list[str] = []
+        secondary_titles_post: list[str] = []
         versions: list[TrackVersion] = []
 
         for artist_index, raw_artist in enumerate(raw_artists):
@@ -129,15 +123,26 @@ class TrackMetadataParser:
                 versions.append(version)
                 continue
 
-            secondary_titles.append(text)
+            if not primary_title:
+                secondary_titles_pre.append(text)
+            else:
+                secondary_titles_post.append(text)
 
         artists = self._deduplicate_artists(artists)
+
+        clean_title_segments = [
+            *(f"({title})" for title in secondary_titles_pre),
+            primary_title,
+            *(f"({title})" for title in secondary_titles_post),
+        ]
+        clean_title = " ".join(clean_title_segments)
 
         return TrackMetadata(
             artists=tuple(artists),
             full_title=raw_title,
+            clean_title=clean_title,
             primary_title=primary_title,
-            secondary_titles=tuple(secondary_titles),
+            secondary_titles=tuple(secondary_titles_pre + secondary_titles_post),
             versions=tuple(versions),
         )
 
