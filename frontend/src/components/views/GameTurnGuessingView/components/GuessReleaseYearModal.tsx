@@ -3,15 +3,17 @@ import { FormattedMessage } from "react-intl";
 
 import { Typography } from "@mui/joy";
 
-import ConfirmModal from "@/components/common/ConfirmModal";
 import YearPicker from "@/components/common/YearPicker";
 import { Track } from "@/types/games";
+
+import GuessModal from "./GuessModal";
 
 const getInitialYear = (min: number, max: number): number =>
   min || max || new Date().getFullYear();
 
 interface GuessReleaseYearModalProps {
   open?: boolean;
+  playerTokens?: number;
   tracks?: Track[];
   activeTrackId?: string;
   tokenCost?: number;
@@ -21,6 +23,7 @@ interface GuessReleaseYearModalProps {
 
 const GuessReleaseYearModal = ({
   open,
+  playerTokens,
   tracks = [],
   activeTrackId,
   tokenCost,
@@ -44,7 +47,7 @@ const GuessReleaseYearModal = ({
   }, [open, minYear, maxYear]);
 
   return (
-    <ConfirmModal
+    <GuessModal
       open={open}
       onClose={onClose}
       onConfirm={handleConfirm}
@@ -55,6 +58,7 @@ const GuessReleaseYearModal = ({
         />
       }
       tokenCost={tokenCost}
+      playerTokens={playerTokens}
     >
       <Typography sx={{ mb: 2 }}>
         <FormattedMessage
@@ -64,7 +68,7 @@ const GuessReleaseYearModal = ({
       </Typography>
 
       <YearPicker value={year} min={minYear} max={maxYear} onChange={setYear} />
-    </ConfirmModal>
+    </GuessModal>
   );
 };
 

@@ -89,6 +89,7 @@
   "GameTurnGuessingView.GuessCreditsModal.artists.label": "Artists",
   "GameTurnGuessingView.GuessCreditsModal.header": "Guess artists & title",
   "GameTurnGuessingView.GuessCreditsModal.title.label": "Title",
+  "GameTurnGuessingView.GuessModal.tokenWarning": "You have only {count, plural, =1 {#{nbsp}token} other {#{nbsp}tokens}} left. If you're wrong, you won't be able to challenge other players until you earn new tokens.",
   "GameTurnGuessingView.GuessReleaseYearModal.content": "You can earn an extra token when guessing the exact year the playing track has been released. You cannot loose any token even if you're wrong.",
   "GameTurnGuessingView.GuessReleaseYearModal.header": "Guess track's release year",
   "GameTurnGuessingView.PassTurnModal.content.canGuessAll": "Do you really want to pass this turn and reject guessing the track?",

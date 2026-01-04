@@ -291,12 +291,14 @@ const GameTurnGuessingView = () => {
         tracks={tracks}
         activeTrackId={turn?.track?.spotifyId}
         tokenCost={tokenCostGuessReleaseYear}
+        playerTokens={currentPlayer?.tokens}
         onConfirm={handleGuessReleaseYear}
         onClose={() => setReleaseYearModalOpen(false)}
       />
       <GuessCreditsModal
         open={creditsModalOpen}
         tokenCost={tokenCostGuessCredits}
+        playerTokens={currentPlayer?.tokens}
         onConfirm={handleGuessCredits}
         onClose={() => setCreditsModalOpen(false)}
       />
