@@ -11,17 +11,20 @@ import {
   ModalDialog,
 } from "@mui/joy";
 
-interface ConfirmModalProps {
+import TokenCost from "@/components/common/TokenCost";
+
+export type ConfirmModalProps = PropsWithChildren<{
   open?: boolean;
   header?: React.ReactNode;
   canConfirm?: boolean;
   confirmLabel?: React.ReactNode;
+  tokenCost?: number;
   showCancel?: boolean;
   canCancel?: boolean;
   cancelLabel?: React.ReactNode;
   onConfirm?: () => void;
   onClose?: () => void;
-}
+}>;
 
 const ConfirmModal = ({
   open = false,
@@ -29,12 +32,13 @@ const ConfirmModal = ({
   children,
   canConfirm = true,
   confirmLabel,
+  tokenCost,
   showCancel = true,
   canCancel = true,
   cancelLabel,
   onConfirm,
   onClose,
-}: PropsWithChildren<ConfirmModalProps>) => {
+}: ConfirmModalProps) => {
   const handleConfirm = () => {
     if (onConfirm) {
       onConfirm();
@@ -60,11 +64,14 @@ const ConfirmModal = ({
 
         <DialogActions>
           <Button disabled={!canConfirm} onClick={handleConfirm}>
-            {confirmLabel || (
+            {confirmLabel ?? (
               <FormattedMessage
                 id="ConfirmModal.confirm"
                 defaultMessage="Confirm"
               />
+            )}
+            {tokenCost != null && tokenCost > 0 && (
+              <TokenCost cost={tokenCost} sx={{ ml: 0.5 }} />
             )}
           </Button>
           {showCancel && (

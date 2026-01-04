@@ -21,6 +21,8 @@ interface TrackCardProps {
   isSelectingPosition?: boolean;
   canGuessReleaseYear?: boolean;
   canGuessCredits?: boolean;
+  tokenCostGuessReleaseYear?: number;
+  tokenCostGuessCredits?: number;
   loadingReleaseYearGuess?: boolean;
   loadingCreditsGuess?: boolean;
   minReleaseYear?: number;
@@ -42,6 +44,8 @@ const TrackCard = ({
   isSelectingPosition = false,
   canGuessReleaseYear = true,
   canGuessCredits = true,
+  tokenCostGuessReleaseYear,
+  tokenCostGuessCredits,
   loadingReleaseYearGuess = false,
   loadingCreditsGuess = false,
   minReleaseYear,
@@ -77,6 +81,7 @@ const TrackCard = ({
       releaseYearGuess == null && !loadingReleaseYearGuess ? (
         <CardOverflow>
           <GuessReleaseYearButton
+            tokenCost={tokenCostGuessReleaseYear}
             disabled={!canGuessReleaseYear}
             onClick={() => onIsSelectingPositionChanged(true)}
           />
@@ -92,6 +97,7 @@ const TrackCard = ({
       creditsGuess == null && !loadingCreditsGuess ? (
         <CardOverflow>
           <GuessCreditsButton
+            tokenCost={tokenCostGuessCredits}
             disabled={!canGuessCredits}
             onClick={onGuessCredits}
           />

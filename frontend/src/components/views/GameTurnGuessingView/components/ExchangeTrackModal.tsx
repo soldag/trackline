@@ -1,5 +1,7 @@
 import { FormattedMessage } from "react-intl";
 
+import { Typography } from "@mui/joy";
+
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { TOKEN_COST_EXCHANGE_TRACK } from "@/constants";
 
@@ -24,12 +26,19 @@ const ExchangeTrackModal = ({
         defaultMessage="Exchange current track"
       />
     }
+    tokenCost={TOKEN_COST_EXCHANGE_TRACK}
   >
-    <FormattedMessage
-      id="GameTurnGuessingView.ExchangeTrackModal.content"
-      defaultMessage="Do you want to exchange the current track by paying {cost, plural, =1 {#{nbsp}token} other {#{nbsp}tokens}}?"
-      values={{ cost: TOKEN_COST_EXCHANGE_TRACK, nbsp: "\u00a0" }}
-    />
+    <Typography>
+      <FormattedMessage
+        id="GameTurnGuessingView.ExchangeTrackModal.content"
+        defaultMessage="Do you want to exchange the current track by paying <bold>{cost, plural, =1 {#{nbsp}token} other {#{nbsp}tokens}}</bold>?"
+        values={{
+          cost: TOKEN_COST_EXCHANGE_TRACK,
+          nbsp: "\u00a0",
+          bold: (chunks) => <strong>{chunks}</strong>,
+        }}
+      />
+    </Typography>
   </ConfirmModal>
 );
 

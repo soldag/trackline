@@ -29,7 +29,6 @@ export const JOIN_URL_REGEX = new RegExp(
 
 export const MIN_PLAYER_COUNT = 2;
 
-export const TOKEN_COST_POSITION_GUESS = 1;
 export const TOKEN_COST_RELEASE_YEAR_GUESS = 1;
 export const TOKEN_COST_CREDITS_GUESS = 1;
 export const TOKEN_COST_EXCHANGE_TRACK = 1;

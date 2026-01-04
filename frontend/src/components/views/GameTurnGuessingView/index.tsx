@@ -15,7 +15,7 @@ import {
   passTurn,
   scoreTurn,
 } from "@/store/games";
-import { Game, Player, Turn } from "@/types/games.ts";
+import { Game, Turn } from "@/types/games.ts";
 import {
   useAppDispatch,
   useAppSelector,
@@ -39,17 +39,6 @@ import Timeline from "./components/Timeline.tsx";
 import TimelineContainer from "./components/TimelineContainer.tsx";
 import TrackExchangePopup from "./components/TrackExchangePopup.tsx";
 import TurnInfoPopup from "./components/TurnInfoPopup.tsx";
-
-const hasTokensToGuess = (
-  turn: Turn,
-  player: Player | undefined,
-  cost: number,
-): boolean => {
-  const isActivePlayer = turn?.activeUserId === player?.userId;
-  const hasEnoughTokens = !!player && player?.tokens >= cost;
-
-  return isActivePlayer || hasEnoughTokens;
-};
 
 const getTimeout = (
   game: Game,
@@ -130,18 +119,24 @@ const GameTurnGuessingView = () => {
   );
   const creditsGuess = guesses.credits.find((g) => g.userId === user?.id);
 
+  const [tokenCostGuessReleaseYear, tokenCostGuessCredits] = isActivePlayer
+    ? [0, 0]
+    : [TOKEN_COST_RELEASE_YEAR_GUESS, TOKEN_COST_CREDITS_GUESS];
+
   const canGuessReleaseYear =
     !hasPassed &&
     releaseYearGuess == null &&
-    hasTokensToGuess(turn, currentPlayer, TOKEN_COST_RELEASE_YEAR_GUESS);
+    currentPlayer &&
+    currentPlayer?.tokens >= tokenCostGuessReleaseYear;
   const canGuessCredits =
     !hasPassed &&
     creditsGuess == null &&
-    hasTokensToGuess(turn, currentPlayer, TOKEN_COST_CREDITS_GUESS);
+    currentPlayer &&
+    currentPlayer?.tokens >= tokenCostGuessCredits;
   const canExchangeTrack =
     !hasPassed &&
-    activePlayer &&
-    activePlayer?.tokens >= TOKEN_COST_EXCHANGE_TRACK;
+    currentPlayer &&
+    currentPlayer?.tokens >= TOKEN_COST_EXCHANGE_TRACK;
 
   const { timeoutStart, timeoutEnd } = getTimeout(game, turn, timeDeviation);
   const hasTimeout = timeoutStart != null && timeoutEnd != null;
@@ -295,11 +290,13 @@ const GameTurnGuessingView = () => {
         open={releaseYearModalOpen}
         tracks={tracks}
         activeTrackId={turn?.track?.spotifyId}
+        tokenCost={tokenCostGuessReleaseYear}
         onConfirm={handleGuessReleaseYear}
         onClose={() => setReleaseYearModalOpen(false)}
       />
       <GuessCreditsModal
         open={creditsModalOpen}
+        tokenCost={tokenCostGuessCredits}
         onConfirm={handleGuessCredits}
         onClose={() => setCreditsModalOpen(false)}
       />
@@ -356,6 +353,8 @@ const GameTurnGuessingView = () => {
             creditsGuess={creditsGuess}
             canGuessReleaseYear={canGuessReleaseYear}
             canGuessCredits={canGuessCredits}
+            tokenCostGuessReleaseYear={tokenCostGuessReleaseYear}
+            tokenCostGuessCredits={tokenCostGuessCredits}
             loadingReleaseYearGuess={loadingReleaseYearGuess}
             loadingCreditsGuess={loadingCreditsGuess}
             timeoutStart={timeoutStart}

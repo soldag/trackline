@@ -1,5 +1,7 @@
 import { FormattedMessage } from "react-intl";
 
+import { Typography } from "@mui/joy";
+
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { TOKEN_COST_BUY_TRACK } from "@/constants";
 
@@ -27,12 +29,19 @@ const BuyTrackModal = ({ open, onConfirm, onClose }: BuyTrackModalProps) => {
           defaultMessage="Buy track"
         />
       }
+      tokenCost={TOKEN_COST_BUY_TRACK}
     >
-      <FormattedMessage
-        id="GameTurnScoringView.BuyTrackModal.message"
-        defaultMessage="Do you want to spend {cost, plural, =1 {#{nbsp}token} other {#{nbsp}tokens}} to buy an extra track for your timeline?"
-        values={{ cost: TOKEN_COST_BUY_TRACK, nbsp: "\u00a0" }}
-      />
+      <Typography>
+        <FormattedMessage
+          id="GameTurnScoringView.BuyTrackModal.message"
+          defaultMessage="Do you want to spend <bold>{cost, plural, =1 {#{nbsp}token} other {#{nbsp}tokens}}</bold> to buy an extra track for your timeline?"
+          values={{
+            cost: TOKEN_COST_BUY_TRACK,
+            nbsp: "\u00a0",
+            bold: (chunks) => <strong>{chunks}</strong>,
+          }}
+        />
+      </Typography>
     </ConfirmModal>
   );
 };

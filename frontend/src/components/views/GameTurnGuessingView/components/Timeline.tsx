@@ -66,6 +66,7 @@ const SortableItem = ({
 };
 
 interface TimelineProps {
+  isActivePlayer?: boolean;
   tracks?: Track[];
   activeTrackId?: string;
   releaseYearGuess?: ReleaseYearGuess;
@@ -74,6 +75,8 @@ interface TimelineProps {
   canGuessCredits?: boolean;
   loadingReleaseYearGuess?: boolean;
   loadingCreditsGuess?: boolean;
+  tokenCostGuessReleaseYear?: number;
+  tokenCostGuessCredits?: number;
   timeoutStart?: number;
   timeoutEnd?: number;
   onActiveTrackPositionChange?: (position: number) => void;
@@ -90,6 +93,8 @@ const Timeline = ({
   canGuessCredits,
   loadingReleaseYearGuess,
   loadingCreditsGuess,
+  tokenCostGuessReleaseYear,
+  tokenCostGuessCredits,
   timeoutStart,
   timeoutEnd,
   onActiveTrackPositionChange,
@@ -188,6 +193,8 @@ const Timeline = ({
                     creditsGuess={creditsGuess}
                     canGuessReleaseYear={canGuessReleaseYear}
                     canGuessCredits={canGuessCredits}
+                    tokenCostGuessReleaseYear={tokenCostGuessReleaseYear}
+                    tokenCostGuessCredits={tokenCostGuessCredits}
                     loadingReleaseYearGuess={loadingReleaseYearGuess}
                     loadingCreditsGuess={loadingCreditsGuess}
                     isSelectingPosition={isSelectingPosition}

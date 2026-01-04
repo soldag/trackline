@@ -20,12 +20,14 @@ interface Credits {
 
 interface GuessCreditsModalProps {
   open?: boolean;
+  tokenCost?: number;
   onConfirm?: (credits: Credits) => void;
   onClose?: () => void;
 }
 
 const GuessCreditsModal = ({
   open,
+  tokenCost,
   onConfirm,
   onClose,
 }: GuessCreditsModalProps) => {
@@ -66,6 +68,7 @@ const GuessCreditsModal = ({
         />
       }
       canConfirm={isValid}
+      tokenCost={tokenCost}
     >
       <form onSubmit={handleSubmit(handleConfirm)}>
         <Stack spacing={2}>

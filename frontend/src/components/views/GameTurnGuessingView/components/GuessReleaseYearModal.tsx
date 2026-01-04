@@ -14,6 +14,7 @@ interface GuessReleaseYearModalProps {
   open?: boolean;
   tracks?: Track[];
   activeTrackId?: string;
+  tokenCost?: number;
   onConfirm?: (args: { position: number; year: number }) => void;
   onClose?: () => void;
 }
@@ -22,6 +23,7 @@ const GuessReleaseYearModal = ({
   open,
   tracks = [],
   activeTrackId,
+  tokenCost,
   onConfirm,
   onClose,
 }: GuessReleaseYearModalProps) => {
@@ -52,6 +54,7 @@ const GuessReleaseYearModal = ({
           defaultMessage="Guess track's release year"
         />
       }
+      tokenCost={tokenCost}
     >
       <Typography sx={{ mb: 2 }}>
         <FormattedMessage
