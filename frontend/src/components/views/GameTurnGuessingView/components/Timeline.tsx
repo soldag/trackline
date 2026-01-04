@@ -12,7 +12,7 @@ import {
   restrictToParentElement,
   restrictToVerticalAxis,
 } from "@dnd-kit/modifiers";
-import { SortableContext, arrayMove, useSortable } from "@dnd-kit/sortable";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { PropsWithChildren, useEffect, useState } from "react";
 
@@ -76,7 +76,7 @@ interface TimelineProps {
   loadingCreditsGuess?: boolean;
   timeoutStart?: number;
   timeoutEnd?: number;
-  onTracksChange?: (tracks: Track[]) => void;
+  onActiveTrackPositionChange?: (position: number) => void;
   onGuessReleaseYear?: () => void;
   onGuessCredits?: () => void;
 }
@@ -92,7 +92,7 @@ const Timeline = ({
   loadingCreditsGuess,
   timeoutStart,
   timeoutEnd,
-  onTracksChange,
+  onActiveTrackPositionChange,
   onGuessReleaseYear,
   onGuessCredits,
 }: TimelineProps) => {
@@ -110,10 +110,6 @@ const Timeline = ({
     }),
   );
 
-  const index = tracks.findIndex((t) => t.spotifyId === activeTrackId);
-  const minYear = tracks[index - 1]?.releaseYear;
-  const maxYear = tracks[index + 1]?.releaseYear;
-
   const handleDragStart = () => {
     setIsDragging(true);
     setIsSelectingPosition(true);
@@ -126,18 +122,14 @@ const Timeline = ({
 
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const oldIndex = tracks.findIndex(
-        (track) => track.spotifyId === active.id,
-      );
       const newIndex = tracks.findIndex((track) => track.spotifyId === over.id);
-
-      onTracksChange?.(arrayMove(tracks, oldIndex, newIndex));
+      onActiveTrackPositionChange?.(newIndex);
     }
   };
 
   const handleTrackClick = (newIndex: number) => {
     if (isSelectingPosition) {
-      onTracksChange?.(arrayMove(tracks, index, newIndex));
+      onActiveTrackPositionChange?.(newIndex);
     }
   };
 
@@ -199,8 +191,8 @@ const Timeline = ({
                     loadingReleaseYearGuess={loadingReleaseYearGuess}
                     loadingCreditsGuess={loadingCreditsGuess}
                     isSelectingPosition={isSelectingPosition}
-                    minReleaseYear={minYear}
-                    maxReleaseYear={maxYear}
+                    minReleaseYear={tracks[i - 1]?.releaseYear}
+                    maxReleaseYear={tracks[i + 1]?.releaseYear}
                     timeoutStart={timeoutStart}
                     timeoutEnd={timeoutEnd}
                     onIsSelectingPositionChanged={setIsSelectingPosition}

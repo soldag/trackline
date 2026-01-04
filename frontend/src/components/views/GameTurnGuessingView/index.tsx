@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Box } from "@mui/joy";
 
@@ -15,7 +15,7 @@ import {
   passTurn,
   scoreTurn,
 } from "@/store/games";
-import { Game, Player, Track, Turn } from "@/types/games.ts";
+import { Game, Player, Turn } from "@/types/games.ts";
 import {
   useAppDispatch,
   useAppSelector,
@@ -73,8 +73,7 @@ const getTimeout = (
 const GameTurnGuessingView = () => {
   const isScreenXs = useBreakpoint((breakpoints) => breakpoints.only("xs"));
 
-  const [tracks, setTracks] = useState<Track[]>([]);
-  const [activeTrackId, setActiveTrackId] = useState<string>();
+  const [activeTrackPosition, setActiveTrackPosition] = useState<number>(0);
   const [releaseYearModalOpen, setReleaseYearModalOpen] = useState(false);
   const [creditsModalOpen, setCreditsModalOpen] = useState(false);
   const [passTurnModalOpen, setPassTurnModalOpen] = useState(false);
@@ -115,7 +114,7 @@ const GameTurnGuessingView = () => {
   const {
     revisionId: turnRevisionId,
     activeUserId,
-    track,
+    track: activeTrack,
     guesses,
     passes,
   } = turn;
@@ -162,33 +161,20 @@ const GameTurnGuessingView = () => {
   }, [hasTimeout, isActivePlayer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!activePlayer) return;
-
-    setActiveTrackId(track.spotifyId);
-
-    if (releaseYearGuess == null) {
-      setTracks((oldTracks) => {
-        const oldIndex = oldTracks.findIndex(
-          (t) => t.spotifyId === track.spotifyId,
-        );
-        if (oldIndex === -1) {
-          return [track, ...activePlayer.timeline];
-        } else {
-          return [
-            ...activePlayer.timeline.slice(0, oldIndex),
-            track,
-            ...activePlayer.timeline.slice(oldIndex),
-          ];
-        }
-      });
-    } else if (releaseYearGuess.position != null) {
-      setTracks([
-        ...activePlayer.timeline.slice(0, releaseYearGuess.position),
-        track,
-        ...activePlayer.timeline.slice(releaseYearGuess.position),
-      ]);
+    if (releaseYearGuess) {
+      setActiveTrackPosition(releaseYearGuess.position);
     }
-  }, [releaseYearGuess, track, activePlayer]);
+  }, [releaseYearGuess]);
+
+  const tracks = useMemo(() => {
+    if (!activePlayer) return [];
+
+    return [
+      ...activePlayer.timeline.slice(0, activeTrackPosition),
+      activeTrack,
+      ...activePlayer.timeline.slice(activeTrackPosition),
+    ];
+  }, [activeTrackPosition, activePlayer, activeTrack]);
 
   useEffect(() => {
     if (!hasPassed && !canGuessReleaseYear && !canGuessCredits) {
@@ -244,7 +230,7 @@ const GameTurnGuessingView = () => {
 
   useSpotifyPlayback({
     isEnabled: isGameMaster,
-    trackId: track.spotifyId,
+    trackId: activeTrack.spotifyId,
     pauseOnUnmount: false,
   });
 
@@ -365,7 +351,7 @@ const GameTurnGuessingView = () => {
         >
           <Timeline
             tracks={tracks}
-            activeTrackId={activeTrackId}
+            activeTrackId={activeTrack.spotifyId}
             releaseYearGuess={releaseYearGuess}
             creditsGuess={creditsGuess}
             canGuessReleaseYear={canGuessReleaseYear}
@@ -374,7 +360,7 @@ const GameTurnGuessingView = () => {
             loadingCreditsGuess={loadingCreditsGuess}
             timeoutStart={timeoutStart}
             timeoutEnd={timeoutEnd}
-            onTracksChange={setTracks}
+            onActiveTrackPositionChange={setActiveTrackPosition}
             onGuessReleaseYear={() => setReleaseYearModalOpen(true)}
             onGuessCredits={() => setCreditsModalOpen(true)}
           />
