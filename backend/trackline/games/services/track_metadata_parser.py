@@ -106,7 +106,8 @@ class TrackMetadataParser:
             artist_type = (
                 ArtistType.PRIMARY if artist_index == 0 else ArtistType.SECONDARY
             )
-            artists.append(self._parse_artist(raw_artist, artist_type))
+            if artist := self._parse_artist(raw_artist, artist_type):
+                artists.append(artist)
 
         for segment in self._split_in_segments(raw_title):
             text = segment.text
@@ -213,9 +214,12 @@ class TrackMetadataParser:
 
         return None
 
-    def _parse_artist(self, text: str, artist_type: ArtistType) -> Artist:
-        primary_name, *secondary_names = [s.text for s in self._split_in_segments(text)]
+    def _parse_artist(self, text: str, artist_type: ArtistType) -> Artist | None:
+        segments = self._split_in_segments(text)
+        if not segments:
+            return None
 
+        primary_name, *secondary_names = [s.text for s in segments]
         return Artist(
             artist_type=artist_type,
             full_name=text,
@@ -243,10 +247,11 @@ class TrackMetadataParser:
         if artists and len(matches) == 1:
             return artists
 
-        for match in re.split(self.ARTIST_JOIN_PATTERN, text):
-            if match and (name := match.strip()):
-                artist = self._parse_artist(name, artist_type)
-                artists.append(artist)
+        artists.extend(
+            artist
+            for match in re.split(self.ARTIST_JOIN_PATTERN, text)
+            if match and (artist := self._parse_artist(match, artist_type))
+        )
 
         return artists
 
