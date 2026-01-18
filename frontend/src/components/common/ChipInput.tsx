@@ -23,9 +23,16 @@ const ChipInput = forwardRef<HTMLInputElement, ChipInputProps<boolean>>(
   ) {
     const [inputValue, setInputValue] = useState("");
 
+    const handleNewItem = (item: string) => {
+      const trimmedItem = item.trim();
+      if (trimmedItem.length > 0 && !value?.includes(trimmedItem)) {
+        onChange([...(value ?? []), trimmedItem]);
+      }
+    };
+
     const handleInputChange = (newInputValue: string) => {
       if (newInputValue.endsWith(",")) {
-        onChange([...(value ?? []), newInputValue.slice(0, -1)]);
+        handleNewItem(newInputValue.slice(0, -1));
         setInputValue("");
         return;
       }
@@ -34,9 +41,7 @@ const ChipInput = forwardRef<HTMLInputElement, ChipInputProps<boolean>>(
     };
 
     const handleBlur: React.FocusEventHandler<HTMLDivElement> = (e) => {
-      if (inputValue && value != null && !value.includes(inputValue)) {
-        onChange([...value, inputValue]);
-      }
+      handleNewItem(inputValue);
       setInputValue("");
       onBlur?.(e);
     };

@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 
-from trackline.core.fields import ResourceId
+from trackline.core.fields import NonEmptyStr, ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
 from trackline.games.constants import TOKEN_COST_GUESS_CREDITS
 from trackline.games.models import CreditsGuess, Guess, Turn
@@ -12,8 +12,8 @@ class CreateCreditsGuess(AuthenticatedUseCase[CreditsGuessOut]):
     game_id: ResourceId
     turn_id: int
     turn_revision_id: str
-    artists: list[str]
-    title: str
+    artists: list[NonEmptyStr]
+    title: NonEmptyStr
 
 
 @CreateCreditsGuess.register_handler
