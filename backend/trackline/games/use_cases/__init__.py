@@ -8,6 +8,7 @@ from .create_turn import CreateTurn
 from .exchange_track import ExchangeTrack
 from .get_game import GetGame
 from .get_game_users import GetGameUsers
+from .get_games import GetGames
 from .join_game import JoinGame
 from .leave_game import LeaveGame
 from .pass_turn import PassTurn
@@ -29,6 +30,7 @@ __all__ = [
     "ExchangeTrack",
     "GetGame",
     "GetGameUsers",
+    "GetGames",
     "JoinGame",
     "LeaveGame",
     "PassTurn",

@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from typing import Any, overload
 
+from beanie import SortDirection
 from injector import inject
 from pymongo.asynchronous.client_session import AsyncClientSession
 from pymongo.results import DeleteResult
@@ -45,8 +46,15 @@ class Repository:
         self,
         document_type: type[T],
         query: Query,
+        sort: str | list[tuple[str, SortDirection]] | None = None,
     ) -> list[T]:
-        return self._track_all(await document_type.find_many(query).to_list())
+        return self._track_all(
+            await document_type.find_many(
+                query,
+                sort=sort,
+                session=self._session,
+            ).to_list()
+        )
 
     async def create[T: BaseDocument](self, document: T) -> T:
         return self._track(await document.create(session=self._session))

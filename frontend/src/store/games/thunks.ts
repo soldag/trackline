@@ -18,6 +18,15 @@ export const fetchGame = createSafeAsyncThunk(
   },
 );
 
+export const fetchGames = createSafeAsyncThunk(
+  PREFIX,
+  "fetchGames",
+  async () => {
+    const games = await tracklineApi.games.getAll();
+    return { games };
+  },
+);
+
 interface FetchGameUsersPayload {
   gameId: string;
 }

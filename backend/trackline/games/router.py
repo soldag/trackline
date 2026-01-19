@@ -32,6 +32,7 @@ from trackline.games.use_cases import (
     CreateTurn,
     ExchangeTrack,
     GetGame,
+    GetGames,
     GetGameUsers,
     JoinGame,
     LeaveGame,
@@ -59,6 +60,16 @@ async def create_game(
 ) -> EntityResponse[GameOut]:
     game = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=game)
+
+
+@router.get("")
+async def get_games(
+    auth_user_id: AuthUserId,
+    use_case: Annotated[GetGames, Depends()],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
+) -> EntityResponse[list[GameOut]]:
+    users = await use_case_executor.execute(use_case, auth_user_id)
+    return EntityResponse(data=users)
 
 
 @router.get("/{game_id}")

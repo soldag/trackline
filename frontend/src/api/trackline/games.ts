@@ -64,6 +64,14 @@ export const get = async ({ gameId }: { gameId: string }): Promise<Game> => {
   return game;
 };
 
+export const getAll = async (): Promise<Game[]> => {
+  const {
+    data: { data: games },
+  } = await instance.get<EntityResponse<Game[]>>("games");
+
+  return games;
+};
+
 export const getUsers = async ({
   gameId,
 }: {
