@@ -31,22 +31,7 @@ const View = ({
   >
     {appBar && <AppBar {...appBar} />}
 
-    <Box
-      sx={{
-        "display": "flex",
-        "flexDirection": "column",
-        "flexGrow": 1,
-        ...(!disablePadding && { padding: 2 }),
-        ...(!disableScrolling && { overflowY: "auto" }),
-        "& > *": {
-          flexGrow: 1,
-        },
-      }}
-    >
-      {children}
-    </Box>
-
-    {loading && (
+    {loading ? (
       <Box
         sx={{
           position: "absolute",
@@ -60,6 +45,21 @@ const View = ({
         }}
       >
         <CircularProgress size="lg" thickness={6} />
+      </Box>
+    ) : (
+      <Box
+        sx={{
+          "display": "flex",
+          "flexDirection": "column",
+          "flexGrow": 1,
+          ...(!disablePadding && { padding: 2 }),
+          ...(!disableScrolling && { overflowY: "auto" }),
+          "& > *": {
+            flexGrow: 1,
+          },
+        }}
+      >
+        {children}
       </Box>
     )}
   </Sheet>
