@@ -1,5 +1,10 @@
 module.exports = {
-  async up(db) {
+  /**
+   * @param db {import('mongodb').Db}
+   * @param client {import('mongodb').MongoClient}
+   * @returns {Promise<void>}
+   */
+  async up(db, client) {
     await db.collection("game").updateMany(
       {
         "settings.playlist_ids": { $exists: true, $type: "array" },
@@ -17,11 +22,16 @@ module.exports = {
           },
         },
         { $unset: "settings.playlist_ids" },
-      ]
+      ],
     );
   },
 
-  async down(db) {
+  /**
+   * @param db {import('mongodb').Db}
+   * @param client {import('mongodb').MongoClient}
+   * @returns {Promise<void>}
+   */
+  async down(db, client) {
     await db.collection("game").updateMany(
       {
         "settings.playlists": { $exists: true, $type: "array" },
@@ -39,7 +49,7 @@ module.exports = {
           },
         },
         { $unset: "settings.playlists" },
-      ]
+      ],
     );
   },
 };

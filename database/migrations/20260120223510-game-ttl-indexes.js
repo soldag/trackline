@@ -1,5 +1,10 @@
 module.exports = {
-  async up(db) {
+  /**
+   * @param db {import('mongodb').Db}
+   * @param client {import('mongodb').MongoClient}
+   * @returns {Promise<void>}
+   */
+  async up(db, client) {
     // Drop the existing index
     await db.collection("game").dropIndex("completion_time_ttl");
 
@@ -24,7 +29,12 @@ module.exports = {
     );
   },
 
-  async down(db) {
+  /**
+   * @param db {import('mongodb').Db}
+   * @param client {import('mongodb').MongoClient}
+   * @returns {Promise<void>}
+   */
+  async down(db, client) {
     // Drop the creation_time_ttl index
     await db.collection("game").dropIndex("creation_time_ttl");
 

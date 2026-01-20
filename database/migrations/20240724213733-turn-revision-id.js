@@ -1,6 +1,11 @@
 const { v4: uuid } = require("uuid");
 
 module.exports = {
+  /**
+   * @param db {import('mongodb').Db}
+   * @param client {import('mongodb').MongoClient}
+   * @returns {Promise<void>}
+   */
   async up(db, client) {
     const session = client.startSession();
     try {
@@ -22,6 +27,11 @@ module.exports = {
     }
   },
 
+  /**
+   * @param db {import('mongodb').Db}
+   * @param client {import('mongodb').MongoClient}
+   * @returns {Promise<void>}
+   */
   async down(db, client) {
     const session = client.startSession();
     try {

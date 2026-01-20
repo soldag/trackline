@@ -1,5 +1,10 @@
 module.exports = {
-  async up(db) {
+  /**
+   * @param db {import('mongodb').Db}
+   * @param client {import('mongodb').MongoClient}
+   * @returns {Promise<void>}
+   */
+  async up(db, client) {
     await db.collection("game").updateMany(
       {
         "settings.enable_catchup": { $exists: false },
@@ -12,7 +17,12 @@ module.exports = {
     );
   },
 
-  async down(db) {
+  /**
+   * @param db {import('mongodb').Db}
+   * @param client {import('mongodb').MongoClient}
+   * @returns {Promise<void>}
+   */
+  async down(db, client) {
     await db.collection("game").updateMany(
       {},
       {
