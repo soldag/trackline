@@ -10,12 +10,12 @@ const migrateUpScoring = (scoring, guesses) => {
       position: migrateUpScoringAspect(
         scoring.release_year.position,
         guesses.release_year,
-        false
+        false,
       ),
       year: migrateUpScoringAspect(
         scoring.release_year.year,
         guesses.release_year,
-        true
+        true,
       ),
     },
     credits: migrateUpScoringAspect(scoring.credits, guesses.credits, false),
@@ -43,7 +43,7 @@ const migrateUpScoringAspect = (scoring, guesses, ignoreCost) => {
             reward_effective: reward,
           },
         ];
-      })
+      }),
     ),
     ...remainingFields,
   };
@@ -80,7 +80,7 @@ const migrateDownScoringAspect = (scoring, ignoreCost) => {
           : refund + reward_effective;
 
         return [playerId, totalTokenGain];
-      })
+      }),
     ),
     ...remainingFields,
   };
@@ -91,7 +91,7 @@ module.exports = {
     const session = client.startSession();
     try {
       await session.withTransaction(async () => {
-        const cursor = db.collection("games").find({});
+        const cursor = db.collection("game").find({});
         for await (const game of cursor) {
           const newGame = {
             ...game,
@@ -100,7 +100,7 @@ module.exports = {
               scoring: migrateUpScoring(turn.scoring, turn.guesses),
             })),
           };
-          await db.collection("games").replaceOne({ _id: game._id }, newGame);
+          await db.collection("game").replaceOne({ _id: game._id }, newGame);
         }
       });
     } finally {
@@ -112,7 +112,7 @@ module.exports = {
     const session = client.startSession();
     try {
       await session.withTransaction(async () => {
-        const cursor = db.collection("games").find({});
+        const cursor = db.collection("game").find({});
         for await (const game of cursor) {
           const newGame = {
             ...game,
@@ -121,7 +121,7 @@ module.exports = {
               scoring: migrateDownScoring(turn.scoring),
             })),
           };
-          await db.collection("games").replaceOne({ _id: game._id }, newGame);
+          await db.collection("game").replaceOne({ _id: game._id }, newGame);
         }
       });
     } finally {

@@ -5,7 +5,7 @@ module.exports = {
     const session = client.startSession();
     try {
       await session.withTransaction(async () => {
-        const cursor = db.collection("games").find({});
+        const cursor = db.collection("game").find({});
         for await (const game of cursor) {
           const newGame = {
             ...game,
@@ -14,7 +14,7 @@ module.exports = {
               revision_id: uuid(),
             })),
           };
-          await db.collection("games").replaceOne({ _id: game._id }, newGame);
+          await db.collection("game").replaceOne({ _id: game._id }, newGame);
         }
       });
     } finally {
@@ -26,13 +26,13 @@ module.exports = {
     const session = client.startSession();
     try {
       await session.withTransaction(async () => {
-        const cursor = db.collection("games").find({});
+        const cursor = db.collection("game").find({});
         for await (const game of cursor) {
           const newGame = {
             ...game,
             turns: game.turns.map(({ revision_id, ...turn }) => turn),
           };
-          await db.collection("games").replaceOne({ _id: game._id }, newGame);
+          await db.collection("game").replaceOne({ _id: game._id }, newGame);
         }
       });
     } finally {

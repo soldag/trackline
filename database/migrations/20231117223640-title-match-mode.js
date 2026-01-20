@@ -1,6 +1,6 @@
 module.exports = {
   async up(db) {
-    await db.collection("games").updateMany(
+    await db.collection("game").updateMany(
       {
         "settings.title_match_mode": { $exists: false },
       },
@@ -8,18 +8,18 @@ module.exports = {
         $set: {
           "settings.title_match_mode": "full",
         },
-      }
+      },
     );
   },
 
   async down(db) {
-    await db.collection("games").updateMany(
+    await db.collection("game").updateMany(
       {},
       {
         $unset: {
           "settings.title_match_mode": "",
         },
-      }
+      },
     );
   },
 };

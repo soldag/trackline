@@ -17,7 +17,7 @@ const migrateUpPasses = (guesses) =>
     Object.entries(guesses).map(([userId, guess]) => [
       userId,
       { creation_time: guess.creation_time },
-    ])
+    ]),
   );
 
 const migrateUpScoring = (scoring) => {
@@ -60,14 +60,14 @@ const migrateDownGuesses = (guesses, passes) => {
         position: null,
         release_year: null,
       },
-    ])
+    ]),
   );
 
   for (const [userId, guess] of Object.entries(guesses.release_year)) {
     newGuesses[userId] = {
       creation_time: getMinTimestamp(
         newGuesses[userId]?.creation_time,
-        guess.creation_time
+        guess.creation_time,
       ),
       position: guess.position,
       release_year: guess.year > 0 ? guess.year : null,
@@ -90,8 +90,8 @@ const migrateDownScoring = (guesses, scoring) => {
           ([userId, tokenGain]) => [
             userId,
             tokenGain - (guesses.release_year[userId]?.tokenCost || 0),
-          ]
-        )
+          ],
+        ),
       ),
     },
     release_year: {
@@ -106,7 +106,7 @@ module.exports = {
     const session = client.startSession();
     try {
       await session.withTransaction(async () => {
-        const cursor = db.collection("games").find({});
+        const cursor = db.collection("game").find({});
         for await (const game of cursor) {
           const newGame = {
             ...game,
@@ -116,7 +116,7 @@ module.exports = {
                 release_year: Object.fromEntries(
                   Object.entries(turn.guesses)
                     .filter(([, guess]) => guess.position != null)
-                    .map(([userId, guess]) => [userId, migrateUpGuess(guess)])
+                    .map(([userId, guess]) => [userId, migrateUpGuess(guess)]),
                 ),
                 credits: {},
               },
@@ -124,7 +124,7 @@ module.exports = {
               scoring: migrateUpScoring(turn.scoring),
             })),
           };
-          await db.collection("games").replaceOne({ _id: game._id }, newGame);
+          await db.collection("game").replaceOne({ _id: game._id }, newGame);
         }
       });
     } finally {
@@ -136,7 +136,7 @@ module.exports = {
     const session = client.startSession();
     try {
       await session.withTransaction(async () => {
-        const cursor = db.collection("games").find({});
+        const cursor = db.collection("game").find({});
         for await (const game of cursor) {
           const newGame = {
             ...game,
@@ -146,7 +146,7 @@ module.exports = {
               scoring: migrateDownScoring(turn.guesses, turn.scoring),
             })),
           };
-          await db.collection("games").replaceOne({ _id: game._id }, newGame);
+          await db.collection("game").replaceOne({ _id: game._id }, newGame);
         }
       });
     } finally {
