@@ -78,6 +78,6 @@
     "i18n:extract": "formatjs extract 'src/**/*.{js,jsx,ts,tsx}' --out-file messages.json && formatjs compile messages.json --out-file src/translations/en.json && rm messages.json",
     "i18n:check": "tsx scripts/checkTranslations.ts",
     "lint": "eslint --max-warnings=0 --fix .",
-    "format": "prettier --write '**/*.{js,jsx,cjs,ts,tsx,css,md,json}' --config .prettierrc.cjs"
+    "format": "prettier --write '**/*.{js,jsx,cjs,ts,tsx,html,css,md,json}' --config .prettierrc.cjs"
   }
 }
