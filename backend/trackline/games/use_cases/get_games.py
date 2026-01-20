@@ -18,7 +18,7 @@ class Handler(BaseHandler[GetGames, list[GameOut]]):
             Game,
             {
                 "players.user_id": user_id,
-                "state": {"$ne": [GameState.ABORTED, GameState.COMPLETED]},
+                "state": {"$nin": [GameState.ABORTED, GameState.COMPLETED]},
             },
             sort=[("creation_time", SortDirection.DESCENDING)],
         )
