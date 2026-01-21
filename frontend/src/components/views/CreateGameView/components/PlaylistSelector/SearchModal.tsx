@@ -19,6 +19,7 @@ import {
 
 import { AppError } from "@/types/errors";
 import { SpotifyPlaylist } from "@/types/spotify";
+import { useBreakpoint } from "@/utils/hooks";
 
 import PlaylistList from "./PlaylistList";
 
@@ -134,6 +135,8 @@ const SearchModal = ({
   searchError,
   searchResults = [],
 }: SearchModalProps) => {
+  const isScreenLg = useBreakpoint((breakpoints) => breakpoints.up("lg"));
+
   const listContainerRef = useRef<HTMLDivElement>(null);
   const [newSelection, setNewSelection] = useState(selection);
 
@@ -160,8 +163,12 @@ const SearchModal = ({
   return (
     <Modal open={open} onClose={handleCancel}>
       <ModalDialog
-        layout="fullscreen"
-        sx={{ display: "flex", flexDirection: "column" }}
+        layout={isScreenLg ? "center" : "fullscreen"}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minWidth: { lg: "550px" },
+        }}
       >
         <DialogTitle>
           <FormattedMessage
