@@ -123,6 +123,13 @@ const revertScoring = (game: Game) => {
   }
 };
 
+const removeGameFromActive = (state: Draft<GamesState>) => {
+  if (state.activeGames && state.game) {
+    const gameId = state.game.id;
+    state.activeGames = state.activeGames.filter((g) => g.id !== gameId);
+  }
+};
+
 const reducer = createReducer(initialState, (builder) => {
   builder
     .addCase(resetState, () => initialState)
@@ -177,6 +184,7 @@ const reducer = createReducer(initialState, (builder) => {
       invariant(state.game);
 
       state.game.state = GameState.Aborted;
+      removeGameFromActive(state);
     })
 
     .addCase(fetchActiveGames.fulfilled, (state, { payload: { games } }) => {
@@ -195,17 +203,24 @@ const reducer = createReducer(initialState, (builder) => {
       };
     })
 
+    .addCase(abortGame.fulfilled, (state) => {
+      removeGameFromActive(state);
+
+      state.game = null;
+      state.users = [];
+    })
+
+    .addCase(leaveGame.fulfilled, (state) => {
+      state.game = null;
+      state.users = [];
+    })
+
     .addMatcher(
       isAnyOf(fetchGame.fulfilled, createGame.fulfilled, joinGame.fulfilled),
       (state, { payload: { game } }) => {
         state.game = game;
       },
     )
-
-    .addMatcher(isAnyOf(abortGame.fulfilled, leaveGame.fulfilled), (state) => {
-      state.game = null;
-      state.users = [];
-    })
 
     .addMatcher(
       isAnyOf(createTurn.fulfilled, turnCreated),
@@ -287,6 +302,7 @@ const reducer = createReducer(initialState, (builder) => {
 
         if (completion.gameCompleted) {
           state.game.state = GameState.Completed;
+          removeGameFromActive(state);
         }
       },
     )
