@@ -65,7 +65,7 @@ const HomeView = () => {
               />
             }
             sx={{ flexGrow: { sm: 1 } }}
-            linkTo="/games/create"
+            linkTo="/games/new"
           />
 
           <ActionCard
