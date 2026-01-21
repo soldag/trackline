@@ -1,23 +1,31 @@
+import { Link as RouterLink } from "react-router";
+
 import {
+  Box,
   Card,
   CardContent,
-  CardOverflow,
   ColorPaletteProp,
-  Typography,
+  Link,
+  Stack,
   VariantProp,
 } from "@mui/joy";
 import { SxProps } from "@mui/joy/styles/types";
 
 import { mergeSx } from "@/utils/style";
 
+import ActionCardOverflow from "./ActionCardOverflow";
+import ActionCardTitle from "./ActionCardTitle";
+
 interface ActionCardProps {
   color?: ColorPaletteProp;
   variant?: VariantProp;
   startDecorator?: React.ReactNode;
   endDecorator?: React.ReactNode;
-  title?: React.ReactNode;
+  title: React.ReactNode;
   description?: React.ReactNode;
+  linkTo?: string;
   sx?: SxProps;
+  onClick?: () => void;
 }
 
 const ActionCard = ({
@@ -27,7 +35,9 @@ const ActionCard = ({
   endDecorator,
   title,
   description,
+  linkTo,
   sx,
+  onClick,
 }: ActionCardProps) => (
   <Card
     orientation="horizontal"
@@ -43,39 +53,31 @@ const ActionCard = ({
         backgroundColor: `${color}.${variant}ActiveBg`,
       },
     })}
+    onClick={onClick}
   >
     {startDecorator && (
-      <CardOverflow
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          pl: "var(--Card-padding)",
-          fontSize: "2rem",
-        }}
-      >
-        {startDecorator}
-      </CardOverflow>
+      <ActionCardOverflow>{startDecorator}</ActionCardOverflow>
     )}
 
-    <CardContent sx={{ gap: 1 }}>
-      {title && <Typography level="title-lg">{title}</Typography>}
-      {description && <Typography>{description}</Typography>}
+    <CardContent sx={{ overflow: "hidden" }}>
+      <Stack direction="column" spacing={1}>
+        {linkTo ? (
+          <Link overlay component={RouterLink} to={linkTo} underline="none">
+            <ActionCardTitle title={title} />
+          </Link>
+        ) : (
+          <ActionCardTitle title={title} />
+        )}
+
+        {description && (
+          <Box sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+            {description}
+          </Box>
+        )}
+      </Stack>
     </CardContent>
 
-    {endDecorator && (
-      <CardOverflow
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          pr: "var(--Card-padding)",
-          fontSize: "2rem",
-        }}
-      >
-        {endDecorator}
-      </CardOverflow>
-    )}
+    {endDecorator && <ActionCardOverflow>{endDecorator}</ActionCardOverflow>}
   </Card>
 );
 

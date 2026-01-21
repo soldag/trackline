@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { FormattedMessage } from "react-intl";
-import { Link as RouterLink } from "react-router";
 
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import { Link, Stack, Typography } from "@mui/joy";
+import { Stack, Typography } from "@mui/joy";
 
 import ActionCard from "@/components/common/ActionCard";
 import View from "@/components/views/View";
@@ -54,17 +53,10 @@ const HomeView = () => {
             startDecorator={<PlaylistAddIcon />}
             endDecorator={<NavigateNextIcon />}
             title={
-              <Link
-                overlay
-                underline="none"
-                component={RouterLink}
-                to="/games/new"
-              >
-                <FormattedMessage
-                  id="HomeView.createGame.title"
-                  defaultMessage="Create new game"
-                />
-              </Link>
+              <FormattedMessage
+                id="HomeView.createGame.title"
+                defaultMessage="Create new game"
+              />
             }
             description={
               <FormattedMessage
@@ -73,6 +65,7 @@ const HomeView = () => {
               />
             }
             sx={{ flexGrow: { sm: 1 } }}
+            linkTo="/games/create"
           />
 
           <ActionCard
@@ -81,17 +74,10 @@ const HomeView = () => {
             startDecorator={<MeetingRoomIcon />}
             endDecorator={<NavigateNextIcon />}
             title={
-              <Link
-                overlay
-                underline="none"
-                component={RouterLink}
-                to="/games/join"
-              >
-                <FormattedMessage
-                  id="HomeView.joinGame.title"
-                  defaultMessage="Join existing game"
-                />
-              </Link>
+              <FormattedMessage
+                id="HomeView.joinGame.title"
+                defaultMessage="Join existing game"
+              />
             }
             description={
               <FormattedMessage
@@ -100,6 +86,7 @@ const HomeView = () => {
               />
             }
             sx={{ flexGrow: { sm: 1 } }}
+            linkTo="/games/join"
           />
         </Stack>
       </Stack>
