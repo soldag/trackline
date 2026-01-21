@@ -1,4 +1,5 @@
 import Avatar from "boring-avatars";
+import { useState } from "react";
 import { useIntl } from "react-intl";
 
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
@@ -8,6 +9,7 @@ import ActionCard from "@/components/common/ActionCard";
 import GameStateChip from "@/components/common/GameStateChip";
 import { ResponsiveChip } from "@/components/common/ResponsiveChip";
 import { Game } from "@/types/games";
+import { useInterval } from "@/utils/hooks";
 import { formatRelativeTime } from "@/utils/i18n";
 
 interface GameCardProps {
@@ -16,6 +18,14 @@ interface GameCardProps {
 
 const GameCard = ({ game }: GameCardProps) => {
   const { locale } = useIntl();
+
+  const [relativeTime, setRelativeTime] = useState(
+    formatRelativeTime(game.creationTime, locale),
+  );
+
+  useInterval(() => {
+    setRelativeTime(formatRelativeTime(game.creationTime, locale));
+  }, 1000);
 
   return (
     <ActionCard
@@ -42,7 +52,7 @@ const GameCard = ({ game }: GameCardProps) => {
             color="primary"
             startDecorator={<AccessTimeFilledIcon />}
           >
-            {formatRelativeTime(game.creationTime, locale)}
+            {relativeTime}
           </ResponsiveChip>
         </Stack>
       }
