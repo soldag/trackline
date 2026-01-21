@@ -12,6 +12,7 @@ import { fetchActiveGames } from "@/store/games/thunks";
 import {
   useAppDispatch,
   useAppSelector,
+  useErrorToast,
   useLoadingSelector,
 } from "@/utils/hooks";
 
@@ -21,6 +22,7 @@ const HomeView = () => {
   const dispatch = useAppDispatch();
   const activeGames = useAppSelector((state) => state.games.activeGames);
   const loading = useLoadingSelector(fetchActiveGames);
+  useErrorToast(fetchActiveGames);
 
   useEffect(() => {
     dispatch(fetchActiveGames());
