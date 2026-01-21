@@ -45,6 +45,7 @@ const ActionCard = ({
     color={color}
     invertedColors
     sx={mergeSx(sx, {
+      "alignItems": "center",
       "&:hover": {
         boxShadow: "md",
         backgroundColor: `${color}.${variant}HoverBg`,

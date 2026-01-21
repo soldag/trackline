@@ -280,7 +280,7 @@ const GameTurnGuessingView = () => {
         showPlaybackControls: isGameMaster,
         showExitGame: true,
       }}
-      disablePadding
+      disableGutters
       disableScrolling
     >
       <TurnInfoPopup game={game} users={users} currentUserId={user?.id} />

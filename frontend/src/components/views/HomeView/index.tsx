@@ -64,7 +64,7 @@ const HomeView = () => {
                 defaultMessage="Start a new game and invite your friends!"
               />
             }
-            sx={{ flexGrow: { sm: 1 } }}
+            sx={{ flexGrow: { sm: 1 }, flexBasis: 0 }}
             linkTo="/games/new"
           />
 
@@ -85,7 +85,7 @@ const HomeView = () => {
                 defaultMessage="Enter a game code to join an existing game!"
               />
             }
-            sx={{ flexGrow: { sm: 1 } }}
+            sx={{ flexGrow: { sm: 1 }, flexBasis: 0 }}
             linkTo="/games/join"
           />
         </Stack>

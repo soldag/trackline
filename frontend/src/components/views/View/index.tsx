@@ -1,19 +1,19 @@
 import { PropsWithChildren } from "react";
 
-import { Box, CircularProgress, Sheet } from "@mui/joy";
+import { Box, CircularProgress, Container, Sheet } from "@mui/joy";
 
 import AppBar, { AppBarProps } from "./components/AppBar";
 
 interface ViewProps {
   appBar?: AppBarProps;
-  disablePadding?: boolean;
+  disableGutters?: boolean;
   disableScrolling?: boolean;
   loading?: boolean;
 }
 
 const View = ({
   appBar,
-  disablePadding = false,
+  disableGutters = false,
   disableScrolling = false,
   loading = false,
   children,
@@ -47,12 +47,14 @@ const View = ({
         <CircularProgress size="lg" thickness={6} />
       </Box>
     ) : (
-      <Box
+      <Container
+        disableGutters={disableGutters}
+        maxWidth={disableGutters ? false : "lg"}
         sx={{
           "display": "flex",
           "flexDirection": "column",
           "flexGrow": 1,
-          ...(!disablePadding && { padding: 2 }),
+          ...(!disableGutters && { py: 2 }),
           ...(!disableScrolling && { overflowY: "auto" }),
           "& > *": {
             flexGrow: 1,
@@ -60,7 +62,7 @@ const View = ({
         }}
       >
         {children}
-      </Box>
+      </Container>
     )}
   </Sheet>
 );
