@@ -49,14 +49,14 @@ import {
 
 interface GamesState {
   game: Game | null;
-  activeGames: Game[];
+  activeGames: Game[] | null;
   users: User[];
   boughtTrack: Track | null;
 }
 
 const initialState: GamesState = {
   game: null,
-  activeGames: [],
+  activeGames: null,
   users: [],
   boughtTrack: null,
 };

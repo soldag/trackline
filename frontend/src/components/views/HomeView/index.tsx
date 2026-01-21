@@ -19,7 +19,7 @@ import GameList from "./components/GameList";
 
 const HomeView = () => {
   const dispatch = useAppDispatch();
-  const games = useAppSelector((state) => state.games.activeGames);
+  const activeGames = useAppSelector((state) => state.games.activeGames);
   const loading = useLoadingSelector(fetchActiveGames);
 
   useEffect(() => {
@@ -27,14 +27,17 @@ const HomeView = () => {
   }, [dispatch]);
 
   return (
-    <View appBar={{ showTitle: true, showLogout: true }} loading={loading}>
+    <View
+      appBar={{ showTitle: true, showLogout: true }}
+      loading={loading && !activeGames}
+    >
       <Stack
         direction="column"
         justifyContent="center"
         gap={4}
         sx={{ height: "100%", overflow: "hidden" }}
       >
-        {games.length > 0 && (
+        {activeGames && activeGames.length > 0 && (
           <Stack direction="column" sx={{ flex: "1 1 0", overflow: "hidden" }}>
             <Typography level="title-lg" sx={{ mb: 1 }}>
               <FormattedMessage
@@ -42,7 +45,10 @@ const HomeView = () => {
                 defaultMessage="Your active games"
               />
             </Typography>
-            <GameList games={games} sx={{ flexShrink: 1, overflow: "auto" }} />
+            <GameList
+              games={activeGames}
+              sx={{ flexShrink: 1, overflow: "auto" }}
+            />
           </Stack>
         )}
 
