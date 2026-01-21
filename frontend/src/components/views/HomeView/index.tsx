@@ -8,7 +8,7 @@ import { Stack, Typography } from "@mui/joy";
 
 import ActionCard from "@/components/common/ActionCard";
 import View from "@/components/views/View";
-import { fetchGames } from "@/store/games/thunks";
+import { fetchActiveGames } from "@/store/games/thunks";
 import {
   useAppDispatch,
   useAppSelector,
@@ -19,11 +19,11 @@ import GameList from "./components/GameList";
 
 const HomeView = () => {
   const dispatch = useAppDispatch();
-  const games = useAppSelector((state) => state.games.games);
-  const loading = useLoadingSelector(fetchGames);
+  const games = useAppSelector((state) => state.games.activeGames);
+  const loading = useLoadingSelector(fetchActiveGames);
 
   useEffect(() => {
-    dispatch(fetchGames());
+    dispatch(fetchActiveGames());
   }, [dispatch]);
 
   return (

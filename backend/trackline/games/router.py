@@ -65,7 +65,7 @@ async def create_game(
 @router.get("")
 async def get_games(
     auth_user_id: AuthUserId,
-    use_case: Annotated[GetGames, Depends()],
+    use_case: Annotated[GetGames, Bind(GetGames, query=["state"])],
     use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[list[GameOut]]:
     users = await use_case_executor.execute(use_case, auth_user_id)

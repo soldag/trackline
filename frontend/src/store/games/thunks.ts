@@ -1,5 +1,6 @@
 import tracklineApi from "@/api/trackline";
 import { TracklineApiError } from "@/api/trackline/errors";
+import { ACTIVE_GAME_STATES } from "@/constants";
 import { createSafeAsyncThunk } from "@/store/utils/thunks";
 import { ArtistMatchMode, TitleMatchMode } from "@/types/games";
 import invariant from "@/utils/invariant";
@@ -18,11 +19,13 @@ export const fetchGame = createSafeAsyncThunk(
   },
 );
 
-export const fetchGames = createSafeAsyncThunk(
+export const fetchActiveGames = createSafeAsyncThunk(
   PREFIX,
-  "fetchGames",
+  "fetchActiveGames",
   async () => {
-    const games = await tracklineApi.games.getAll();
+    const games = await tracklineApi.games.getAll({
+      state: ACTIVE_GAME_STATES,
+    });
     return { games };
   },
 );

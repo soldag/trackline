@@ -33,9 +33,9 @@ import {
   createGame,
   createTurn,
   exchangeTrack,
+  fetchActiveGames,
   fetchGame,
   fetchGameUsers,
-  fetchGames,
   guessTrackCredits,
   guessTrackReleaseYear,
   joinGame,
@@ -49,14 +49,14 @@ import {
 
 interface GamesState {
   game: Game | null;
-  games: Game[];
+  activeGames: Game[];
   users: User[];
   boughtTrack: Track | null;
 }
 
 const initialState: GamesState = {
   game: null,
-  games: [],
+  activeGames: [],
   users: [],
   boughtTrack: null,
 };
@@ -179,8 +179,8 @@ const reducer = createReducer(initialState, (builder) => {
       state.game.state = GameState.Aborted;
     })
 
-    .addCase(fetchGames.fulfilled, (state, { payload: { games } }) => {
-      state.games = games;
+    .addCase(fetchActiveGames.fulfilled, (state, { payload: { games } }) => {
+      state.activeGames = games;
     })
 
     .addCase(fetchGameUsers.fulfilled, (state, { payload: { users } }) => {

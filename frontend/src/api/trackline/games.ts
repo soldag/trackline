@@ -5,6 +5,7 @@ import {
   CorrectionProposalVote,
   CreditsGuess,
   Game,
+  GameState,
   Player,
   ReleaseYearGuess,
   TitleMatchMode,
@@ -64,10 +65,14 @@ export const get = async ({ gameId }: { gameId: string }): Promise<Game> => {
   return game;
 };
 
-export const getAll = async (): Promise<Game[]> => {
+export const getAll = async (
+  params: { state?: GameState[] } = {},
+): Promise<Game[]> => {
   const {
     data: { data: games },
-  } = await instance.get<EntityResponse<Game[]>>("games");
+  } = await instance.get<EntityResponse<Game[]>>("games", {
+    params,
+  });
 
   return games;
 };

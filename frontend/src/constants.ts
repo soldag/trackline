@@ -46,6 +46,12 @@ export const MIN_TIMELINE_LENGTH = 5;
 export const MAX_TIMELINE_LENGTH = 20;
 export const DEFAULT_TIMELINE_LENGTH = 10;
 
+export const ACTIVE_GAME_STATES = [
+  GameState.WaitingForPlayers,
+  GameState.Started,
+  GameState.Guessing,
+  GameState.Scoring,
+];
 export const TURN_GAME_STATES = [GameState.Guessing, GameState.Scoring];
 
 export const CREDITS_STRICTNESS_VALUES = {

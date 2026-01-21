@@ -47,11 +47,13 @@ class Repository:
         document_type: type[T],
         query: Query,
         sort: str | list[tuple[str, SortDirection]] | None = None,
+        limit: int | None = None,
     ) -> list[T]:
         return self._track_all(
             await document_type.find_many(
                 query,
                 sort=sort,
+                limit=limit,
                 session=self._session,
             ).to_list()
         )

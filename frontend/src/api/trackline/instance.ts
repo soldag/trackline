@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import rateLimit from "axios-rate-limit";
+import qs from "qs";
 
 import { TracklineApiError } from "@/api/trackline/errors";
 import { ErrorResponse } from "@/api/trackline/types";
@@ -33,6 +34,8 @@ const instance = rateLimit(
       "Accept": "application/json",
       "Content-Type": "application/json",
     },
+    paramsSerializer: (params) =>
+      qs.stringify(params, { arrayFormat: "repeat" }),
     timeout: HTTP_REQUEST_TIMEOUT,
   }),
   { maxRPS: 15 },
