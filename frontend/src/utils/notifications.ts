@@ -96,7 +96,13 @@ export const useNotifications = ({
     webSocketUrl,
     {
       retryOnError: true,
-      shouldReconnect: () => true,
+      shouldReconnect: (e) => {
+        const shouldReconnect = e.code !== 1008;
+        console.error(
+          `Failed to connect to notifications websocket (Code: ${e.code}, Reason: ${e.reason})${shouldReconnect ? ", reconnecting..." : ", will not reconnect"}`,
+        );
+        return shouldReconnect;
+      },
       reconnectAttempts: Infinity,
       reconnectInterval: (retries) => {
         const interval = 2 ** retries * WS_RECONNECT_MIN_INTERVAL;

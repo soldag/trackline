@@ -2,10 +2,11 @@ import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, FastAPI, Request, WebSocket
+from fastapi import Depends, FastAPI
 from fastapi.exceptions import RequestValidationError, WebSocketRequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_injector import InjectorMiddleware, attach_injector
+from starlette.requests import HTTPConnection
 
 from trackline.auth.router import router as auth_router
 from trackline.core.db.client import DatabaseClient
@@ -83,15 +84,8 @@ app.include_router(users_router)
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: Exception) -> None:
+@app.exception_handler(WebSocketRequestValidationError)
+async def validation_exception_handler(conn: HTTPConnection, exc: Exception) -> None:
     # This is needed to disable the builtin error handler of fastapi
     # and instead use the custom ExceptionHandlingMiddleware
     raise exc
-
-
-@app.exception_handler(WebSocketRequestValidationError)
-async def ws_validation_exception_handler(
-    ws: WebSocket,
-    exc: WebSocketRequestValidationError,
-) -> None:
-    pass

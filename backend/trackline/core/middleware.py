@@ -3,8 +3,9 @@ import time
 from collections.abc import Awaitable, Callable, Sequence
 
 from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import RequestValidationError, WebSocketRequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.websockets import WebSocketState
 from sentry_sdk import capture_exception
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -119,14 +120,24 @@ class ExceptionHandlingMiddleware:
         ws = WebSocket(scope, receive, send)
         try:
             await self.app(scope, receive, send)
-        except RequestValidationError:
-            await ws.close(code=1008, reason="VALIDATION_ERROR")
+        except WebSocketRequestValidationError:
+            await self._close_websocket(ws, code=1008, reason="VALIDATION_ERROR")
         except RequestError as exc:
-            await ws.close(code=1008, reason=exc.code)
+            await self._close_websocket(ws, code=1008, reason=exc.code)
         except Exception:
             capture_exception()
             log.exception("Unhandled exception")
-            await ws.close(code=1008)
+            await self._close_websocket(ws, code=1008, reason="UNEXPECTED_ERROR")
+
+    async def _close_websocket(
+        self, ws: WebSocket, code: int, reason: str | None = None
+    ) -> None:
+        # Accept before closing so the client receives the actual close code and reason.
+        # Closing before accepting results in client-side 1006 code (abnormal closure).
+        if ws.application_state == WebSocketState.CONNECTING:
+            await ws.accept()
+
+        await ws.close(code=code, reason=reason)
 
     def _create_response(
         self,
