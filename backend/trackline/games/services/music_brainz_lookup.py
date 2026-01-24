@@ -87,7 +87,7 @@ class MusicBrainzLookup:
     def _build_query(self, text: str, *, tokenize: bool = False) -> Q:
         if tokenize:
             sub_queries = [Q(t) for t in tokenize_string(text)]
-            return reduce(lambda q1, q2: q1 & q2, sub_queries)
+            return reduce(lambda q1, q2: q1 & q2, sub_queries, Q())
 
         return Q(text)
 
