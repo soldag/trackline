@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated
 
-from httpx import AsyncClient, HTTPError
+from httpx import AsyncClient, ConnectError, HTTPError
 from injector import Inject
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -83,6 +83,9 @@ class MusicBrainzClient:
                 "recording",
                 params={"query": query, "limit": limit, "fmt": "json"},
             )
+        except ConnectError:
+            log.exception("MusicBrainz request failed due to connection error")
+            return []
         except HTTPError:
             log.exception("MusicBrainz request failed due to HTTP error")
             return []
