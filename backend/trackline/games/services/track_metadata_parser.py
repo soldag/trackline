@@ -233,25 +233,31 @@ class TrackMetadataParser:
         artist_type: ArtistType,
         known_artists: Iterable[Artist],
     ) -> list[Artist]:
-        artists: list[Artist] = []
-        for artist in known_artists:
-            if artist.primary_name in text:
-                artists.append(replace(artist, artist_type=artist_type))
-                for name in (artist.full_name, artist.primary_name):
-                    text = text.replace(name, "").strip()
+        artists = [
+            replace(artist, artist_type=artist_type)
+            for artist in known_artists
+            if artist.primary_name in text
+        ]
 
-        matches = re.split(self.ARTIST_JOIN_PATTERN, text)
+        matches = [m for m in re.split(self.ARTIST_JOIN_PATTERN, text) if m]
 
         # If there's only one match, it means the remaining string does not contain
         # any join phrase, so it's likely not another artist but rather some extra info
         if artists and len(matches) == 1:
             return artists
 
-        artists.extend(
-            artist
-            for match in re.split(self.ARTIST_JOIN_PATTERN, text)
-            if match and (artist := self._parse_artist(match, artist_type))
-        )
+        known_names = {
+            name
+            for artist in known_artists
+            for name in (artist.full_name, artist.primary_name)
+        }
+
+        for match in matches:
+            if not match or any(name in match for name in known_names):
+                continue
+
+            if artist := self._parse_artist(match, artist_type):
+                artists.append(artist)
 
         return artists
 
