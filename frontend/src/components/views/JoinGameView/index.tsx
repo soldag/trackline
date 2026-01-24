@@ -41,7 +41,15 @@ const JoinGameView = () => {
   }
 
   return (
-    <View appBar={{ showTitle: true, showLogout: true }}>
+    <View
+      appBar={{ showTitle: true, showLogout: true }}
+      header={
+        <FormattedMessage
+          id="JoinGameView.header"
+          defaultMessage="Join existing game"
+        />
+      }
+    >
       <Stack
         direction={{ xs: "column", sm: "row" }}
         alignItems="stretch"

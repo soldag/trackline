@@ -1,11 +1,12 @@
 import { PropsWithChildren } from "react";
 
-import { Box, CircularProgress, Container, Sheet } from "@mui/joy";
+import { Box, CircularProgress, Container, Sheet, Typography } from "@mui/joy";
 
 import AppBar, { AppBarProps } from "./components/AppBar";
 
 interface ViewProps {
   appBar?: AppBarProps;
+  header?: React.ReactNode;
   disableGutters?: boolean;
   disableScrolling?: boolean;
   loading?: boolean;
@@ -13,6 +14,7 @@ interface ViewProps {
 
 const View = ({
   appBar,
+  header,
   disableGutters = false,
   disableScrolling = false,
   loading = false,
@@ -61,6 +63,11 @@ const View = ({
           },
         }}
       >
+        {header && (
+          <Typography level="title-lg" sx={{ flexGrow: 0, mb: 2 }}>
+            {header}
+          </Typography>
+        )}
         {children}
       </Container>
     )}

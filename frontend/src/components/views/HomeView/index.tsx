@@ -41,7 +41,7 @@ const HomeView = () => {
       >
         {activeGames && activeGames.length > 0 && (
           <Stack direction="column" sx={{ flex: "1 1 0", overflow: "hidden" }}>
-            <Typography level="title-lg" sx={{ mb: 1 }}>
+            <Typography level="title-lg" sx={{ mb: 2 }}>
               <FormattedMessage
                 id="HomeView.activeGames"
                 defaultMessage="Your active games"

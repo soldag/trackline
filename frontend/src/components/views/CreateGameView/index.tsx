@@ -195,7 +195,15 @@ const CreateGameView = () => {
   );
 
   return (
-    <View appBar={{ showTitle: true, showLogout: true }}>
+    <View
+      appBar={{ showTitle: true, showLogout: true }}
+      header={
+        <FormattedMessage
+          id="CreateGameView.header"
+          defaultMessage="Create new game"
+        />
+      }
+    >
       <Stack
         direction="column"
         justifyContent="space-between"

@@ -56,6 +56,12 @@ const GameLobbyView = () => {
         showPlaybackControls: true,
         showExitGame: true,
       }}
+      header={
+        <FormattedMessage
+          id="GameLobbyView.header"
+          defaultMessage="Waiting for players..."
+        />
+      }
     >
       <QrCodeModal
         joinUrl={joinUrl}
