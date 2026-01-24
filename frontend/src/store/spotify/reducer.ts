@@ -123,6 +123,7 @@ const reducer = createReducer(initialState, (builder) => {
       state.playback.isPlaying = true;
       if (trackId) {
         state.playback.progress = 0;
+        state.playback.trackId = trackId;
       }
     })
 

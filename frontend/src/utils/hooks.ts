@@ -213,14 +213,29 @@ export const useSpotifyPlayback = ({
   pauseOnUnmount?: boolean;
 }) => {
   const dispatch = useAppDispatch();
-
   const playbackTrackId = useAppSelector(
     (state) => state.spotify.playback.trackId,
   );
 
+  const cooldownInterval = 3000;
+  const currentCooldownRef = useRef(0);
+
   useEffect(() => {
     if (trackId && isEnabled && playbackTrackId !== trackId) {
-      dispatch(play({ trackId }));
+      const playTrack = () => {
+        dispatch(play({ trackId }));
+        currentCooldownRef.current = Date.now() + cooldownInterval;
+      };
+
+      // Prevent spamming play requests when playback state does
+      // not reflect new track after sending play request
+      const cooldownDiff = currentCooldownRef.current - Date.now();
+      if (cooldownDiff <= 0) {
+        playTrack();
+      } else {
+        const timeout = setTimeout(playTrack, cooldownDiff);
+        return () => clearTimeout(timeout);
+      }
     }
   }, [dispatch, isEnabled, trackId, playbackTrackId]);
 
