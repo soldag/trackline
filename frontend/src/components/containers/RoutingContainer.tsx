@@ -28,7 +28,7 @@ const RoutingContainer = () => (
       </Route>
     </Route>
 
-    <Route path="*" element={<Navigate to="/" />} />
+    <Route path="*" element={<Navigate replace to="/" />} />
   </Routes>
 );
 

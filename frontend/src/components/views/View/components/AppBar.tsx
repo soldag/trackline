@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { useNavigate } from "react-router";
+import { Link as RouterLink } from "react-router";
 
 import AlbumIcon from "@mui/icons-material/Album";
 import ClearIcon from "@mui/icons-material/Clear";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Box, IconButton, Stack, Typography } from "@mui/joy";
+import { Box, IconButton, Link, Stack } from "@mui/joy";
 
 import { TURN_GAME_STATES } from "@/constants";
 import { logout } from "@/store/auth";
@@ -40,8 +40,6 @@ const AppBar = ({
   showExitGame = false,
   showLogout = false,
 }: AppBarProps) => {
-  const navigate = useNavigate();
-
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [abortModalOpen, setAbortModalOpen] = useState(false);
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
@@ -76,14 +74,6 @@ const AppBar = ({
       dispatch(unwatchPlayback());
     };
   }, [dispatch, showPlaybackControls, isSpotifyLoggedIn]);
-
-  const handleLogoClick = () => {
-    if (!game) {
-      navigate("/");
-    } else {
-      handleExitGame();
-    }
-  };
 
   const handleExitGame = () => {
     if (isGameMaster) {
@@ -142,16 +132,20 @@ const AppBar = ({
         onConfirm={handleLeaveGame}
       />
 
-      <AlbumIcon
-        color="primary"
-        sx={{ fontSize: "45px", cursor: "pointer" }}
-        onClick={handleLogoClick}
-      />
+      <Link component={RouterLink} to="/">
+        <AlbumIcon color="primary" sx={{ fontSize: "45px" }} />
+      </Link>
 
       {showTitle && (
-        <Typography level="h1" fontSize="xl">
+        <Link
+          component={RouterLink}
+          to="/"
+          level="h1"
+          fontSize="xl"
+          underline="none"
+        >
           <FormattedMessage id="View.AppBar.title" defaultMessage="Trackline" />
-        </Typography>
+        </Link>
       )}
 
       {showPlayerInfo && game && user && player && (

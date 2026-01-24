@@ -46,12 +46,16 @@ const GameLobbyView = () => {
   });
 
   if (!gameId || !userId) {
-    return <Navigate to="/" />;
+    return <Navigate replace to="/" />;
   }
 
   return (
     <View
-      appBar={{ showTitle: true, showPlaybackControls: true, showLogout: true }}
+      appBar={{
+        showTitle: true,
+        showPlaybackControls: true,
+        showExitGame: true,
+      }}
     >
       <QrCodeModal
         joinUrl={joinUrl}

@@ -50,7 +50,7 @@ const SpotifyCallbackView = () => {
 
   const handleCancel = () => {
     dispatch(dismissError({ typePrefix: completeAuth.typePrefix }));
-    navigate("/");
+    navigate("/", { replace: true });
   };
 
   if (!code) {

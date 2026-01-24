@@ -62,7 +62,7 @@ const GameContainer = () => {
   const prevGame = usePrevious(game);
   useEffect(() => {
     if (prevGame && !game) {
-      navigate("/");
+      navigate("/", { replace: true });
     }
   }, [prevGame, game, navigate]);
 
@@ -73,7 +73,7 @@ const GameContainer = () => {
   });
 
   if (!gameId) {
-    return <Navigate to="/" />;
+    return <Navigate replace to="/" />;
   }
 
   if (!game || game.id !== gameId) {

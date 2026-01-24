@@ -37,7 +37,7 @@ const JoinGameView = () => {
   }, [dispatch, gameId]);
 
   if (game && game.id === gameId) {
-    return <Navigate to={`/games/${game.id}`} />;
+    return <Navigate replace to={`/games/${game.id}`} />;
   }
 
   return (

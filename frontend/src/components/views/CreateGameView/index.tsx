@@ -135,7 +135,7 @@ const CreateGameView = () => {
 
   const prevGame = usePrevious(game);
   if (game && game !== prevGame) {
-    return <Navigate to={`/games/${game.id}`} />;
+    return <Navigate replace to={`/games/${game.id}`} />;
   }
 
   if (!user) {
