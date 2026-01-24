@@ -145,10 +145,18 @@ class MusicBrainzLookup:
         *,
         ignore_secondary: bool = False,
     ) -> bool:
-        recording_title = recording.title
+        actual_titles: set[str] = set()
         if ignore_secondary:
-            recording_title = self._strip_secondary_title(recording_title)
-        actual_tokens = tokenize_string(recording_title)
+            actual_titles.add(self._strip_secondary_title(recording.title))
+        else:
+            actual_titles.add(recording.title)
+        # The track title in media might differ from the recording's title
+        actual_titles.update(
+            track.title
+            for release in recording.releases
+            for media in release.media
+            for track in media.track
+        )
 
         expected_tokens = tokenize_string(expected_metadata.primary_title)
         optional_tokens: set[str] = set()
@@ -161,19 +169,23 @@ class MusicBrainzLookup:
             for secondary_title in expected_metadata.secondary_titles:
                 expected_tokens |= tokenize_string(secondary_title)
 
-        score = self._score_similarity(actual_tokens, expected_tokens, optional_tokens)
+        score = max(
+            self._score_similarity(
+                tokenize_string(title), expected_tokens, optional_tokens
+            )
+            for title in actual_titles
+        )
+
         return score >= self.MIN_SIMILARITY_SCORE
 
     def _validate_artists(
         self, recording: Recording, expected_metadata: TrackMetadata
     ) -> bool:
-        actual_names: list[str] = []
+        actual_names: set[str] = set()
         for artist_credit in recording.artist_credit:
-            actual_names += [
-                artist_credit.name,
-                artist_credit.artist.name,
-                *(a.name for a in artist_credit.artist.aliases),
-            ]
+            actual_names.add(artist_credit.name)
+            actual_names.add(artist_credit.artist.name)
+            actual_names.update(a.name for a in artist_credit.artist.aliases)
 
         for artist in expected_metadata.artists:
             if artist.artist_type == ArtistType.REMIXER:

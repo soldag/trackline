@@ -39,8 +39,19 @@ class ReleaseGroup(MusicBrainzModel):
     secondary_types: Annotated[list[str], Field(default_factory=list)]
 
 
+class Track(MusicBrainzModel):
+    id: str
+    title: str
+
+
+class ReleaseMedia(MusicBrainzModel):
+    id: str
+    track: list[Track]
+
+
 class Release(MusicBrainzModel):
     release_group: ReleaseGroup
+    media: list[ReleaseMedia]
 
 
 class Recording(MusicBrainzModel):
