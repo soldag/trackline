@@ -123,6 +123,7 @@
   "GameTurnScoringView.BuyTrackModal.header": "Song kaufen",
   "GameTurnScoringView.BuyTrackModal.message": "Möchtest du <bold>{cost, plural, =1 {#{nbsp}Token} other {#{nbsp}Tokens}}</bold> ausgeben, um einen Extra-Song für deinen Zeitstrahl zu kaufen?",
   "GameTurnScoringView.BuyTrackReminderModal.confirmLabel": "Trotzdem fortfahren",
+  "GameTurnScoringView.BuyTrackReminderModal.disableLabel": "Diese Erinnerung nicht mehr anzeigen, bis sich die Anzahl deiner Tokens ändert.",
   "GameTurnScoringView.BuyTrackReminderModal.header": "Song kaufen?",
   "GameTurnScoringView.BuyTrackReminderModal.message": "Du hast genug Tokens, um deinem Zeitstrahl einen zusätzlichen Song hinzuzufügen. Möchtest du wirklich ohne Kauf fortfahren?",
   "GameTurnScoringView.CorrectionProposalVotingModal.agree": "Zustimmen",

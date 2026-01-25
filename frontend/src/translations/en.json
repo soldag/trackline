@@ -123,6 +123,7 @@
   "GameTurnScoringView.BuyTrackModal.header": "Buy track",
   "GameTurnScoringView.BuyTrackModal.message": "Do you want to spend <bold>{cost, plural, =1 {#{nbsp}token} other {#{nbsp}tokens}}</bold> to buy an extra track for your timeline?",
   "GameTurnScoringView.BuyTrackReminderModal.confirmLabel": "Continue anyway",
+  "GameTurnScoringView.BuyTrackReminderModal.disableLabel": "Don't show this reminder again until your tokens change.",
   "GameTurnScoringView.BuyTrackReminderModal.header": "Buy track?",
   "GameTurnScoringView.BuyTrackReminderModal.message": "You have enough tokens to add an extra track to your timeline. Are you sure you want to continue without buying one?",
   "GameTurnScoringView.CorrectionProposalVotingModal.agree": "Agree",

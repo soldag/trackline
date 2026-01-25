@@ -14,6 +14,8 @@ import {
   correctionProposed,
   correctionVoted,
   creditsGuessCreated,
+  disableBuyTrackReminder,
+  enableBuyTrackReminder,
   gameAborted,
   gameStarted,
   playerJoined,
@@ -52,6 +54,7 @@ interface GamesState {
   activeGames: Game[] | null;
   users: User[];
   boughtTrack: Track | null;
+  isBuyTrackReminderDisabled: boolean;
 }
 
 const initialState: GamesState = {
@@ -59,6 +62,7 @@ const initialState: GamesState = {
   activeGames: null,
   users: [],
   boughtTrack: null,
+  isBuyTrackReminderDisabled: false,
 };
 
 const getCurrentTurn = (state: Draft<GamesState>): Draft<Turn> => {
@@ -137,10 +141,20 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(clearGame, (state) => {
       state.game = null;
       state.users = [];
+      state.boughtTrack = null;
+      state.isBuyTrackReminderDisabled = false;
     })
 
     .addCase(clearBoughtTrack, (state) => {
       state.boughtTrack = null;
+    })
+
+    .addCase(enableBuyTrackReminder, (state) => {
+      state.isBuyTrackReminderDisabled = false;
+    })
+
+    .addCase(disableBuyTrackReminder, (state) => {
+      state.isBuyTrackReminderDisabled = true;
     })
 
     .addCase(playerJoined, (state, { payload: { user, player, position } }) => {

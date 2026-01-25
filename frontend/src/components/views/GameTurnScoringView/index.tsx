@@ -13,6 +13,7 @@ import {
   buyTrack,
   clearBoughtTrack,
   completeTurn,
+  disableBuyTrackReminder,
   proposeCorrection,
   voteCorrection,
 } from "@/store/games";
@@ -47,6 +48,9 @@ const GameTurnScoringView = () => {
   const game = useAppSelector((state) => state.games.game)!;
   const users = useAppSelector((state) => state.games.users);
   const boughtTrack = useAppSelector((state) => state.games.boughtTrack);
+  const isBuyTrackReminderDisabled = useAppSelector(
+    (state) => state.games.isBuyTrackReminderDisabled,
+  );
 
   const loadingBuyTrack = useLoadingSelector(buyTrack);
   const loadingCompleteTurn = useLoadingSelector(completeTurn);
@@ -101,11 +105,22 @@ const GameTurnScoringView = () => {
   }, [correctionProposal?.state]);
 
   const handleCompleteTurn = () => {
-    if (currentPlayer && currentPlayer.tokens > TOKEN_COST_BUY_TRACK) {
+    if (
+      currentPlayer &&
+      currentPlayer.tokens > TOKEN_COST_BUY_TRACK &&
+      !isBuyTrackReminderDisabled
+    ) {
       setBuyTrackReminderModalOpen(true);
     } else {
       dispatch(completeTurn({ gameId, turnId }));
     }
+  };
+
+  const handleDismissBuyTrackReminder = (disableReminder: boolean) => {
+    if (disableReminder) {
+      dispatch(disableBuyTrackReminder());
+    }
+    dispatch(completeTurn({ gameId, turnId }));
   };
 
   return (
@@ -124,7 +139,7 @@ const GameTurnScoringView = () => {
 
       <BuyTrackReminderModal
         open={buyTrackReminderModalOpen}
-        onConfirm={() => dispatch(completeTurn({ gameId, turnId }))}
+        onConfirm={handleDismissBuyTrackReminder}
         onClose={() => setBuyTrackReminderModalOpen(false)}
       />
 

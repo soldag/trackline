@@ -18,6 +18,12 @@ import { PREFIX } from "./constants";
 
 export const clearGame = createAction(`${PREFIX}/clearGame`);
 export const clearBoughtTrack = createAction(`${PREFIX}/clearBoughtTrack`);
+export const enableBuyTrackReminder = createAction(
+  `${PREFIX}/enableBuyTrackReminder`,
+);
+export const disableBuyTrackReminder = createAction(
+  `${PREFIX}/disableBuyTrackReminder`,
+);
 
 interface PlayerJoinedPayload {
   user: User;
