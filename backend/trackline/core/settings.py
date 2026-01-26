@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     db_txn_retries_min_interval: PositiveInt = 100
     db_txn_retries_jitter: PositiveInt = 50
 
+    musicbrainz_retries_max_attempts: PositiveInt = 3
+    musicbrainz_retries_min_interval: PositiveInt = 500
+
     spotify_client_id: str
     spotify_client_secret: str
     spotify_redirect_url: str

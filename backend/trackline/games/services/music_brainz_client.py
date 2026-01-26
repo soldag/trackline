@@ -2,6 +2,7 @@ import logging
 from typing import Annotated
 
 from httpx import AsyncClient, ConnectError, HTTPError
+from httpx_retries import Retry, RetryTransport
 from injector import Inject
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -70,6 +71,12 @@ class MusicBrainzClient:
         self._client = AsyncClient(
             base_url="https://musicbrainz.org/ws/2/",
             headers={"user-agent": self._get_user_agent()},
+            transport=RetryTransport(
+                retry=Retry(
+                    total=settings.musicbrainz_retries_max_attempts,
+                    backoff_factor=settings.musicbrainz_retries_min_interval / 1000,
+                )
+            ),
         )
 
     async def close(self) -> None:
