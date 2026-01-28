@@ -25,6 +25,7 @@ class DatabaseClient:
         self._client: AsyncMongoClient[dict[str, Any]] = AsyncMongoClient(
             settings.db_uri,
             tz_aware=True,
+            maxIdleTimeMS=settings.db_connection_idle_time,
         )
         self._database = self._client[settings.db_name]
 
