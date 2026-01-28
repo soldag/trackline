@@ -219,6 +219,9 @@ class MusicBrainzLookup:
 
         expected_token_weights = sum(len(t) for t in expected_tokens)
         actual_token_weights = sum(len(t) for t in actual_tokens)
+        if actual_token_weights == 0:
+            return 0
+
         return expected_token_weights / actual_token_weights
 
     def _strip_secondary_title(self, title: str) -> str:
