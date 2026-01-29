@@ -18,7 +18,10 @@ const GuessModal = ({
   ...remainingProps
 }: GuessModalProps) => {
   const showTokenWarning =
-    playerTokens != null && tokenCost != null && playerTokens <= tokenCost;
+    playerTokens != null &&
+    tokenCost != null &&
+    tokenCost > 0 &&
+    tokenCost >= playerTokens;
 
   return (
     <ConfirmModal tokenCost={tokenCost} {...remainingProps}>
