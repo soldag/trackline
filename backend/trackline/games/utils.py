@@ -14,7 +14,7 @@ def compare_strings(value1: str, value2: str) -> float:
 def normalize_string(value: str) -> str:
     value = unicodedata.normalize("NFKD", value)
     value = "".join(
-        ch for ch in value if not unicodedata.category(ch).startswith(("P", "S", "C"))
+        ch for ch in value if not unicodedata.category(ch).startswith(("P", "C"))
     )
     value = re.sub(r"\s+", " ", value)
     value = " ".join(value.lower().split())
