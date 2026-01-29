@@ -3,6 +3,7 @@ from typing import Protocol
 
 from injector import inject
 
+from trackline.constants import CREDITS_STOP_WORDS
 from trackline.core.fields import ResourceId
 from trackline.games.models import (
     ArtistsMatchMode,
@@ -320,7 +321,7 @@ class ScoringService:
         self, candidates: Iterable[str], references: Iterable[str]
     ) -> float:
         return max(
-            compare_strings(candidate, reference)
+            compare_strings(candidate, reference, stop_words=CREDITS_STOP_WORDS)
             for candidate in candidates
             for reference in references
         )

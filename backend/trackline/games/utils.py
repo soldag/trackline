@@ -1,5 +1,6 @@
 import re
 import unicodedata
+from collections.abc import Iterable
 
 from Levenshtein import ratio
 from unidecode import unidecode
@@ -7,18 +8,34 @@ from unidecode import unidecode
 from trackline.games.models import Track
 
 
-def compare_strings(value1: str, value2: str) -> float:
-    return ratio(value1, value2, processor=normalize_string)
+def compare_strings(
+    value1: str, value2: str, stop_words: Iterable[str] | None = None
+) -> float:
+    def processor(value: str) -> str:
+        return normalize_string(value, stop_words=stop_words)
+
+    return ratio(value1, value2, processor=processor)
 
 
-def normalize_string(value: str) -> str:
+def normalize_string(value: str, stop_words: Iterable[str] | None = None) -> str:
+    # Normalize unicode (decompose accents, compatibility chars, etc.)
     value = unicodedata.normalize("NFKD", value)
+
+    # Remove punctuation and control characters
     value = "".join(
         ch for ch in value if not unicodedata.category(ch).startswith(("P", "C"))
     )
-    value = re.sub(r"\s+", " ", value)
-    value = " ".join(value.lower().split())
-    return unidecode(value)
+    # Normalize whitespace
+    value = re.sub(r"\s+", " ", value).strip()
+
+    # Remove stop words
+    tokens = value.lower().split()
+    if stop_words:
+        stop_words_set = {x.lower() for x in stop_words}
+        tokens = [token for token in tokens if token not in stop_words_set]
+
+    # Rejoin tokens & ASCII transliteration
+    return unidecode(" ".join(tokens))
 
 
 def tokenize_string(value: str) -> set[str]:
