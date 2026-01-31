@@ -25,18 +25,17 @@ export const setup = (config: SpotifyApiConfig) => {
 
 const refreshLock = new Lock();
 const refreshAccessToken = async (refreshToken: string): Promise<boolean> => {
-  await refreshLock.acquire();
-  try {
-    const accessToken = await tracklineApi.spotify.refreshAccessToken({
-      refreshToken,
-    });
-    setAccessToken(accessToken);
-    return true;
-  } catch {
-    return false;
-  } finally {
-    refreshLock.release();
-  }
+  return refreshLock.withLock(async () => {
+    try {
+      const accessToken = await tracklineApi.spotify.refreshAccessToken({
+        refreshToken,
+      });
+      setAccessToken(accessToken);
+      return true;
+    } catch {
+      return false;
+    }
+  });
 };
 
 const instance = rateLimit(

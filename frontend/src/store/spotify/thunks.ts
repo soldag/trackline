@@ -3,10 +3,13 @@ import tracklineApi from "@/api/trackline";
 import { RECOMMENDED_PLAYLIST_IDS } from "@/constants";
 import { createSafeAsyncThunk } from "@/store/utils/thunks";
 import { RepeatMode } from "@/types/spotify";
+import { Lock } from "@/utils/concurrency";
 import invariant from "@/utils/invariant";
 
 import { setAccessToken } from "./actions";
 import { PREFIX } from "./constants";
+
+const playbackLock = new Lock();
 
 export const startAuth = createSafeAsyncThunk(PREFIX, "startAuth", async () => {
   window.location.href = spotifyApi.auth.getAuthorizeUrl();
@@ -81,7 +84,7 @@ export const searchPlaylists = createSafeAsyncThunk(
 );
 
 export const pause = createSafeAsyncThunk(PREFIX, "pause", async () => {
-  await spotifyApi.player.pause();
+  await playbackLock.withLock(() => spotifyApi.player.pause());
 });
 
 interface PlayPayload {
@@ -91,7 +94,7 @@ export const play = createSafeAsyncThunk(
   PREFIX,
   "play",
   async ({ trackId }: PlayPayload | undefined = {}) => {
-    await spotifyApi.player.play({ trackId });
+    await playbackLock.withLock(() => spotifyApi.player.play({ trackId }));
     await spotifyApi.player.setRepeatMode(RepeatMode.Track);
     return { trackId };
   },

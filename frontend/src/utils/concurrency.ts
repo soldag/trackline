@@ -29,4 +29,13 @@ export class Lock {
       this._callbacks.push(() => resolve(true));
     });
   }
+
+  async withLock<T>(callback: () => Promise<T>): Promise<T> {
+    await this.acquire();
+    try {
+      return await callback();
+    } finally {
+      this.release();
+    }
+  }
 }
