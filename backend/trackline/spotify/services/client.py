@@ -19,6 +19,7 @@ from async_spotify.authentification.spotify_authorization_token import (
 )
 from async_spotify.spotify_errors import SpotifyError
 from injector import inject
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 from trackline.core.settings import Settings
 from trackline.spotify.models import SpotifyProduct, SpotifyTrack, SpotifyUser
@@ -40,6 +41,16 @@ class PlaylistNotFoundError(Exception):
     def __init__(self, playlist_id: str) -> None:
         super().__init__(f"The playlist {playlist_id} was not found")
         self.playlist_id = playlist_id
+
+
+retry_on_network_error = retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=0.1, max=3),
+    retry=retry_if_exception(
+        lambda e: isinstance(e, SpotifyError)
+        and e.get_json().get("error", {}).get("status") == "0"
+    ),
+)
 
 
 class SpotifyClient:
@@ -87,6 +98,7 @@ class SpotifyClient:
 
         return token.access_token, token.refresh_token
 
+    @retry_on_network_error
     async def get_current_user(self, access_token: str) -> SpotifyUser:
         async with self._get_user_client(access_token) as client:
             user = await client.user.me(
@@ -100,6 +112,7 @@ class SpotifyClient:
                 product=SpotifyProduct(user_product) if user_product else None,
             )
 
+    @retry_on_network_error
     async def get_track(self, track_id: str) -> SpotifyTrack:
         await self._get_auth_token_if_needed()
 
@@ -128,6 +141,7 @@ class SpotifyClient:
             image_url=images[0]["url"] if images else None,
         )
 
+    @retry_on_network_error
     async def get_playlist_total_tracks(
         self,
         playlist_id: str,
@@ -145,6 +159,7 @@ class SpotifyClient:
 
         return playlist["tracks"]["total"]
 
+    @retry_on_network_error
     async def get_playlist_tracks(
         self,
         playlist_id: str,
@@ -210,6 +225,7 @@ class SpotifyClient:
 
         return tracks
 
+    @retry_on_network_error
     async def get_playlist_track(
         self,
         playlist_id: str,
@@ -224,6 +240,7 @@ class SpotifyClient:
         )
         return tracks[0] if tracks else None
 
+    @retry_on_network_error
     async def remove_tracks_from_playlist(
         self, playlist_id: str, track_ids: Sequence[str], access_token: str
     ) -> None:
