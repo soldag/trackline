@@ -11,10 +11,17 @@ from trackline.games.models import Track
 def compare_strings(
     value1: str, value2: str, stop_words: Iterable[str] | None = None
 ) -> float:
-    def processor(value: str) -> str:
-        return normalize_string(value, stop_words=stop_words)
+    normalized_value1 = normalize_string(value1, stop_words=stop_words)
+    normalized_value2 = normalize_string(value2, stop_words=stop_words)
 
-    return ratio(value1, value2, processor=processor)
+    # If any of the two strings only consists of stop words, keep them
+    if stop_words and (
+        (value1 and not normalized_value1) or (value2 and not normalized_value2)
+    ):
+        normalized_value1 = normalize_string(value1)
+        normalized_value2 = normalize_string(value2)
+
+    return ratio(normalized_value1, normalized_value2)
 
 
 def normalize_string(value: str, stop_words: Iterable[str] | None = None) -> str:
