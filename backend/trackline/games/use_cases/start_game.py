@@ -44,7 +44,7 @@ class Handler(TrackProvidingBaseHandler[StartGame, GameOut]):
             market=game.settings.spotify_market,
         )
         for player, track in zip(game.players, tracks, strict=False):
-            player.timeline = [track]
+            player.add_to_timeline(track)
 
         game.state = GameState.STARTED
 

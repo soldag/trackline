@@ -43,11 +43,15 @@ class Track(BaseModel):
     image_url: str | None = None
 
 
+class TimelineTrack(Track):
+    creation_time: datetime = Field(default_factory=utcnow)
+
+
 class Player(BaseModel):
     user_id: ResourceId
     is_game_master: bool = False
     tokens: int = 0
-    timeline: list[Track] = Field(default_factory=list[Track])
+    timeline: list[TimelineTrack] = Field(default_factory=list[TimelineTrack])
 
     def add_to_timeline(self, track: Track) -> None:
         index = next(
@@ -58,7 +62,8 @@ class Player(BaseModel):
             ),
             len(self.timeline),
         )
-        self.timeline.insert(index, track)
+        timeline_track = TimelineTrack(**track.model_dump())
+        self.timeline.insert(index, timeline_track)
 
 
 class Guess(BaseModel, abc.ABC):

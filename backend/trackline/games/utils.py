@@ -5,7 +5,7 @@ from collections.abc import Iterable
 from Levenshtein import ratio
 from unidecode import unidecode
 
-from trackline.games.models import Track
+from trackline.games.models import TimelineTrack
 
 
 def compare_strings(
@@ -50,7 +50,7 @@ def tokenize_string(value: str) -> set[str]:
 
 
 def is_valid_release_year(
-    timeline: list[Track],
+    timeline: list[TimelineTrack],
     position: int,
     release_year: int,
 ) -> bool:
