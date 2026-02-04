@@ -1,7 +1,34 @@
-import { Game, TurnScoring } from "@/types/games";
+import { Game, ReleaseYearGuess, Track, TurnScoring } from "@/types/games";
 
 export const getRoundNumber = (game: Game) =>
   Math.floor(Math.max(0, game.turns.length - 1) / game.players.length) + 1;
+
+export const getTrackPosition = (timeline: Track[], track: Track) => {
+  const position = timeline.findIndex((t) => t.releaseYear > track.releaseYear);
+  return position < 0 ? timeline.length : position;
+};
+
+export const getTrackPositionFromGuess = (
+  timeline: Track[],
+  guess: ReleaseYearGuess,
+) => {
+  if (guess.prevTrackId === null) {
+    return 0;
+  }
+
+  if (guess.nextTrackId === null) {
+    return timeline.length;
+  }
+
+  const prevIndex = timeline.findIndex(
+    (t) => t.spotifyId === guess.prevTrackId,
+  );
+  if (prevIndex < 0 || prevIndex === timeline.length - 1) {
+    throw new Error("Invalid guess track position");
+  }
+
+  return prevIndex + 1;
+};
 
 export const aggregateTokenGains = (
   userId: string,

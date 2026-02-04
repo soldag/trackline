@@ -14,8 +14,10 @@ from trackline.games.models import (
     GameSettings,
     GameState,
     Guess,
+    ReleaseYearGuess,
     ReleaseYearScoring,
     Scoring,
+    TimelineTrack,
     TitleMatchMode,
     TokenGain,
     Turn,
@@ -25,7 +27,7 @@ from trackline.games.services.track_metadata_parser import (
     TrackMetadata,
     TrackMetadataParser,
 )
-from trackline.games.utils import compare_strings, is_valid_release_year
+from trackline.games.utils import compare_strings
 
 TOKEN_GAIN_YEAR_GUESS = 1
 TOKEN_GAIN_CREDITS_GUESS = 1
@@ -95,7 +97,7 @@ class ScoringService:
         guesses = turn.guesses.release_year
         sorted_guesses = self._sort_guesses(guesses, turn.active_user_id)
 
-        seen_positions: set[int] = set()
+        seen_positions: set[tuple[str | None, str | None]] = set()
         winner: ResourceId | None = None
         token_gains: dict[ResourceId, TokenGain] = {}
 
@@ -103,9 +105,9 @@ class ScoringService:
         correct_guesses = [
             user_id
             for user_id, guess in sorted_guesses.items()
-            if is_valid_release_year(
+            if self._check_position(
                 active_player.timeline,
-                guess.position,
+                guess,
                 correct_release_year,
             )
         ]
@@ -114,8 +116,9 @@ class ScoringService:
             if not player:
                 continue
 
+            position = (guess.prev_track_id, guess.next_track_id)
             is_correct = user_id in correct_guesses
-            is_duplicate = guess.position in seen_positions
+            is_duplicate = position in seen_positions
             if is_correct and not winner:
                 winner = user_id
                 player.add_to_timeline(turn.track)
@@ -125,13 +128,37 @@ class ScoringService:
                 # positions that's why we also need to check for is_correct.
                 token_gains[user_id] = TokenGain(refund=guess.token_cost)
 
-            seen_positions.add(guess.position)
+            seen_positions.add(position)
 
         return Scoring(
             winner=winner,
             correct_guesses=correct_guesses,
             token_gains=token_gains,
         )
+
+    def _check_position(
+        self,
+        timeline: list[TimelineTrack],
+        guess: ReleaseYearGuess,
+        correct_release_year: int,
+    ) -> bool:
+        tracks_by_spotify_id = {track.spotify_id: track for track in timeline}
+
+        if guess.prev_track_id:
+            prev_track = tracks_by_spotify_id.get(guess.prev_track_id)
+            if not prev_track:
+                raise ValueError("Previous track not found in timeline")
+            if correct_release_year < prev_track.release_year:
+                return False
+
+        if guess.next_track_id:
+            next_track = tracks_by_spotify_id.get(guess.next_track_id)
+            if not next_track:
+                raise ValueError("Next track not found in timeline")
+            if correct_release_year > next_track.release_year:
+                return False
+
+        return True
 
     def _score_release_year(self, turn: Turn) -> Scoring:
         winner: ResourceId | None = None

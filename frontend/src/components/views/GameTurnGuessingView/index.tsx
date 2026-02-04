@@ -16,6 +16,7 @@ import {
   scoreTurn,
 } from "@/store/games";
 import { Game, Turn } from "@/types/games.ts";
+import { getTrackPositionFromGuess } from "@/utils/games.ts";
 import {
   useAppDispatch,
   useAppSelector,
@@ -156,10 +157,14 @@ const GameTurnGuessingView = () => {
   }, [hasTimeout, isActivePlayer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (releaseYearGuess) {
-      setActiveTrackPosition(releaseYearGuess.position);
+    if (activePlayer && releaseYearGuess) {
+      const position = getTrackPositionFromGuess(
+        activePlayer.timeline,
+        releaseYearGuess,
+      );
+      setActiveTrackPosition(position);
     }
-  }, [releaseYearGuess]);
+  }, [releaseYearGuess, activePlayer]);
 
   const tracks = useMemo(() => {
     if (!activePlayer) return [];

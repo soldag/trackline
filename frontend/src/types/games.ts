@@ -52,7 +52,8 @@ export interface Guess {
 }
 
 export interface ReleaseYearGuess extends Guess {
-  position: number;
+  prevTrackId: string | null;
+  nextTrackId: string | null;
   year: number;
 }
 

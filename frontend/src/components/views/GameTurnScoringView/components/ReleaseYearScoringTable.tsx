@@ -21,7 +21,6 @@ const PositionResult = ({ turn, guess, timeline }: PositionResultProps) => {
   }
 
   const {
-    track,
     scoring: {
       releaseYear: {
         position: { winner, correctGuesses, tokenGains },
@@ -34,11 +33,8 @@ const PositionResult = ({ turn, guess, timeline }: PositionResultProps) => {
   const isWinner = winner == guess.userId;
   const tracksDelta = isWinner ? 1 : 0;
 
-  const originalTimeline = timeline.filter(
-    (t) => t.spotifyId !== track.spotifyId,
-  );
-  const minYear = originalTimeline[guess.position - 1]?.releaseYear;
-  const maxYear = originalTimeline[guess.position]?.releaseYear;
+  const prevTrack = timeline.find((t) => t.spotifyId === guess.prevTrackId);
+  const nextTrack = timeline.find((t) => t.spotifyId === guess.nextTrackId);
 
   return (
     <ScoringResult
@@ -47,7 +43,7 @@ const PositionResult = ({ turn, guess, timeline }: PositionResultProps) => {
       tokenGain={tokenGains[guess.userId]}
     >
       <Typography color={isCorrect ? "success" : "danger"}>
-        <YearRange min={minYear} max={maxYear} />
+        <YearRange min={prevTrack?.releaseYear} max={nextTrack?.releaseYear} />
       </Typography>
     </ScoringResult>
   );

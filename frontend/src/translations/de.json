@@ -8,6 +8,7 @@
   "ApiErrors.invalidPosition": "Die gewählte Position überschreitet die Grenzen der Zeitleiste.",
   "ApiErrors.invalidSpotifyAuthToken": "Der Spotify-Autorisierungscode ist ungültig.",
   "ApiErrors.invalidSpotifyRefreshToken": "Der Spotify-Refresh-Token ist ungültig.",
+  "ApiErrors.noActivePlayer": "Dieses Spiel hat keinen aktiven Spieler.",
   "ApiErrors.noGameMaster": "Diese Aktion kann nur vom Spielleiter ausgeführt werden.",
   "ApiErrors.turnCompleted": "Du hast diese Runde bereits abgeschlossen.",
   "ApiErrors.turnGuessed": "Du kannst nur einen Tipp pro Runde abgeben.",

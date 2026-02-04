@@ -72,7 +72,8 @@ class Guess(BaseModel, abc.ABC):
 
 
 class ReleaseYearGuess(Guess):
-    position: int
+    prev_track_id: str | None
+    next_track_id: str | None
     year: int
 
 

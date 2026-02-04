@@ -7,7 +7,6 @@ from trackline.games.constants import TOKEN_COST_GUESS_RELEASE_YEAR
 from trackline.games.models import Guess, ReleaseYearGuess, Turn
 from trackline.games.schemas import ReleaseYearGuessCreated, ReleaseYearGuessOut
 from trackline.games.use_cases.base import CreateGuessBaseHandler
-from trackline.games.utils import is_valid_release_year
 
 
 class CreateReleaseYearGuess(AuthenticatedUseCase[ReleaseYearGuessOut]):
@@ -37,17 +36,32 @@ class Handler(CreateGuessBaseHandler[CreateReleaseYearGuess, ReleaseYearGuessOut
         )
 
         active_player = game.get_active_player()
-        if active_player and use_case.position > len(active_player.timeline):
+        if not active_player:
+            raise UseCaseError(
+                code="NO_ACTIVE_PLAYER",
+                message="There is no active player in this game.",
+                status_code=400,
+            )
+
+        if use_case.position > len(active_player.timeline):
             raise UseCaseError(
                 code="INVALID_POSITION",
                 message="This position exceeds the boundaries of the timeline.",
                 status_code=400,
             )
 
-        if active_player and not is_valid_release_year(
-            active_player.timeline,
-            use_case.position,
-            use_case.year,
+        if use_case.position == 0:
+            prev_track = None
+        else:
+            prev_track = active_player.timeline[use_case.position - 1]
+
+        if use_case.position == len(active_player.timeline):
+            next_track = None
+        else:
+            next_track = active_player.timeline[use_case.position]
+
+        if (prev_track and prev_track.release_year > use_case.year) or (
+            next_track and next_track.release_year < use_case.year
         ):
             raise UseCaseError(
                 code="INVALID_RELEASE_YEAR",
@@ -60,7 +74,8 @@ class Handler(CreateGuessBaseHandler[CreateReleaseYearGuess, ReleaseYearGuessOut
 
         guess = ReleaseYearGuess(
             token_cost=token_cost,
-            position=use_case.position,
+            prev_track_id=prev_track.spotify_id if prev_track else None,
+            next_track_id=next_track.spotify_id if next_track else None,
             year=use_case.year,
         )
         game.turns[use_case.turn_id].guesses.release_year[user_id] = guess

@@ -5,7 +5,11 @@ import { TOKEN_COST_BUY_TRACK } from "@/constants";
 import { resetState } from "@/store/common/actions";
 import { Game, GameState, Track, Turn, TurnScoring } from "@/types/games";
 import { User } from "@/types/users";
-import { aggregateTokenGains } from "@/utils/games";
+import {
+  aggregateTokenGains,
+  getTrackPosition,
+  getTrackPositionFromGuess,
+} from "@/utils/games";
 import invariant from "@/utils/invariant";
 
 import {
@@ -71,11 +75,6 @@ const getCurrentTurn = (state: Draft<GamesState>): Draft<Turn> => {
   return turn;
 };
 
-const getTrackPosition = (timeline: Track[], track: Track) => {
-  const position = timeline.findIndex((t) => t.releaseYear > track.releaseYear);
-  return position < 0 ? timeline.length : position;
-};
-
 const applyTokenDelta = (
   game: Game,
   tokenDelta: { [userId: string]: number },
@@ -100,8 +99,8 @@ const applyScoring = (game: Game, scoring: TurnScoring) => {
     if (userId === scoring.releaseYear.position.winner) {
       const guess = turn.guesses.releaseYear.find((g) => g.userId === userId);
       const position =
-        userId === turn.activeUserId
-          ? guess?.position
+        userId === turn.activeUserId && guess
+          ? getTrackPositionFromGuess(player.timeline, guess)
           : getTrackPosition(player.timeline, turn.track);
 
       if (position != null) {

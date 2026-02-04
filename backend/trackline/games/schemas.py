@@ -72,7 +72,8 @@ class GuessOut(BaseModel, abc.ABC):
 
 
 class ReleaseYearGuessOut(GuessOut):
-    position: int
+    prev_track_id: str | None
+    next_track_id: str | None
     year: int
 
     @staticmethod
@@ -84,7 +85,8 @@ class ReleaseYearGuessOut(GuessOut):
             user_id=user_id,
             creation_time=model.creation_time,
             token_cost=model.token_cost,
-            position=model.position,
+            prev_track_id=model.prev_track_id,
+            next_track_id=model.next_track_id,
             year=model.year,
         )
 

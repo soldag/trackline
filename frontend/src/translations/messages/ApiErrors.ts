@@ -50,6 +50,10 @@ export default defineMessages<string, MessageDescriptor | undefined>({
     id: "ApiErrors.invalidPosition",
     defaultMessage: "This position exceeds the boundaries of the timeline.",
   },
+  NO_ACTIVE_PLAYER: {
+    id: "ApiErrors.noActivePlayer",
+    defaultMessage: "There is no active player in this game.",
+  },
   NO_GAME_MASTER: {
     id: "ApiErrors.noGameMaster",
     defaultMessage: "Only the game master can perform this operation.",

@@ -8,6 +8,7 @@
   "ApiErrors.invalidPosition": "This position exceeds the boundaries of the timeline.",
   "ApiErrors.invalidSpotifyAuthToken": "The Spotify authorization code is invalid.",
   "ApiErrors.invalidSpotifyRefreshToken": "The Spotify refresh token is invalid.",
+  "ApiErrors.noActivePlayer": "There is no active player in this game.",
   "ApiErrors.noGameMaster": "Only the game master can perform this operation.",
   "ApiErrors.turnCompleted": "You have already completed this turn.",
   "ApiErrors.turnGuessed": "You can only guess once per turn.",

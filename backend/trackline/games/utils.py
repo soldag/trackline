@@ -5,8 +5,6 @@ from collections.abc import Iterable
 from Levenshtein import ratio
 from unidecode import unidecode
 
-from trackline.games.models import TimelineTrack
-
 
 def compare_strings(
     value1: str, value2: str, stop_words: Iterable[str] | None = None
@@ -47,18 +45,3 @@ def normalize_string(value: str, stop_words: Iterable[str] | None = None) -> str
 
 def tokenize_string(value: str) -> set[str]:
     return {normalize_string(token) for token in re.split(r"\W+", value) if token}
-
-
-def is_valid_release_year(
-    timeline: list[TimelineTrack],
-    position: int,
-    release_year: int,
-) -> bool:
-    min_year = 0 if position == 0 else timeline[position - 1].release_year
-
-    if position == len(timeline):
-        max_year = float("inf")
-    else:
-        max_year = timeline[position].release_year
-
-    return min_year <= release_year <= max_year
