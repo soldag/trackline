@@ -4,6 +4,7 @@ import sentry_sdk
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 from sentry_sdk.integrations.asyncio import AsyncioIntegration
 from sentry_sdk.integrations.pymongo import PyMongoIntegration
+from sentry_sdk.types import Event, Hint
 
 from trackline.core.settings import Settings
 
@@ -50,3 +51,19 @@ def initialize_sentry(settings: Settings) -> None:
             ],
             ignore_errors=[KeyboardInterrupt],
         )
+
+
+def before_send(event: Event, hint: Hint) -> Event | None:
+    exc_info = hint.get("exc_info")
+
+    if exc_info:
+        _, exc, _ = exc_info
+
+        if isinstance(exc, OSError) and str(exc) == "connection closed":
+            event.setdefault("extra", {})
+            event["extra"]["mongo_debug"] = {  # pyright: ignore[reportTypedDictNotRequiredAccess]
+                "likely_cause": "mongo_restart_or_socket_close",
+                "driver_layer": "pymongo_network",
+            }
+
+    return event
