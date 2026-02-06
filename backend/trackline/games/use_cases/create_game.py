@@ -30,6 +30,7 @@ class CreateGame(AuthenticatedUseCase[GameOut]):
     artists_match_mode: ArtistsMatchMode = ArtistsMatchMode.ONE
     title_match_mode: TitleMatchMode = TitleMatchMode.MAIN
     credits_similarity_threshold: Fraction = 0.9
+    credits_filter_stop_words: bool = True
     enable_catch_up: bool = True
 
 
@@ -61,6 +62,7 @@ class Handler(BaseHandler[CreateGame, GameOut]):
                 artists_match_mode=use_case.artists_match_mode,
                 title_match_mode=use_case.title_match_mode,
                 credits_similarity_threshold=use_case.credits_similarity_threshold,
+                credits_filter_stop_words=use_case.credits_filter_stop_words,
                 enable_catchup=use_case.enable_catch_up,
             ),
             players=[

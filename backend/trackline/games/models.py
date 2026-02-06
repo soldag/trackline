@@ -158,6 +158,7 @@ class GameSettings(BaseModel):
     artists_match_mode: ArtistsMatchMode
     title_match_mode: TitleMatchMode
     credits_similarity_threshold: float
+    credits_filter_stop_words: bool
     enable_catchup: bool
 
 

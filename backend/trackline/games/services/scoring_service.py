@@ -278,12 +278,10 @@ class ScoringService:
         similarity_artists = self._get_artists_similarity(
             candidate_metadata,
             reference_metadata,
-            settings.artists_match_mode,
+            settings,
         )
         similarity_title = self._get_title_similarity(
-            candidate_metadata,
-            reference_metadata,
-            settings.title_match_mode,
+            candidate_metadata, reference_metadata, settings
         )
 
         return (similarity_artists + similarity_title) / 2
@@ -292,7 +290,7 @@ class ScoringService:
         self,
         candidate_metadata: TrackMetadata,
         reference_metadata: TrackMetadata,
-        match_mode: ArtistsMatchMode,
+        settings: GameSettings,
     ) -> float:
         if len(reference_metadata.artists) == 0:
             return 0
@@ -311,12 +309,13 @@ class ScoringService:
                         reference_artist.primary_name,
                         *reference_artist.secondary_names,
                     ],
+                    filter_stop_words=settings.credits_filter_stop_words,
                 )
                 for candidate in candidate_metadata.artists
             )
             similarities.append(similarity)
 
-        match match_mode:
+        match settings.artists_match_mode:
             case ArtistsMatchMode.ALL:
                 return sum(similarities) / len(reference_metadata.artists)
             case ArtistsMatchMode.ONE:
@@ -326,7 +325,7 @@ class ScoringService:
         self,
         candidate_metadata: TrackMetadata,
         reference_metadata: TrackMetadata,
-        match_mode: TitleMatchMode,
+        settings: GameSettings,
     ) -> float:
         candidates = [
             candidate_metadata.full_title,
@@ -338,17 +337,25 @@ class ScoringService:
             reference_metadata.full_title,
             reference_metadata.clean_title,
         ]
-        if match_mode == TitleMatchMode.MAIN:
+        if settings.title_match_mode == TitleMatchMode.MAIN:
             references.append(reference_metadata.primary_title)
             references += reference_metadata.secondary_titles
 
-        return self._get_max_similarity(candidates, references)
+        return self._get_max_similarity(
+            candidates, references, filter_stop_words=settings.credits_filter_stop_words
+        )
 
     def _get_max_similarity(
-        self, candidates: Iterable[str], references: Iterable[str]
+        self,
+        candidates: Iterable[str],
+        references: Iterable[str],
+        *,
+        filter_stop_words: bool = False,
     ) -> float:
+        stop_words = CREDITS_STOP_WORDS if filter_stop_words else None
+
         return max(
-            compare_strings(candidate, reference, stop_words=CREDITS_STOP_WORDS)
+            compare_strings(candidate, reference, stop_words=stop_words)
             for candidate in candidates
             for reference in references
         )

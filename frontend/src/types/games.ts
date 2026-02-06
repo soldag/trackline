@@ -126,6 +126,7 @@ export interface Turn {
 export interface GameSettings {
   artistsMatchMode: ArtistMatchMode;
   creditsSimilarityThreshold: number;
+  creditsFilterStopWords: boolean;
   guessTimeout: number;
   initialTokens: number;
   maxTokens: number;

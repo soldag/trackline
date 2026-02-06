@@ -51,6 +51,7 @@ interface CreateGamePayload {
   artistsMatchMode: ArtistMatchMode;
   titleMatchMode: TitleMatchMode;
   creditsSimilarityThreshold: number;
+  creditsFilterStopWords: boolean;
   enableCatchUp: boolean;
 }
 export const createGame = createSafeAsyncThunk(
@@ -65,6 +66,7 @@ export const createGame = createSafeAsyncThunk(
     artistsMatchMode,
     titleMatchMode,
     creditsSimilarityThreshold,
+    creditsFilterStopWords,
     enableCatchUp,
   }: CreateGamePayload) => {
     const game = await tracklineApi.games.create({
@@ -76,6 +78,7 @@ export const createGame = createSafeAsyncThunk(
       artistsMatchMode,
       titleMatchMode,
       creditsSimilarityThreshold,
+      creditsFilterStopWords,
       enableCatchUp,
     });
     return { game };

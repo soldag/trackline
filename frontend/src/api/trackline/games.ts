@@ -28,6 +28,7 @@ export const create = async ({
   artistsMatchMode,
   titleMatchMode,
   creditsSimilarityThreshold,
+  creditsFilterStopWords,
   enableCatchUp,
 }: {
   playlistIds: string[];
@@ -38,6 +39,7 @@ export const create = async ({
   artistsMatchMode: ArtistMatchMode;
   titleMatchMode: TitleMatchMode;
   creditsSimilarityThreshold: number;
+  creditsFilterStopWords: boolean;
   enableCatchUp: boolean;
 }): Promise<Game> => {
   const {
@@ -51,6 +53,7 @@ export const create = async ({
     artistsMatchMode,
     titleMatchMode,
     creditsSimilarityThreshold,
+    creditsFilterStopWords,
     enableCatchUp,
   });
 
