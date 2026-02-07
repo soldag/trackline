@@ -7,7 +7,10 @@ from trackline.core.use_cases import AuthenticatedUseCase
 from trackline.games.models import (
     CorrectionProposalState,
     CorrectionProposalVote,
+    Game,
     GameState,
+    TrackCorrection,
+    Turn,
 )
 from trackline.games.schemas import (
     CorrectionProposalVoteOut,
@@ -77,10 +80,7 @@ class Handler(BaseHandler[VoteCorrection, CorrectionProposalVoteResultOut]):
 
         scoring_out: TurnScoringOut | None = None
         if proposal.state == CorrectionProposalState.ACCEPTED:
-            turn.track.release_year = proposal.release_year
-
-            scoring = await self._scoring_service.score_turn(game, use_case.turn_id)
-            scoring_out = TurnScoringOut.from_model(scoring)
+            scoring_out = await self._handle_accepted_proposal(game, turn)
 
         vote_out = CorrectionProposalVoteOut.from_model(user_id, vote)
         await self._notifier.notify(
@@ -98,3 +98,26 @@ class Handler(BaseHandler[VoteCorrection, CorrectionProposalVoteResultOut]):
             proposal_state=proposal.state,
             scoring=scoring_out,
         )
+
+    async def _handle_accepted_proposal(self, game: Game, turn: Turn) -> TurnScoringOut:
+        if not turn.correction_proposal:
+            raise ValueError("Turn has no correction proposal")
+
+        correction = await self._repository.get_one(
+            TrackCorrection, {"track_spotify_id": turn.track.spotify_id}
+        )
+        if correction:
+            correction.release_year = turn.correction_proposal.release_year
+        else:
+            correction = TrackCorrection(
+                track_spotify_id=turn.track.spotify_id,
+                release_year=turn.correction_proposal.release_year,
+            )
+            await self._repository.create(correction)
+
+        turn.track.release_year = turn.correction_proposal.release_year
+
+        turn_id = game.turns.index(turn)
+        scoring = await self._scoring_service.score_turn(game, turn_id)
+
+        return TurnScoringOut.from_model(scoring)

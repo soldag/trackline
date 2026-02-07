@@ -2,10 +2,15 @@ from collections.abc import Collection, Iterable
 
 from injector import inject
 
+from trackline.core.db.repository import Repository
 from trackline.core.utils import shuffle
-from trackline.games.models import Playlist, Track
+from trackline.games.models import Playlist, Track, TrackCorrection
 from trackline.games.services.music_brainz_lookup import MusicBrainzLookup
-from trackline.games.services.track_metadata_parser import TrackMetadataParser
+from trackline.games.services.track_metadata_parser import (
+    TrackMetadata,
+    TrackMetadataParser,
+)
+from trackline.spotify.models import SpotifyTrack
 from trackline.spotify.services.client import SpotifyClient
 
 
@@ -13,10 +18,12 @@ class TrackProvider:
     @inject
     def __init__(
         self,
+        repository: Repository,
         spotify_client: SpotifyClient,
         music_brainz_lookup: MusicBrainzLookup,
         track_metadata_parser: TrackMetadataParser,
     ) -> None:
+        self._repository = repository
         self._spotify_client = spotify_client
         self._music_brainz_lookup = music_brainz_lookup
         self._track_metadata_parser = track_metadata_parser
@@ -71,12 +78,7 @@ class TrackProvider:
                 continue
 
             metadata = self._track_metadata_parser.parse(track.artists, track.title)
-
-            mb_release_year = await self._music_brainz_lookup.get_release_year(metadata)
-            if mb_release_year is not None:
-                release_year = min(track.release_year, mb_release_year)
-            else:
-                release_year = track.release_year
+            release_year = await self._validate_release_year(track, metadata)
 
             return Track(
                 spotify_id=track.id,
@@ -87,3 +89,25 @@ class TrackProvider:
             )
 
         return None
+
+    async def _validate_release_year(
+        self,
+        track: SpotifyTrack,
+        metadata: TrackMetadata,
+    ) -> int:
+        if not track.release_year:
+            raise ValueError("Track has no release year")
+
+        # If the release year has been corrected before, use the corrected value
+        correction = await self._repository.get_one(
+            TrackCorrection, {"track_spotify_id": track.id}
+        )
+        if correction:
+            return correction.release_year
+
+        # Lookup release year on MusicBrainz and use the lower of the two values
+        mb_release_year = await self._music_brainz_lookup.get_release_year(metadata)
+        if mb_release_year is not None:
+            return min(track.release_year, mb_release_year)
+
+        return track.release_year

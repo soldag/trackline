@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from enum import Enum
 from uuid import uuid4
 
+from beanie import Replace, SaveChanges, Update, before_event
 from pydantic import BaseModel, Field
 
 from trackline.core.db.models import BaseDocument
@@ -199,3 +200,17 @@ class Game(BaseDocument):
 
     class Settings(BaseDocument.Settings):
         name = "game"
+
+
+class TrackCorrection(BaseDocument):
+    track_spotify_id: str
+    release_year: int
+    creation_time: datetime = Field(default_factory=utcnow)
+    update_time: datetime = Field(default_factory=utcnow)
+
+    @before_event(Update, SaveChanges, Replace)
+    def _set_update_time(self) -> None:
+        self.update_time = utcnow()
+
+    class Settings(BaseDocument.Settings):
+        name = "track_correction"

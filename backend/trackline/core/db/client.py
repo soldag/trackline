@@ -10,7 +10,7 @@ from pymongo.asynchronous.client_session import AsyncClientSession
 
 from trackline.auth.models import Session
 from trackline.core.settings import Settings
-from trackline.games.models import Game
+from trackline.games.models import Game, TrackCorrection
 from trackline.users.models import User
 
 session_ctx: ContextVar[AsyncClientSession | None] = ContextVar(
@@ -36,7 +36,7 @@ class DatabaseClient:
     async def initialize(self) -> None:
         await init_beanie(
             database=self._database,
-            document_models=[Session, Game, User],
+            document_models=[Session, Game, TrackCorrection, User],
             skip_indexes=True,
         )
 
