@@ -50,6 +50,7 @@ def initialize_sentry(settings: Settings) -> None:
                 PyMongoIntegration(),
             ],
             ignore_errors=[KeyboardInterrupt],
+            before_send=before_send,
         )
 
 
