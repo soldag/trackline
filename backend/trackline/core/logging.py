@@ -1,3 +1,4 @@
+import traceback
 from typing import Any
 
 import sentry_sdk
@@ -55,16 +56,17 @@ def initialize_sentry(settings: Settings) -> None:
 
 
 def before_send(event: Event, hint: Hint) -> Event | None:
-    exc_info = hint.get("exc_info")
+    if exc_info := hint.get("exc_info"):
+        _, exc, tb = exc_info
 
-    if exc_info:
-        _, exc, _ = exc_info
-
-        if isinstance(exc, OSError) and str(exc) == "connection closed":
-            event.setdefault("extra", {})
-            event["extra"]["mongo_debug"] = {  # pyright: ignore[reportTypedDictNotRequiredAccess]
-                "likely_cause": "mongo_restart_or_socket_close",
-                "driver_layer": "pymongo_network",
-            }
+        # Ignore 'connection closed' errors from pymongo, as
+        # they commonly occur during normal server restarts
+        stack_trace = traceback.extract_tb(tb)
+        if (
+            isinstance(exc, OSError)
+            and str(exc) == "connection closed"
+            and any("pymongo" in frame.filename for frame in stack_trace)
+        ):
+            return None
 
     return event
