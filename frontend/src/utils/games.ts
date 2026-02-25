@@ -1,4 +1,11 @@
-import { Game, ReleaseYearGuess, Track, TurnScoring } from "@/types/games";
+import { TOKEN_COST_BUY_TRACK } from "@/constants";
+import {
+  Game,
+  Player,
+  ReleaseYearGuess,
+  Track,
+  TurnScoring,
+} from "@/types/games";
 
 export const getRoundNumber = (game: Game) =>
   Math.floor(Math.max(0, game.turns.length - 1) / game.players.length) + 1;
@@ -55,4 +62,39 @@ export const aggregateTokenGains = (
         rewardTheoretical: 0,
       },
     );
+};
+
+export const checkEndCondition = (
+  game: Game,
+): { isGameEnding: boolean; winner?: Player } => {
+  if (game.turns.length === 0) {
+    return { isGameEnding: false };
+  }
+
+  const activeUserId = game.turns[game.turns.length - 1].activeUserId;
+  const roundComplete =
+    game.players[game.players.length - 1].userId === activeUserId;
+
+  const timelineLengths = game.players.map((p) => p.timeline.length);
+  const maxTimelineLength = Math.max(...timelineLengths);
+  const leadingPlayers = game.players.filter(
+    (p) => p.timeline.length === maxTimelineLength,
+  );
+  const isGameEnding =
+    roundComplete &&
+    leadingPlayers.length === 1 &&
+    maxTimelineLength >= game.settings.timelineLength;
+
+  return {
+    isGameEnding,
+    winner: isGameEnding ? leadingPlayers[0] : undefined,
+  };
+};
+
+export const checkCatchUp = (game: Game, player: Player): boolean => {
+  const maxTimelineLength = Math.max(
+    ...game.players.map((p) => p.timeline.length),
+  );
+  const affordableTrackCount = Math.floor(player.tokens / TOKEN_COST_BUY_TRACK);
+  return player.timeline.length + affordableTrackCount >= maxTimelineLength;
 };

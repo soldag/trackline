@@ -7,6 +7,7 @@ import { Button, Stack } from "@mui/joy";
 
 import TrackCard from "@/components/common/TrackCard";
 import BuyTrackReminderModal from "@/components/views/GameTurnScoringView/components/BuyTrackReminderModal";
+import GameEndWarningSnackbar from "@/components/views/GameTurnScoringView/components/GameEndWarningSnackbar";
 import View from "@/components/views/View";
 import { TOKEN_COST_BUY_TRACK } from "@/constants";
 import {
@@ -19,6 +20,7 @@ import {
 } from "@/store/games";
 import { CorrectionProposalState } from "@/types/games";
 import { useConfetti, useStars } from "@/utils/confetti";
+import { checkCatchUp, checkEndCondition } from "@/utils/games";
 import {
   useAppDispatch,
   useAppSelector,
@@ -41,6 +43,7 @@ const GameTurnScoringView = () => {
     useState(false);
   const [correctionVotingModalOpen, setCorrectionVotingModalOpen] =
     useState(false);
+  const [showGameEndSnackbar, setShowGameEndSnackbar] = useState(false);
   const [showMaxTokenSnackbar, setShowMaxTokenSnackbar] = useState(false);
 
   const dispatch = useAppDispatch();
@@ -65,6 +68,8 @@ const GameTurnScoringView = () => {
   const { isGameMaster = false } = currentPlayer || {};
   const { correctionProposal } = turn;
   const hasCompletedTurn = turn.completedBy.includes(userId);
+  const { isGameEnding, winner } = checkEndCondition(game);
+  const canCatchUp = !!currentPlayer && checkCatchUp(game, currentPlayer);
   const canBuyTrack =
     !hasCompletedTurn &&
     currentPlayer &&
@@ -104,12 +109,20 @@ const GameTurnScoringView = () => {
     }
   }, [correctionProposal?.state]);
 
+  useEffect(() => {
+    if (isGameEnding && winner !== currentPlayer) {
+      setShowGameEndSnackbar(true);
+    } else {
+      setShowGameEndSnackbar(false);
+    }
+  }, [isGameEnding, winner, currentPlayer]);
+
   const handleCompleteTurn = () => {
-    if (
-      currentPlayer &&
-      currentPlayer.tokens > TOKEN_COST_BUY_TRACK &&
-      !isBuyTrackReminderDisabled
-    ) {
+    const shouldShowBuyTrackReminder =
+      (currentPlayer && currentPlayer.tokens > TOKEN_COST_BUY_TRACK) ||
+      (isGameEnding && canCatchUp);
+
+    if (shouldShowBuyTrackReminder && !isBuyTrackReminderDisabled) {
       setBuyTrackReminderModalOpen(true);
     } else {
       dispatch(completeTurn({ gameId, turnId }));
@@ -139,6 +152,8 @@ const GameTurnScoringView = () => {
 
       <BuyTrackReminderModal
         open={buyTrackReminderModalOpen}
+        canCatchUp={canCatchUp}
+        isGameEnding={isGameEnding}
         onConfirm={handleDismissBuyTrackReminder}
         onClose={() => setBuyTrackReminderModalOpen(false)}
       />
@@ -167,9 +182,16 @@ const GameTurnScoringView = () => {
         onClose={() => setCorrectionVotingModalOpen(false)}
       />
 
+      <GameEndWarningSnackbar
+        canCatchUp={canCatchUp}
+        winner={users.find((u) => u.id === winner?.userId)}
+        open={showGameEndSnackbar}
+        onClose={() => setShowGameEndSnackbar(false)}
+      />
+
       <MaxTokenWarningSnackbar
         limit={game.settings.maxTokens}
-        open={showMaxTokenSnackbar}
+        open={showMaxTokenSnackbar && !showGameEndSnackbar}
         onClose={() => setShowMaxTokenSnackbar(false)}
       />
 
