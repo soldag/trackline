@@ -95,6 +95,10 @@ export const checkCatchUp = (game: Game, player: Player): boolean => {
   const maxTimelineLength = Math.max(
     ...game.players.map((p) => p.timeline.length),
   );
+  if (player.timeline.length === maxTimelineLength) {
+    return false;
+  }
+
   const affordableTrackCount = Math.floor(player.tokens / TOKEN_COST_BUY_TRACK);
   return player.timeline.length + affordableTrackCount >= maxTimelineLength;
 };
