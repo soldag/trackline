@@ -178,7 +178,7 @@ class PlaylistTrackDeduplicatorCli:
             duplicate_tracks: list[SpotifyTrack] = []
             for tracks_group in self._group_tracks(tracks):
                 sorted_tracks_group = sorted(
-                    tracks_group, key=lambda t: (t.release_year or 0)
+                    tracks_group, key=lambda t: t.release_year or 0
                 )
                 duplicate_tracks += sorted_tracks_group[1:]
 

@@ -1,6 +1,6 @@
 import abc
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from uuid import uuid4
 
 from beanie import Replace, SaveChanges, Update, before_event
@@ -11,7 +11,7 @@ from trackline.core.fields import ResourceId
 from trackline.core.utils.datetime import utcnow
 
 
-class GameState(str, Enum):
+class GameState(StrEnum):
     WAITING_FOR_PLAYERS = "waiting_for_players"
     STARTED = "started"
     GUESSING = "guessing"
@@ -20,18 +20,18 @@ class GameState(str, Enum):
     ABORTED = "aborted"
 
 
-class CorrectionProposalState(str, Enum):
+class CorrectionProposalState(StrEnum):
     VOTING = "VOTING"
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
 
 
-class ArtistsMatchMode(str, Enum):
+class ArtistsMatchMode(StrEnum):
     ALL = "all"
     ONE = "one"
 
 
-class TitleMatchMode(str, Enum):
+class TitleMatchMode(StrEnum):
     FULL = "full"
     MAIN = "main"
 
