@@ -360,7 +360,7 @@ const reducer = createReducer(initialState, (builder) => {
       (state, { payload }) => {
         invariant(state.game);
 
-        const { userId, track } =
+        const { userId, track, turnCompletedBy } =
           "receipt" in payload ? payload.receipt : payload;
 
         const player = state.game.players.find((p) => p.userId === userId);
@@ -370,6 +370,9 @@ const reducer = createReducer(initialState, (builder) => {
 
           player.tokens -= TOKEN_COST_BUY_TRACK;
         }
+
+        const turn = getCurrentTurn(state);
+        turn.completedBy = turnCompletedBy;
       },
     )
 

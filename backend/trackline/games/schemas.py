@@ -349,6 +349,7 @@ class TurnCompletionOut(BaseModel):
 class TrackPurchaseReceiptOut(BaseModel):
     user_id: ResourceId
     track: TrackOut
+    turn_completed_by: list[ResourceId]
 
 
 class PlayerJoined(Notification):
@@ -404,6 +405,7 @@ class TurnCompleted(Notification):
 class TrackBought(Notification):
     user_id: ResourceId
     track: TrackOut
+    turn_completed_by: list[ResourceId]
 
 
 class CorrectionProposed(Notification):

@@ -290,6 +290,7 @@ export const completeTurn = async ({
 interface BuyTrackResult {
   userId: string;
   track: Track;
+  turnCompletedBy: string[];
 }
 
 export const buyTrack = async ({

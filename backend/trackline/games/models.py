@@ -172,6 +172,35 @@ class Game(BaseDocument):
     players: list[Player] = Field(default_factory=list[Player])
     discarded_track_ids: list[str] = Field(default_factory=list[str])
 
+    @property
+    def round_num(self) -> int:
+        if not self.players:
+            return 0
+
+        return int(len(self.turns) / len(self.players)) + 1
+
+    @property
+    def turn_num(self) -> int:
+        if not self.players:
+            return 0
+
+        return (len(self.turns) - 1) % len(self.players) + 1
+
+    @property
+    def end_condition_met(self) -> bool:
+        if not self.players or not self.turns:
+            return False
+
+        round_complete = self.turn_num == len(self.players)
+
+        timeline_lengths = [len(p.timeline) for p in self.players]
+        has_single_winner = (
+            max(timeline_lengths) >= self.settings.timeline_length
+            and timeline_lengths.count(max(timeline_lengths)) == 1
+        )
+
+        return round_complete and has_single_winner
+
     def get_player(self, user_id: ResourceId) -> Player:
         try:
             return next(p for p in self.players if p.user_id == user_id)

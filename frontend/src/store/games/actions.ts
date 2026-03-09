@@ -108,6 +108,7 @@ export const turnCompleted = createAction<TurnCompletedPayload>(
 interface TrackBoughtPayload {
   userId: string;
   track: Track;
+  turnCompletedBy: string[];
 }
 export const trackBought = createAction<TrackBoughtPayload>(
   `${PREFIX}/trackBought`,
