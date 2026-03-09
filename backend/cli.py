@@ -9,7 +9,7 @@ from typing import Annotated, Any
 
 import anyio
 import typer
-from injector import inject
+from injector import ClassAssistedBuilder, inject
 from rich import print  # noqa: A004
 from rich.console import Console
 from rich.pretty import pprint
@@ -22,7 +22,7 @@ from trackline.games.services.track_metadata_parser import (
     TrackMetadataParser,
 )
 from trackline.spotify.models import SpotifyTrack
-from trackline.spotify.services.client import SpotifyClient
+from trackline.spotify.services.spotify_client import SpotifyClient, SpotifyUserClient
 
 app = typer.Typer()
 
@@ -40,11 +40,8 @@ class MusicbrainzTrackLookupCli:
         self._spotify_client = spotify_client
 
     async def run(self, track_id: str) -> None:
-        await self._spotify_client.initialize()
-        try:
+        async with self._spotify_client:
             track = await self._spotify_client.get_track(track_id)
-        finally:
-            await self._spotify_client.close()
 
         metadata = self._track_metadata_parser.parse(track.artists, track.title)
         mb_release_year = await self._mb_lookup.get_release_year(metadata)
@@ -70,11 +67,8 @@ class MusicbrainzPlaylistLookupCli:
 
     async def run(self, playlist_id: str, file_name: str) -> None:
         print(f"Fetching playlist {playlist_id} from Spotify...")
-        await self._spotify_client.initialize()
-        try:
+        async with self._spotify_client:
             tracks = await self._spotify_client.get_playlist_tracks(playlist_id)
-        finally:
-            await self._spotify_client.close()
 
         buffer = StringIO()
         writer = csv.DictWriter(
@@ -147,11 +141,8 @@ class TrackMetadataParserCli:
         self._track_metadata_parser = track_metadata_parser
 
     async def run(self, track_id: str) -> None:
-        await self._spotify_client.initialize()
-        try:
+        async with self._spotify_client:
             track = await self._spotify_client.get_track(track_id)
-        finally:
-            await self._spotify_client.close()
 
         metadata = self._track_metadata_parser.parse(track.artists, track.title)
 
@@ -171,17 +162,18 @@ class PlaylistTrackDeduplicatorCli:
     @inject
     def __init__(
         self,
-        spotify_client: SpotifyClient,
+        spotify_client_builder: ClassAssistedBuilder[SpotifyUserClient],
         track_metadata_parser: TrackMetadataParser,
     ) -> None:
-        self._spotify_client = spotify_client
+        self._spotify_client_builder = spotify_client_builder
         self._track_metadata_parser = track_metadata_parser
 
     async def run(self, playlist_id: str, access_token: str, *, dry_run: bool) -> None:
         print(f"Fetching playlist {playlist_id} from Spotify...")
-        await self._spotify_client.initialize()
-        try:
-            tracks = await self._spotify_client.get_playlist_tracks(playlist_id)
+        async with self._spotify_client_builder.build(
+            access_token=access_token
+        ) as spotify_client:
+            tracks = await spotify_client.get_playlist_tracks(playlist_id)
 
             duplicate_tracks: list[SpotifyTrack] = []
             for tracks_group in self._group_tracks(tracks):
@@ -193,14 +185,11 @@ class PlaylistTrackDeduplicatorCli:
             print("Deleting duplicate tracks from playlist...")
             await asyncio.sleep(5)
             await self._delete_tracks_from_playlist(
+                spotify_client,
                 playlist_id,
                 duplicate_tracks,
-                access_token,
                 dry_run=dry_run,
             )
-
-        finally:
-            await self._spotify_client.close()
 
     def _group_tracks(self, tracks: list[SpotifyTrack]) -> list[list[SpotifyTrack]]:
         grouped_tracks: dict[tuple[str, tuple[str, ...]], list[SpotifyTrack]] = (
@@ -218,9 +207,9 @@ class PlaylistTrackDeduplicatorCli:
 
     async def _delete_tracks_from_playlist(
         self,
+        spotify_client: SpotifyUserClient,
         playlist_id: str,
         tracks: Collection[SpotifyTrack],
-        access_token: str,
         *,
         dry_run: bool = False,
     ) -> None:
@@ -237,10 +226,9 @@ class PlaylistTrackDeduplicatorCli:
                         )
                     )
         else:
-            await self._spotify_client.remove_tracks_from_playlist(
+            await spotify_client.remove_tracks_from_playlist(
                 playlist_id,
                 [track.id for track in tracks],
-                access_token,
             )
             print(f"Removed {len(tracks)} duplicate tracks.")
 

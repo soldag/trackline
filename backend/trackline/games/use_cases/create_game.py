@@ -17,7 +17,10 @@ from trackline.games.models import (
 )
 from trackline.games.schemas import GameOut
 from trackline.games.use_cases.base import BaseHandler
-from trackline.spotify.services.client import PlaylistNotFoundError, SpotifyClient
+from trackline.spotify.services.spotify_client import (
+    PlaylistNotFoundError,
+    SpotifyClient,
+)
 
 
 class CreateGame(AuthenticatedUseCase[GameOut]):

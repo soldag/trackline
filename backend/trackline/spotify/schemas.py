@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 
-class SpotifyAccessToken(BaseModel):
+class SpotifyAccessTokenOut(BaseModel):
     access_token: str
     refresh_token: str

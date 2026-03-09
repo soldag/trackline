@@ -23,7 +23,7 @@ from trackline.core.settings import Settings
 from trackline.di import injector
 from trackline.games.router import router as games_router
 from trackline.spotify.router import router as spotify_router
-from trackline.spotify.services.client import SpotifyClient
+from trackline.spotify.services.spotify_client import SpotifyClient
 from trackline.users.router import router as users_router
 
 log = logging.getLogger(__name__)
@@ -37,9 +37,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     database_client = injector.get(DatabaseClient)
     await database_client.initialize()
-
-    spotify_client = injector.get(SpotifyClient)
-    await spotify_client.initialize()
 
     log.info("Application startup complete.")
 

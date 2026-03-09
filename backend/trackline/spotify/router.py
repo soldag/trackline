@@ -6,7 +6,7 @@ from fastapi_injector import Injected
 from trackline.auth.deps import AuthUserId
 from trackline.core.schemas import EntityResponse
 from trackline.core.use_cases import UseCaseExecutor
-from trackline.spotify.schemas import SpotifyAccessToken
+from trackline.spotify.schemas import SpotifyAccessTokenOut
 from trackline.spotify.use_cases import GetAccessToken, RefreshAccessToken
 
 router = APIRouter(
@@ -20,7 +20,7 @@ async def get_access_token(
     auth_user_id: AuthUserId,
     use_case: GetAccessToken,
     use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
-) -> EntityResponse[SpotifyAccessToken]:
+) -> EntityResponse[SpotifyAccessTokenOut]:
     user = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=user)
 
@@ -30,6 +30,6 @@ async def refresh_access_token(
     auth_user_id: AuthUserId,
     use_case: RefreshAccessToken,
     use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
-) -> EntityResponse[SpotifyAccessToken]:
+) -> EntityResponse[SpotifyAccessTokenOut]:
     user = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=user)

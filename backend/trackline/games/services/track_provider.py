@@ -11,7 +11,7 @@ from trackline.games.services.track_metadata_parser import (
     TrackMetadataParser,
 )
 from trackline.spotify.models import SpotifyTrack
-from trackline.spotify.services.client import SpotifyClient
+from trackline.spotify.services.spotify_client import SpotifyClient
 
 
 class TrackProvider:

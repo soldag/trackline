@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     spotify_client_id: str
     spotify_client_secret: str
     spotify_redirect_url: str
+    spotify_retries_max_attempts: PositiveInt = 3
+    spotify_retries_min_interval: PositiveInt = 100
+    spotify_throttle_time: PositiveInt = 200
 
     sentry_dsn: str | None = None
 
