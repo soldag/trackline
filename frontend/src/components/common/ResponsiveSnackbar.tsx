@@ -1,5 +1,3 @@
-import { useMediaQuery } from "react-responsive";
-
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -10,6 +8,7 @@ import {
   Typography,
 } from "@mui/joy";
 
+import { useBreakpoint } from "@/utils/hooks";
 import { mergeSx } from "@/utils/style";
 
 interface ResponsiveSnackbarProps extends Omit<
@@ -31,7 +30,7 @@ const ResponsiveSnackbar = ({
   onClose,
   ...remainingProps
 }: ResponsiveSnackbarProps) => {
-  const hasSmallHeight = useMediaQuery({ query: "(max-height: 550px)" });
+  const isScreenLg = useBreakpoint((breakpoints) => breakpoints.up("lg"));
 
   return (
     <Snackbar
@@ -44,7 +43,7 @@ const ResponsiveSnackbar = ({
       }
       anchorOrigin={{
         vertical: "bottom",
-        horizontal: hasSmallHeight ? "right" : "center",
+        horizontal: isScreenLg ? "right" : "center",
         ...anchorOrigin,
       }}
       sx={mergeSx(sx, {
