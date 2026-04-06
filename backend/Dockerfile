@@ -2,7 +2,7 @@ FROM python:3.13-alpine AS poetry
 
 WORKDIR /tmp
 
-RUN pip install poetry==2.2.1 \
+RUN pip install poetry==2.3.3 \
     && poetry self add poetry-plugin-export
 
 ADD pyproject.toml poetry.lock /tmp/
