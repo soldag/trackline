@@ -31,7 +31,7 @@ class NotificationEnvelope[NotificationT: Notification](BaseModel):
     def for_notification(
         cls,
         notification: NotificationT,
-    ) -> "NotificationEnvelope[NotificationT]":
+    ) -> NotificationEnvelope[NotificationT]:
         return cls(type=notification.get_type(), payload=notification)
 
 

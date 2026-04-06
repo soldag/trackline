@@ -39,7 +39,7 @@ class TrackOut(BaseModel):
     image_url: str | None
 
     @staticmethod
-    def from_model(model: Track) -> "TrackOut":
+    def from_model(model: Track) -> TrackOut:
         return TrackOut(
             spotify_id=model.spotify_id,
             title=model.title,
@@ -56,7 +56,7 @@ class PlayerOut(BaseModel):
     timeline: list[TrackOut]
 
     @staticmethod
-    def from_model(model: Player) -> "PlayerOut":
+    def from_model(model: Player) -> PlayerOut:
         return PlayerOut(
             user_id=model.user_id,
             is_game_master=model.is_game_master,
@@ -80,7 +80,7 @@ class ReleaseYearGuessOut(GuessOut):
     def from_model(
         model: ReleaseYearGuess,
         user_id: ResourceId,
-    ) -> "ReleaseYearGuessOut":
+    ) -> ReleaseYearGuessOut:
         return ReleaseYearGuessOut(
             user_id=user_id,
             creation_time=model.creation_time,
@@ -96,7 +96,7 @@ class CreditsGuessOut(GuessOut):
     title: str
 
     @staticmethod
-    def from_model(model: CreditsGuess, user_id: ResourceId) -> "CreditsGuessOut":
+    def from_model(model: CreditsGuess, user_id: ResourceId) -> CreditsGuessOut:
         return CreditsGuessOut(
             user_id=user_id,
             creation_time=model.creation_time,
@@ -111,7 +111,7 @@ class TurnGuessesOut(BaseModel):
     credits: list[CreditsGuessOut] = []
 
     @staticmethod
-    def from_model(model: TurnGuesses) -> "TurnGuessesOut":
+    def from_model(model: TurnGuesses) -> TurnGuessesOut:
         return TurnGuessesOut(
             release_year=[
                 ReleaseYearGuessOut.from_model(guess, user_id)
@@ -135,7 +135,7 @@ class TurnPassOut(BaseModel):
     creation_time: datetime
 
     @staticmethod
-    def from_model(user_id: ResourceId, model: TurnPass) -> "TurnPassOut":
+    def from_model(user_id: ResourceId, model: TurnPass) -> TurnPassOut:
         return TurnPassOut(user_id=user_id, creation_time=model.creation_time)
 
 
@@ -145,7 +145,7 @@ class TokenGainOut(BaseModel):
     reward_effective: int
 
     @staticmethod
-    def from_model(model: TokenGain) -> "TokenGainOut":
+    def from_model(model: TokenGain) -> TokenGainOut:
         return TokenGainOut(
             refund=model.refund,
             reward_theoretical=model.reward_theoretical,
@@ -159,7 +159,7 @@ class ScoringOut(BaseModel):
     token_gains: Mapping[ResourceId, TokenGainOut]
 
     @staticmethod
-    def from_model(model: Scoring) -> "ScoringOut":
+    def from_model(model: Scoring) -> ScoringOut:
         return ScoringOut(
             winner=model.winner,
             correct_guesses=model.correct_guesses,
@@ -175,7 +175,7 @@ class ReleaseYearScoringOut(BaseModel):
     year: ScoringOut
 
     @staticmethod
-    def from_model(model: ReleaseYearScoring) -> "ReleaseYearScoringOut":
+    def from_model(model: ReleaseYearScoring) -> ReleaseYearScoringOut:
         return ReleaseYearScoringOut(
             position=ScoringOut.from_model(model.position),
             year=ScoringOut.from_model(model.year),
@@ -189,7 +189,7 @@ class CreditsScoringOut(BaseModel):
     similarity_scores: dict[ResourceId, float]
 
     @staticmethod
-    def from_model(model: CreditsScoring) -> "CreditsScoringOut":
+    def from_model(model: CreditsScoring) -> CreditsScoringOut:
         return CreditsScoringOut(
             winner=model.winner,
             correct_guesses=model.correct_guesses,
@@ -206,7 +206,7 @@ class TurnScoringOut(BaseModel):
     credits: CreditsScoringOut
 
     @staticmethod
-    def from_model(model: TurnScoring) -> "TurnScoringOut":
+    def from_model(model: TurnScoring) -> TurnScoringOut:
         return TurnScoringOut(
             release_year=ReleaseYearScoringOut.from_model(model.release_year),
             credits=CreditsScoringOut.from_model(model.credits),
@@ -222,7 +222,7 @@ class CorrectionProposalVoteOut(BaseModel):
     def from_model(
         user_id: ResourceId,
         model: CorrectionProposalVote,
-    ) -> "CorrectionProposalVoteOut":
+    ) -> CorrectionProposalVoteOut:
         return CorrectionProposalVoteOut(
             user_id=user_id,
             agree=model.agree,
@@ -244,7 +244,7 @@ class CorrectionProposalOut(BaseModel):
     votes: list[CorrectionProposalVoteOut]
 
     @staticmethod
-    def from_model(model: CorrectionProposal) -> "CorrectionProposalOut":
+    def from_model(model: CorrectionProposal) -> CorrectionProposalOut:
         return CorrectionProposalOut(
             created_by=model.created_by,
             creation_time=model.creation_time,
@@ -270,7 +270,7 @@ class TurnOut(BaseModel):
     completed_by: list[ResourceId]
 
     @staticmethod
-    def from_model(model: Turn) -> "TurnOut":
+    def from_model(model: Turn) -> TurnOut:
         return TurnOut(
             revision_id=model.revision_id,
             creation_time=model.creation_time,
@@ -304,7 +304,7 @@ class GameSettingsOut(BaseModel):
     credits_similarity_threshold: float
 
     @staticmethod
-    def from_model(model: GameSettings) -> "GameSettingsOut":
+    def from_model(model: GameSettings) -> GameSettingsOut:
         return GameSettingsOut(
             spotify_market=model.spotify_market,
             playlist_ids=[p.spotify_id for p in model.playlists],
@@ -327,7 +327,7 @@ class GameOut(BaseModel):
     players: list[PlayerOut]
 
     @staticmethod
-    def from_model(model: Game) -> "GameOut":
+    def from_model(model: Game) -> GameOut:
         if not model.id:
             raise ValueError("ID is required")
 
