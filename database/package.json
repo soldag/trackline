@@ -2,6 +2,16 @@
   "name": "trackline-database-utils",
   "version": "0.1.0",
   "private": true,
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": "^11"
+    }
+  },
   "dependencies": {
     "migrate-mongo": "^14.0.7",
     "uuid": "^13.0.0"
