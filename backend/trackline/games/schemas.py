@@ -1,6 +1,6 @@
 import abc
 from collections.abc import Mapping
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from pydantic import BaseModel
 
@@ -350,6 +350,38 @@ class TrackPurchaseReceiptOut(BaseModel):
     user_id: ResourceId
     track: TrackOut
     turn_completed_by: list[ResourceId]
+
+
+class ReleaseYearStatsOut(BaseModel):
+    guess_count: int
+    mean_time_to_guess: timedelta | None
+    position_mean_accuracy: float | None
+    position_mean_absolute_error: float | None
+    year_mean_accuracy: float | None
+    year_mean_absolute_error: float | None
+
+
+class CreditsStatsOut(BaseModel):
+    guess_count: int
+    mean_time_to_guess: timedelta | None
+    mean_accuracy: float | None
+    mean_similarity: float | None
+
+
+class GuessStatsOut(BaseModel):
+    release_year: ReleaseYearStatsOut
+    credits: CreditsStatsOut
+
+
+class UserStatsOut(BaseModel):
+    total_games: int
+    won_games: int
+    total_duration: timedelta
+    mean_duration: timedelta | None
+    total_played_tracks: int
+    total_timeline_tracks: int
+    guess_stats: GuessStatsOut
+    guess_stats_by_year: dict[int, GuessStatsOut]
 
 
 class PlayerJoined(Notification):

@@ -21,6 +21,7 @@ from trackline.games.schemas import (
     TurnOut,
     TurnPassOut,
     TurnScoringOut,
+    UserStatsOut,
 )
 from trackline.games.use_cases import (
     AbortGame,
@@ -34,6 +35,7 @@ from trackline.games.use_cases import (
     GetGame,
     GetGames,
     GetGameUsers,
+    GetUserStats,
     JoinGame,
     LeaveGame,
     PassTurn,
@@ -70,6 +72,16 @@ async def get_games(
 ) -> EntityResponse[list[GameOut]]:
     users = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=users)
+
+
+@router.get("/stats")
+async def get_user_stats(
+    auth_user_id: AuthUserId,
+    use_case: Annotated[GetUserStats, Depends()],
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
+) -> EntityResponse[UserStatsOut]:
+    stats = await use_case_executor.execute(use_case, auth_user_id)
+    return EntityResponse(data=stats)
 
 
 @router.get("/{game_id}")
