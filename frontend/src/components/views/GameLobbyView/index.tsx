@@ -51,6 +51,7 @@ const GameLobbyView = () => {
 
   return (
     <View
+      backButton
       appBar={{
         showTitle: true,
         showPlaybackControls: true,

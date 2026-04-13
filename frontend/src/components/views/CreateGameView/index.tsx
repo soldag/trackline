@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import MediaQuery from "react-responsive";
-import { Link, Navigate } from "react-router";
+import { Navigate } from "react-router";
 
 import LinkIcon from "@mui/icons-material/Link";
 import {
@@ -25,7 +25,6 @@ import {
   DEFAULT_MAX_TOKENS,
   DEFAULT_TIMELINE_LENGTH,
 } from "@/constants";
-import { dismissAllErrors } from "@/store/errors";
 import { createGame } from "@/store/games";
 import {
   clearPlaylistSearchResults,
@@ -128,11 +127,6 @@ const CreateGameView = () => {
     creditsStrictness,
   ]);
 
-  const handleDismissErrors = useCallback(
-    () => dispatch(dismissAllErrors()),
-    [dispatch],
-  );
-
   const prevGame = usePrevious(game);
   if (game && game !== prevGame) {
     return <Navigate replace to={`/games/${game.id}`} />;
@@ -196,6 +190,7 @@ const CreateGameView = () => {
 
   return (
     <View
+      backButton
       appBar={{ showTitle: true, showLogout: true }}
       header={
         <FormattedMessage
@@ -277,15 +272,6 @@ const CreateGameView = () => {
         </MediaQuery>
 
         <ButtonFooter>
-          <Button
-            color="neutral"
-            variant="soft"
-            component={Link}
-            to="/"
-            onClick={handleDismissErrors}
-          >
-            <FormattedMessage id="CreateGameView.back" defaultMessage="Back" />
-          </Button>
           <Button
             loading={loadingCreateGame}
             disabled={loadingCreateGame || playlists.length === 0}

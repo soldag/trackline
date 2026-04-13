@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Link } from "react-router";
 
 import ClearIcon from "@mui/icons-material/Clear";
 import NumbersIcon from "@mui/icons-material/Numbers";
-import { Button, Grid, IconButton, Input, Stack } from "@mui/joy";
+import { Button, Grid, IconButton, Input } from "@mui/joy";
 
 import FormController from "@/components/common/FormController";
 import { GAME_ID_LENGTH, GAME_ID_REGEX } from "@/constants";
@@ -78,31 +77,17 @@ const JoinGameForm = ({ loading = false, onSubmit }: JoinGameFormProps) => {
           </FormattedMessage>
         </Grid>
         <Grid xs={12}>
-          <Stack direction="row" spacing={2}>
-            <Button
-              fullWidth
-              color="neutral"
-              variant="soft"
-              component={Link}
-              to="/"
-            >
-              <FormattedMessage
-                id="JoinGameView.JoinGameForm.back"
-                defaultMessage="Back"
-              />
-            </Button>
-            <Button
-              fullWidth
-              type="submit"
-              loading={loading}
-              disabled={loading || !isValid}
-            >
-              <FormattedMessage
-                id="JoinGameView.JoinGameForm.joinGame"
-                defaultMessage="Join game"
-              />
-            </Button>
-          </Stack>
+          <Button
+            fullWidth
+            type="submit"
+            loading={loading}
+            disabled={loading || !isValid}
+          >
+            <FormattedMessage
+              id="JoinGameView.JoinGameForm.joinGame"
+              defaultMessage="Join game"
+            />
+          </Button>
         </Grid>
       </Grid>
     </form>

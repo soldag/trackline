@@ -42,6 +42,7 @@ const JoinGameView = () => {
 
   return (
     <View
+      backButton
       appBar={{ showTitle: true, showLogout: true }}
       header={
         <FormattedMessage

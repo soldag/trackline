@@ -68,6 +68,7 @@ const StatsView = () => {
 
   return (
     <View
+      backButton
       appBar={{ showTitle: true, showLogout: true }}
       loading={loading && !stats}
       header={
