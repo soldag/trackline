@@ -329,3 +329,12 @@ export const exchangeTrack = createSafeAsyncThunk(
     return exchange;
   },
 );
+
+export const fetchUserStats = createSafeAsyncThunk(
+  PREFIX,
+  "fetchUserStats",
+  async () => {
+    const stats = await tracklineApi.games.getUserStats();
+    return { stats };
+  },
+);

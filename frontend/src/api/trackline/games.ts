@@ -13,6 +13,7 @@ import {
   Turn,
   TurnPass,
   TurnScoring,
+  UserStats,
 } from "@/types/games";
 import { User } from "@/types/users";
 
@@ -329,4 +330,12 @@ export const exchangeTrack = async ({
   );
 
   return exchange;
+};
+
+export const getUserStats = async (): Promise<UserStats> => {
+  const {
+    data: { data: stats },
+  } = await instance.get<EntityResponse<UserStats>>("games/stats");
+
+  return stats;
 };

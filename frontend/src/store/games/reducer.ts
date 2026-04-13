@@ -3,7 +3,14 @@ import { Draft } from "immer";
 
 import { TOKEN_COST_BUY_TRACK } from "@/constants";
 import { resetState } from "@/store/common/actions";
-import { Game, GameState, Track, Turn, TurnScoring } from "@/types/games";
+import {
+  Game,
+  GameState,
+  Track,
+  Turn,
+  TurnScoring,
+  UserStats,
+} from "@/types/games";
 import { User } from "@/types/users";
 import {
   aggregateTokenGains,
@@ -42,6 +49,7 @@ import {
   fetchActiveGames,
   fetchGame,
   fetchGameUsers,
+  fetchUserStats,
   guessTrackCredits,
   guessTrackReleaseYear,
   joinGame,
@@ -57,6 +65,7 @@ interface GamesState {
   game: Game | null;
   activeGames: Game[] | null;
   users: User[];
+  stats: UserStats | null;
   boughtTrack: Track | null;
   isBuyTrackReminderDisabled: boolean;
 }
@@ -65,6 +74,7 @@ const initialState: GamesState = {
   game: null,
   activeGames: null,
   users: [],
+  stats: null,
   boughtTrack: null,
   isBuyTrackReminderDisabled: false,
 };
@@ -226,6 +236,10 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(leaveGame.fulfilled, (state) => {
       state.game = null;
       state.users = [];
+    })
+
+    .addCase(fetchUserStats.fulfilled, (state, { payload: { stats } }) => {
+      state.stats = stats;
     })
 
     .addMatcher(

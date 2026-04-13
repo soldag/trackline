@@ -8,6 +8,7 @@ import JoinGameView from "@/components/views/JoinGameView";
 import LoginView from "@/components/views/LoginView";
 import RegisterView from "@/components/views/RegisterView";
 import SpotifyCallbackView from "@/components/views/SpotifyCallbackView";
+import StatsView from "@/components/views/StatsView";
 
 const RoutingContainer = () => (
   <Routes>
@@ -22,6 +23,8 @@ const RoutingContainer = () => (
         <Route path="join/:gameId?" element={<JoinGameView />} />
         <Route path=":gameId" element={<GameContainer />} />
       </Route>
+
+      <Route path="stats" element={<StatsView />} />
 
       <Route path="spotify">
         <Route path="callback" element={<SpotifyCallbackView />} />

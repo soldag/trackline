@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { FormattedMessage } from "react-intl";
 
+import BarChartIcon from "@mui/icons-material/BarChart";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
@@ -95,6 +96,27 @@ const HomeView = () => {
             }
             sx={{ flexGrow: { sm: 1 }, flexBasis: 0 }}
             linkTo="/games/join"
+          />
+
+          <ActionCard
+            color="primary"
+            variant="soft"
+            startDecorator={<BarChartIcon />}
+            endDecorator={<NavigateNextIcon />}
+            title={
+              <FormattedMessage
+                id="HomeView.stats.title"
+                defaultMessage="Statistics"
+              />
+            }
+            description={
+              <FormattedMessage
+                id="HomeView.stats.description"
+                defaultMessage="View your game stats and performance details."
+              />
+            }
+            sx={{ flexGrow: { sm: 1 }, flexBasis: 0 }}
+            linkTo="/stats"
           />
         </Stack>
       </Stack>

@@ -144,3 +144,35 @@ export interface Game {
   turns: Turn[];
   players: Player[];
 }
+
+export interface ReleaseYearStats {
+  guessCount: number;
+  meanTimeToGuess: string | null;
+  positionMeanAccuracy: number | null;
+  positionMeanAbsoluteError: number | null;
+  yearMeanAccuracy: number | null;
+  yearMeanAbsoluteError: number | null;
+}
+
+export interface CreditsStats {
+  guessCount: number;
+  meanTimeToGuess: string | null;
+  meanAccuracy: number | null;
+  meanSimilarity: number | null;
+}
+
+export interface GuessStats {
+  releaseYear: ReleaseYearStats;
+  credits: CreditsStats;
+}
+
+export interface UserStats {
+  totalGames: number;
+  wonGames: number;
+  totalDuration: string;
+  meanDuration: string | null;
+  totalPlayedTracks: number;
+  totalTimelineTracks: number;
+  guessStats: GuessStats;
+  guessStatsByYear: Record<number, GuessStats>;
+}
