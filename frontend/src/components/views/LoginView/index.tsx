@@ -45,7 +45,7 @@ const LoginView = () => {
 
         <Stack direction="column" spacing={2}>
           <Typography level="title-lg">
-            <FormattedMessage id="LoginView.header" defaultMessage="Login" />
+            <FormattedMessage id="LoginView.title" defaultMessage="Login" />
           </Typography>
 
           <LoginForm

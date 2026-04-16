@@ -190,14 +190,16 @@ const CreateGameView = () => {
 
   return (
     <View
-      backButton
-      appBar={{ showTitle: true, showLogout: true }}
-      header={
-        <FormattedMessage
-          id="CreateGameView.header"
-          defaultMessage="Create new game"
-        />
-      }
+      appBar={{
+        title: (
+          <FormattedMessage
+            id="CreateGameView.title"
+            defaultMessage="Create new game"
+          />
+        ),
+        showBack: true,
+        showLogout: true,
+      }}
     >
       <Stack
         direction="column"

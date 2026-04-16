@@ -42,14 +42,16 @@ const JoinGameView = () => {
 
   return (
     <View
-      backButton
-      appBar={{ showTitle: true, showLogout: true }}
-      header={
-        <FormattedMessage
-          id="JoinGameView.header"
-          defaultMessage="Join existing game"
-        />
-      }
+      appBar={{
+        title: (
+          <FormattedMessage
+            id="JoinGameView.title"
+            defaultMessage="Join existing game"
+          />
+        ),
+        showBack: true,
+        showLogout: true,
+      }}
     >
       <Stack
         direction={{ xs: "column", sm: "row" }}

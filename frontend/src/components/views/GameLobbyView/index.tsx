@@ -51,18 +51,17 @@ const GameLobbyView = () => {
 
   return (
     <View
-      backButton
       appBar={{
-        showTitle: true,
+        title: (
+          <FormattedMessage
+            id="GameLobbyView.title"
+            defaultMessage="Waiting for players"
+          />
+        ),
+        showBack: true,
         showPlaybackControls: true,
         showExitGame: true,
       }}
-      header={
-        <FormattedMessage
-          id="GameLobbyView.header"
-          defaultMessage="Waiting for players..."
-        />
-      }
     >
       <QrCodeModal
         joinUrl={joinUrl}

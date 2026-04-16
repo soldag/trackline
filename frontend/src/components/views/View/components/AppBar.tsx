@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { Link as RouterLink } from "react-router";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router";
 
 import AlbumIcon from "@mui/icons-material/Album";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ClearIcon from "@mui/icons-material/Clear";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Box, IconButton, Link, Stack } from "@mui/joy";
+import { Box, IconButton, Link, Stack, Typography } from "@mui/joy";
 
 import { TURN_GAME_STATES } from "@/constants";
 import { logout } from "@/store/auth";
+import { dismissAllErrors } from "@/store/errors";
 import { abortGame, leaveGame } from "@/store/games";
 import {
   pause,
@@ -26,7 +28,9 @@ import PlayerInfo from "./PlayerInfo";
 import SpotifyPlayer from "./SpotifyPlayer";
 
 export interface AppBarProps {
+  title?: ReactNode;
   showTitle?: boolean;
+  showBack?: boolean;
   showPlayerInfo?: boolean;
   showPlaybackControls?: boolean;
   showExitGame?: boolean;
@@ -34,12 +38,17 @@ export interface AppBarProps {
 }
 
 const AppBar = ({
+  title,
+  showBack = false,
   showTitle = false,
   showPlayerInfo = false,
   showPlaybackControls = false,
   showExitGame = false,
   showLogout = false,
 }: AppBarProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [abortModalOpen, setAbortModalOpen] = useState(false);
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
@@ -74,6 +83,16 @@ const AppBar = ({
       dispatch(unwatchPlayback());
     };
   }, [dispatch, showPlaybackControls, isSpotifyLoggedIn]);
+
+  const handleBack = () => {
+    dispatch(dismissAllErrors());
+
+    if (location.key === "default") {
+      navigate("/");
+    } else {
+      navigate(-1);
+    }
+  };
 
   const handleExitGame = () => {
     if (isGameMaster) {
@@ -132,20 +151,25 @@ const AppBar = ({
         onConfirm={handleLeaveGame}
       />
 
-      <Link component={RouterLink} to="/">
-        <AlbumIcon color="primary" sx={{ fontSize: "45px" }} />
-      </Link>
-
-      {showTitle && (
-        <Link
-          component={RouterLink}
-          to="/"
-          level="h1"
-          fontSize="xl"
-          underline="none"
-        >
-          <FormattedMessage id="View.AppBar.title" defaultMessage="Trackline" />
+      {showBack ? (
+        <IconButton color="primary" onClick={handleBack}>
+          <ArrowBackIcon />
+        </IconButton>
+      ) : (
+        <Link component={RouterLink} to="/">
+          <AlbumIcon color="primary" sx={{ fontSize: "36px" }} />
         </Link>
+      )}
+
+      {(showTitle || title) && (
+        <Typography color="primary" level="h1" fontSize="xl">
+          {title ?? (
+            <FormattedMessage
+              id="View.AppBar.defaultTitle"
+              defaultMessage="Trackline"
+            />
+          )}
+        </Typography>
       )}
 
       {showPlayerInfo && game && user && player && (

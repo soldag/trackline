@@ -68,12 +68,14 @@ const StatsView = () => {
 
   return (
     <View
-      backButton
-      appBar={{ showTitle: true, showLogout: true }}
+      appBar={{
+        title: (
+          <FormattedMessage id="StatsView.title" defaultMessage="Statistics" />
+        ),
+        showBack: true,
+        showLogout: true,
+      }}
       loading={loading && !stats}
-      header={
-        <FormattedMessage id="StatsView.header" defaultMessage="Statistics" />
-      }
     >
       {stats && (
         <Stack

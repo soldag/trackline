@@ -43,7 +43,7 @@ const RegisterView = () => {
         <Stack direction="column" spacing={2}>
           <Typography level="title-lg">
             <FormattedMessage
-              id="RegisterView.header"
+              id="RegisterView.title"
               defaultMessage="Register"
             />
           </Typography>
