@@ -78,15 +78,7 @@ const StatsView = () => {
       loading={loading && !stats}
     >
       {stats && (
-        <Stack
-          direction="column"
-          justifyContent="space-between"
-          spacing={2}
-          sx={{
-            height: "100%",
-            width: "100%",
-          }}
-        >
+        <Stack direction="column" justifyContent="space-between" spacing={2}>
           <Box
             sx={{
               display: "grid",
