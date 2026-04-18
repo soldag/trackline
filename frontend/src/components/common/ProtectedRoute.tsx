@@ -1,6 +1,7 @@
 import { PropsWithChildren } from "react";
-import { Navigate, Outlet, useLocation } from "react-router";
+import { Outlet, useLocation } from "react-router";
 
+import AppNavigate from "@/components/common/AppNavigate";
 import LoadingView from "@/components/views/LoadingView";
 import { useAppSelector } from "@/utils/hooks";
 
@@ -15,7 +16,7 @@ const ProtectedRoute = ({ children }: PropsWithChildren) => {
 
   if (!isLoggedIn) {
     return (
-      <Navigate
+      <AppNavigate
         replace
         to="/login"
         state={{

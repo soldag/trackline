@@ -1,13 +1,15 @@
 import { useEffect } from "react";
 import { FormattedMessage } from "react-intl";
-import { Navigate, useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 
 import { Box, Stack, Typography } from "@mui/joy";
 
+import AppNavigate from "@/components/common/AppNavigate";
 import View from "@/components/views/View";
 import { joinGame } from "@/store/games";
 import {
   useAppDispatch,
+  useAppNavigate,
   useAppSelector,
   useErrorToast,
   useLoadingSelector,
@@ -18,7 +20,7 @@ import QrCodeScanner from "./components/QrCodeScanner";
 
 const JoinGameView = () => {
   const { joinCode } = useParams();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
 
   const dispatch = useAppDispatch();
   const game = useAppSelector((state) => state.games.game);
@@ -37,7 +39,7 @@ const JoinGameView = () => {
   }, [dispatch, joinCode]);
 
   if (game && game.joinCode === joinCode) {
-    return <Navigate replace to={`/games/${game.id}`} />;
+    return <AppNavigate replace to={`/games/${game.id}`} />;
   }
 
   return (

@@ -1,8 +1,8 @@
 import { FormattedMessage } from "react-intl";
-import { Navigate } from "react-router";
 
 import { Box, Stack, Typography } from "@mui/joy";
 
+import AppNavigate from "@/components/common/AppNavigate";
 import Heading from "@/components/common/Heading";
 import View from "@/components/views/View";
 import { createUser } from "@/store/auth";
@@ -28,7 +28,7 @@ const RegisterView = () => {
   const handleDismissError = () => dispatch(dismissAllErrors());
 
   if (user) {
-    return <Navigate replace to="/" />;
+    return <AppNavigate replace to="/" />;
   }
 
   return (

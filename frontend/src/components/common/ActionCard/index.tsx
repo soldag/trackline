@@ -1,5 +1,3 @@
-import { Link as RouterLink } from "react-router";
-
 import {
   Box,
   Card,
@@ -11,6 +9,7 @@ import {
 } from "@mui/joy";
 import { SxProps } from "@mui/joy/styles/types";
 
+import AppLink from "@/components/common/AppLink";
 import { mergeSx } from "@/utils/style";
 
 import ActionCardOverflow from "./ActionCardOverflow";
@@ -63,7 +62,7 @@ const ActionCard = ({
     <CardContent sx={{ overflow: "hidden" }}>
       <Stack direction="column" spacing={1}>
         {linkTo ? (
-          <Link overlay component={RouterLink} to={linkTo} underline="none">
+          <Link overlay component={AppLink} to={linkTo} underline="none">
             <ActionCardTitle title={title} />
           </Link>
         ) : (

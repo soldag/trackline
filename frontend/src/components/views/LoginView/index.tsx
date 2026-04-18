@@ -1,8 +1,9 @@
 import { FormattedMessage } from "react-intl";
-import { Navigate, useLocation } from "react-router";
+import { useLocation } from "react-router";
 
 import { Box, Stack, Typography } from "@mui/joy";
 
+import AppNavigate from "@/components/common/AppNavigate";
 import Heading from "@/components/common/Heading";
 import View from "@/components/views/View";
 import { login } from "@/store/auth";
@@ -31,7 +32,7 @@ const LoginView = () => {
 
   if (user) {
     const path = location.state?.redirect || "/";
-    return <Navigate replace to={path} />;
+    return <AppNavigate replace to={path} />;
   }
 
   return (

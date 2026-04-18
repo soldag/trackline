@@ -51,10 +51,19 @@ export default tseslint.config(
       "@typescript-eslint/no-restricted-imports": [
         "warn",
         {
-          name: "react-redux",
-          importNames: ["useSelector", "useDispatch"],
-          message:
-            "Use typed hooks `useAppDispatch` and `useAppSelector` instead.",
+          paths: [
+            {
+              name: "react-redux",
+              importNames: ["useSelector", "useDispatch"],
+              message:
+                "Use typed hooks `useAppDispatch` and `useAppSelector` instead.",
+            },
+            {
+              name: "react-router",
+              importNames: ["useNavigate", "Link", "Navigate"],
+              message: "Use `AppLink`, `AppNavigate` or `useAppNavigate`.",
+            },
+          ],
         },
       ],
       "@typescript-eslint/naming-convention": [

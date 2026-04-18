@@ -1,10 +1,10 @@
 import { FormattedMessage } from "react-intl";
-import { Navigate } from "react-router";
 
 import EmailIcon from "@mui/icons-material/Email";
 import PeopleIcon from "@mui/icons-material/People";
 import { Box, Button, Divider, Stack, Typography } from "@mui/joy";
 
+import AppNavigate from "@/components/common/AppNavigate";
 import View from "@/components/views/View";
 import { LOBBY_TRACK_ID, MIN_PLAYER_COUNT } from "@/constants";
 import { abortGame, leaveGame, startGame } from "@/store/games";
@@ -45,7 +45,7 @@ const GameLobbyView = () => {
   });
 
   if (!gameId || !userId) {
-    return <Navigate replace to="/" />;
+    return <AppNavigate replace to="/" />;
   }
 
   return (

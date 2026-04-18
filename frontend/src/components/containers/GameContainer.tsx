@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
-import { Navigate, useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 
+import AppNavigate from "@/components/common/AppNavigate";
 import GameAbortView from "@/components/views/GameAbortView";
 import GameCompletionView from "@/components/views/GameCompletionView";
 import GameLobbyView from "@/components/views/GameLobbyView";
@@ -12,6 +13,7 @@ import { pause } from "@/store/spotify";
 import { GameState } from "@/types/games";
 import {
   useAppDispatch,
+  useAppNavigate,
   useAppSelector,
   usePrevious,
   useSpotify,
@@ -30,7 +32,7 @@ const GAME_STATE_VIEWS = {
 
 const GameContainer = () => {
   const { gameId } = useParams();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
 
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
@@ -73,7 +75,7 @@ const GameContainer = () => {
   });
 
   if (!gameId) {
-    return <Navigate replace to="/" />;
+    return <AppNavigate replace to="/" />;
   }
 
   if (!game || game.id !== gameId) {

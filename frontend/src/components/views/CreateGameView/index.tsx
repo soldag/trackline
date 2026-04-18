@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import MediaQuery from "react-responsive";
-import { Navigate } from "react-router";
 
 import LinkIcon from "@mui/icons-material/Link";
 import {
@@ -16,6 +15,7 @@ import {
   useTheme,
 } from "@mui/joy";
 
+import AppNavigate from "@/components/common/AppNavigate";
 import ButtonFooter from "@/components/common/ButtonFooter";
 import View from "@/components/views/View";
 import {
@@ -129,11 +129,11 @@ const CreateGameView = () => {
 
   const prevGame = usePrevious(game);
   if (game && game !== prevGame) {
-    return <Navigate replace to={`/games/${game.id}`} />;
+    return <AppNavigate replace to={`/games/${game.id}`} />;
   }
 
   if (!user) {
-    return <Navigate replace to="/login" />;
+    return <AppNavigate replace to="/login" />;
   }
 
   const playlistsHeader = (

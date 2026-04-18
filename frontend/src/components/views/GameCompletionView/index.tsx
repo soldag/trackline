@@ -1,9 +1,9 @@
 import * as _ from "lodash-es";
 import { FormattedMessage } from "react-intl";
-import { Link } from "react-router";
 
 import { Box, Button, Stack } from "@mui/joy";
 
+import AppLink from "@/components/common/AppLink";
 import GameScoringTable from "@/components/common/GameScoringTable";
 import View from "@/components/views/View";
 import { GAME_COMPLETION_TRACK_ID } from "@/constants";
@@ -73,7 +73,7 @@ const GameCompletionView = () => {
           </Stack>
         </Box>
 
-        <Button fullWidth component={Link} to="/">
+        <Button fullWidth component={AppLink} to="/">
           <FormattedMessage
             id="GameCompletionView.mainMenu"
             defaultMessage="Back to main menu"

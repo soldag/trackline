@@ -1,11 +1,13 @@
 import { useEffect, useMemo } from "react";
-import { Navigate, useNavigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 
+import AppNavigate from "@/components/common/AppNavigate";
 import View from "@/components/views/View";
 import { dismissError } from "@/store/errors";
 import { completeAuth, startAuth } from "@/store/spotify";
 import {
   useAppDispatch,
+  useAppNavigate,
   useAppSelector,
   useErrorSelector,
   useLoadingSelector,
@@ -20,7 +22,7 @@ const SpotifyCallbackView = () => {
   const loading = useLoadingSelector(completeAuth);
   const { error } = useErrorSelector(completeAuth);
 
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const [searchParams] = useSearchParams();
   const code = searchParams.get("code");
   const rawState = searchParams.get("state");
@@ -54,11 +56,11 @@ const SpotifyCallbackView = () => {
   };
 
   if (!code) {
-    return <Navigate replace to="/" />;
+    return <AppNavigate replace to="/" />;
   }
 
   if (user) {
-    return <Navigate replace to={state.pathname || "/"} />;
+    return <AppNavigate replace to={state.pathname || "/"} />;
   }
 
   return (

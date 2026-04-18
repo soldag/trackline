@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Link } from "react-router";
 
 import KeyIcon from "@mui/icons-material/Key";
 import PersonIcon from "@mui/icons-material/Person";
 import { Button, Grid, Input } from "@mui/joy";
 
+import AppLink from "@/components/common/AppLink";
 import ErrorAlert from "@/components/common/ErrorAlert";
 import FormController from "@/components/common/FormController";
 import {
@@ -140,7 +140,7 @@ const RegisterForm = ({
             fullWidth
             color="neutral"
             variant="soft"
-            component={Link}
+            component={AppLink}
             to="/login"
             onClick={onDismissError}
           >

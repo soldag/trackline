@@ -10,13 +10,15 @@ import { useIntl } from "react-intl";
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+import { NavigateOptions, To, useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 
 import { useTheme } from "@mui/joy";
 import { Breakpoints } from "@mui/system";
 
 import SpotifyContext from "@/components/contexts/SpotifyContext";
-import { dismissError } from "@/store/errors/actions";
+import { dismissAllErrors, dismissError } from "@/store/errors/actions";
 import { pause, play } from "@/store/spotify";
 import { AppError } from "@/types/errors";
 import { AnyAsyncThunk, AppDispatch, RootState } from "@/types/store";
@@ -24,6 +26,38 @@ import { getErrorMessage } from "@/utils/errors";
 
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();
+
+export const useAppNavigate = () => {
+  const navigate = useNavigate();
+
+  return useCallback(
+    (to: To, options?: NavigateOptions) =>
+      navigate(to, {
+        ...options,
+        state: {
+          ...options?.state,
+          canGoBack: true,
+        },
+      }),
+    [navigate],
+  );
+};
+
+export const useAppNavigateBack = (fallback: string = "/") => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useAppDispatch();
+
+  return useCallback(() => {
+    dispatch(dismissAllErrors());
+
+    if (location.state?.canGoBack) {
+      navigate(-1);
+    } else {
+      navigate(fallback, { replace: true });
+    }
+  }, [dispatch, location, fallback, navigate]);
+};
 
 export const useMountEffect = (effect: React.EffectCallback) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps

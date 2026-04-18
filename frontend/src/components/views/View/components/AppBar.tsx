@@ -1,6 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { Link as RouterLink, useLocation, useNavigate } from "react-router";
 
 import AlbumIcon from "@mui/icons-material/Album";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -8,9 +7,9 @@ import ClearIcon from "@mui/icons-material/Clear";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Box, IconButton, Link, Stack, Typography } from "@mui/joy";
 
+import AppLink from "@/components/common/AppLink";
 import { TURN_GAME_STATES } from "@/constants";
 import { logout } from "@/store/auth";
-import { dismissAllErrors } from "@/store/errors";
 import { abortGame, leaveGame } from "@/store/games";
 import {
   pause,
@@ -19,7 +18,11 @@ import {
   unwatchPlayback,
   watchPlayback,
 } from "@/store/spotify";
-import { useAppDispatch, useAppSelector } from "@/utils/hooks";
+import {
+  useAppDispatch,
+  useAppNavigateBack,
+  useAppSelector,
+} from "@/utils/hooks";
 
 import AbortGameModal from "./AbortGameModal";
 import LeaveGameModal from "./LeaveGameModal";
@@ -46,8 +49,7 @@ const AppBar = ({
   showExitGame = false,
   showLogout = false,
 }: AppBarProps) => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigateBack = useAppNavigateBack("/");
 
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [abortModalOpen, setAbortModalOpen] = useState(false);
@@ -83,16 +85,6 @@ const AppBar = ({
       dispatch(unwatchPlayback());
     };
   }, [dispatch, showPlaybackControls, isSpotifyLoggedIn]);
-
-  const handleBack = () => {
-    dispatch(dismissAllErrors());
-
-    if (location.key === "default") {
-      navigate("/");
-    } else {
-      navigate(-1);
-    }
-  };
 
   const handleExitGame = () => {
     if (isGameMaster) {
@@ -152,11 +144,11 @@ const AppBar = ({
       />
 
       {showBack ? (
-        <IconButton color="primary" onClick={handleBack}>
+        <IconButton color="primary" onClick={navigateBack}>
           <ArrowBackIcon />
         </IconButton>
       ) : (
-        <Link component={RouterLink} to="/">
+        <Link component={AppLink} to="/">
           <AlbumIcon color="primary" sx={{ fontSize: "36px" }} />
         </Link>
       )}

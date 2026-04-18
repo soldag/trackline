@@ -1,5 +1,6 @@
-import { Navigate, Route, Routes } from "react-router";
+import { Route, Routes } from "react-router";
 
+import AppNavigate from "@/components/common/AppNavigate";
 import ProtectedRoute from "@/components/common/ProtectedRoute";
 import GameContainer from "@/components/containers/GameContainer";
 import CreateGameView from "@/components/views/CreateGameView";
@@ -31,8 +32,7 @@ const RoutingContainer = () => (
       </Route>
     </Route>
 
-    <Route path="*" element={<Navigate replace to="/" />} />
+    <Route path="*" element={<AppNavigate replace to="/" />} />
   </Routes>
 );
-
 export default RoutingContainer;
