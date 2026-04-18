@@ -20,7 +20,7 @@ const RoutingContainer = () => (
 
       <Route path="games">
         <Route path="new" element={<CreateGameView />} />
-        <Route path="join/:gameId?" element={<JoinGameView />} />
+        <Route path="join/:joinCode?" element={<JoinGameView />} />
         <Route path=":gameId" element={<GameContainer />} />
       </Route>
 

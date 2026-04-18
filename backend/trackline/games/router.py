@@ -74,6 +74,16 @@ async def get_games(
     return EntityResponse(data=users)
 
 
+@router.post("/join")
+async def join_game(
+    auth_user_id: AuthUserId,
+    use_case: JoinGame,
+    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
+) -> EntityResponse[GameOut]:
+    game = await use_case_executor.execute(use_case, auth_user_id)
+    return EntityResponse(data=game)
+
+
 @router.get("/stats")
 async def get_user_stats(
     auth_user_id: AuthUserId,
@@ -102,16 +112,6 @@ async def get_game_users(
 ) -> EntityResponse[list[UserOut]]:
     users = await use_case_executor.execute(use_case, auth_user_id)
     return EntityResponse(data=users)
-
-
-@router.put("/{game_id}/players", status_code=201)
-async def join_game(
-    auth_user_id: AuthUserId,
-    use_case: Annotated[JoinGame, Depends()],
-    use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
-) -> EmptyResponse:
-    await use_case_executor.execute(use_case, auth_user_id)
-    return EmptyResponse()
 
 
 @router.delete("/{game_id}/players/{user_id}")

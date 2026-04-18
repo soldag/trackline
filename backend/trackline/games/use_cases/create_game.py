@@ -1,3 +1,4 @@
+import random
 from typing import Annotated
 
 from annotated_types import Len
@@ -7,10 +8,12 @@ from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import Fraction, ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
+from trackline.games.constants import JOIN_CODE_CHARACTERS, JOIN_CODE_LENGTH
 from trackline.games.models import (
     ArtistsMatchMode,
     Game,
     GameSettings,
+    GameState,
     Player,
     Playlist,
     TitleMatchMode,
@@ -49,12 +52,14 @@ class Handler(BaseHandler[CreateGame, GameOut]):
         self._spotify_client = spotify_client
 
     async def execute(self, user_id: ResourceId, use_case: CreateGame) -> GameOut:
+        join_code = await self._get_random_join_code()
         playlists = await self._get_playlists(
             use_case.playlist_ids,
             use_case.spotify_market,
         )
 
         game = Game(
+            join_code=join_code,
             settings=GameSettings(
                 playlists=playlists,
                 spotify_market=use_case.spotify_market,
@@ -79,6 +84,25 @@ class Handler(BaseHandler[CreateGame, GameOut]):
         await self._repository.create(game)
 
         return GameOut.from_model(game)
+
+    async def _get_random_join_code(self) -> str:
+        for _ in range(3):
+            join_code = "".join(
+                random.choice(JOIN_CODE_CHARACTERS)  # noqa: S311
+                for _ in range(JOIN_CODE_LENGTH)
+            )
+
+            game = await self._repository.get_one(
+                Game,
+                {
+                    "join_code": join_code,
+                    "state": GameState.WAITING_FOR_PLAYERS,
+                },
+            )
+            if not game:
+                return join_code
+
+        raise RuntimeError("Failed to generate random join code")
 
     async def _get_playlists(
         self,

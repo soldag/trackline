@@ -321,6 +321,7 @@ class GameSettingsOut(BaseModel):
 class GameOut(BaseModel):
     id: ResourceId
     creation_time: datetime
+    join_code: str
     settings: GameSettingsOut
     state: GameState
     turns: list[TurnOut]
@@ -334,6 +335,7 @@ class GameOut(BaseModel):
         return GameOut(
             id=model.id,
             creation_time=model.creation_time,
+            join_code=model.join_code,
             settings=GameSettingsOut.from_model(model.settings),
             state=model.state,
             turns=[TurnOut.from_model(t) for t in model.turns],

@@ -17,7 +17,7 @@ import JoinGameForm, { FormValues } from "./components/JoinGameForm";
 import QrCodeScanner from "./components/QrCodeScanner";
 
 const JoinGameView = () => {
-  const { gameId } = useParams();
+  const { joinCode } = useParams();
   const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
@@ -26,17 +26,17 @@ const JoinGameView = () => {
   const loadingJoinGame = useLoadingSelector(joinGame);
   useErrorToast(joinGame);
 
-  const handleJoin = ({ gameId }: FormValues) => {
-    navigate(`/games/join/${gameId}`, { replace: true });
+  const handleJoin = ({ joinCode }: FormValues) => {
+    navigate(`/games/join/${joinCode}`, { replace: true });
   };
 
   useEffect(() => {
-    if (gameId) {
-      dispatch(joinGame({ gameId }));
+    if (joinCode) {
+      dispatch(joinGame({ joinCode }));
     }
-  }, [dispatch, gameId]);
+  }, [dispatch, joinCode]);
 
-  if (game && game.id === gameId) {
+  if (game && game.joinCode === joinCode) {
     return <Navigate replace to={`/games/${game.id}`} />;
   }
 
@@ -66,7 +66,7 @@ const JoinGameView = () => {
             />
           </Typography>
           <Box sx={{ flex: "1 1 0", overflow: "hidden" }}>
-            {!gameId && (
+            {!joinCode && (
               <QrCodeScanner
                 sx={{ margin: { xs: "0 auto", sm: "0" } }}
                 onResult={handleJoin}

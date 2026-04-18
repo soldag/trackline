@@ -21,11 +21,13 @@ export const MAX_USERNAME_LENGTH = 24;
 export const MIN_PASSWORD_LENGTH = 8;
 export const MAX_PASSWORD_LENGTH = 32;
 
-export const GAME_ID_LENGTH = 24;
-export const GAME_ID_REGEX = /^[a-f\d]{24}$/;
+export const JOIN_CODE_LENGTH = 5;
+const JOIN_CODE_PATTERN = `[A-Z\\d]{${JOIN_CODE_LENGTH}}`;
+export const JOIN_CODE_REGEX = new RegExp(`^${JOIN_CODE_PATTERN}$`);
 export const JOIN_URL_REGEX = new RegExp(
-  `^${document.location.origin}/games/join/([a-f\\d]{24})$`,
+  `^${document.location.origin}/games/join/(${JOIN_CODE_PATTERN})$`,
 );
+export const JOIN_URL_PATTERN = "/games/join/:joinCode";
 
 export const MIN_PLAYER_COUNT = 2;
 

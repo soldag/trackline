@@ -166,6 +166,7 @@ class GameSettings(BaseModel):
 class Game(BaseDocument):
     creation_time: datetime = Field(default_factory=utcnow)
     completion_time: datetime | None = None
+    join_code: str
     settings: GameSettings
     state: GameState = GameState.WAITING_FOR_PLAYERS
     turns: list[Turn] = Field(default_factory=list[Turn])

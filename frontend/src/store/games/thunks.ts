@@ -1,5 +1,4 @@
 import tracklineApi from "@/api/trackline";
-import { TracklineApiError } from "@/api/trackline/errors";
 import { ACTIVE_GAME_STATES } from "@/constants";
 import { createSafeAsyncThunk } from "@/store/utils/thunks";
 import { ArtistMatchMode, TitleMatchMode } from "@/types/games";
@@ -110,25 +109,13 @@ export const abortGame = createSafeAsyncThunk(
 );
 
 interface JoinGamePayload {
-  gameId: string;
+  joinCode: string;
 }
 export const joinGame = createSafeAsyncThunk(
   PREFIX,
   "joinGame",
-  async ({ gameId }: JoinGamePayload) => {
-    try {
-      await tracklineApi.games.join({ gameId });
-    } catch (e) {
-      const hasJoinedAlready =
-        e instanceof TracklineApiError &&
-        e.errorObject?.code === "ALREADY_JOINED";
-
-      if (!hasJoinedAlready) {
-        throw e;
-      }
-    }
-
-    const game = await tracklineApi.games.get({ gameId });
+  async ({ joinCode }: JoinGamePayload) => {
+    const game = await tracklineApi.games.join({ joinCode });
     return { game };
   },
 );

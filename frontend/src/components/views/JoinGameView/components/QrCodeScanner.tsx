@@ -6,7 +6,7 @@ import type { SxProps } from "@mui/joy/styles/types";
 
 import { JOIN_URL_REGEX } from "@/constants";
 
-type OnResultCallback = (args: { gameId: string }) => void;
+type OnResultCallback = (args: { joinCode: string }) => void;
 
 interface QrCodeScannerProps {
   sx?: SxProps;
@@ -15,7 +15,7 @@ interface QrCodeScannerProps {
 
 const QrCodeScanner = ({ sx, onResult = () => {} }: QrCodeScannerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const lastGameId = useRef<string>(null);
+  const lastJoinCode = useRef<string>(null);
   const onResultRef = useRef<OnResultCallback>(null);
   const [videoPlaying, setVideoPlaying] = useState(false);
 
@@ -29,10 +29,10 @@ const QrCodeScanner = ({ sx, onResult = () => {} }: QrCodeScannerProps) => {
     const qrScanner = new QrScanner(
       videoRef.current,
       ({ data }) => {
-        const [, gameId] = data.match(JOIN_URL_REGEX) || [];
-        if (gameId != null && gameId !== lastGameId.current) {
-          onResultRef.current?.({ gameId });
-          lastGameId.current = gameId;
+        const [, joinCode] = data.match(JOIN_URL_REGEX) || [];
+        if (joinCode != null && joinCode !== lastJoinCode.current) {
+          onResultRef.current?.({ joinCode });
+          lastJoinCode.current = joinCode;
         }
       },
       { returnDetailedScanResult: true },

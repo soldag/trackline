@@ -7,11 +7,11 @@ import NumbersIcon from "@mui/icons-material/Numbers";
 import { Button, Grid, IconButton, Input } from "@mui/joy";
 
 import FormController from "@/components/common/FormController";
-import { GAME_ID_LENGTH, GAME_ID_REGEX } from "@/constants";
+import { JOIN_CODE_LENGTH, JOIN_CODE_REGEX } from "@/constants";
 import { buildRules } from "@/utils/forms";
 
 export interface FormValues {
-  gameId: string;
+  joinCode: string;
 }
 
 interface JoinGameFormProps {
@@ -28,11 +28,11 @@ const JoinGameForm = ({ loading = false, onSubmit }: JoinGameFormProps) => {
   } = useForm<FormValues>({
     mode: "onTouched",
     defaultValues: {
-      gameId: "",
+      joinCode: "",
     },
   });
 
-  const [gameId, setGameId] = useState("");
+  const [joinCode, setJoinCode] = useState("");
 
   return (
     <form onSubmit={onSubmit ? handleSubmit(onSubmit) : undefined}>
@@ -44,28 +44,28 @@ const JoinGameForm = ({ loading = false, onSubmit }: JoinGameFormProps) => {
           >
             {([label]) => (
               <FormController
-                name="gameId"
+                name="joinCode"
                 label={label as string}
                 control={control}
                 rules={buildRules(intl, {
                   required: true,
-                  pattern: GAME_ID_REGEX,
+                  pattern: JOIN_CODE_REGEX,
                 })}
                 render={({ field }) => (
                   <Input
                     {...field}
                     placeholder={label as string}
-                    error={!!errors.gameId}
+                    error={!!errors.joinCode}
                     slotProps={{
                       input: {
-                        autoCapitalize: "none",
-                        maxLength: GAME_ID_LENGTH,
+                        autoCapitalize: "on",
+                        maxLength: JOIN_CODE_LENGTH,
                       },
                     }}
                     startDecorator={<NumbersIcon />}
                     endDecorator={
-                      gameId.length > 0 && (
-                        <IconButton onClick={() => setGameId("")}>
+                      joinCode.length > 0 && (
+                        <IconButton onClick={() => setJoinCode("")}>
                           <ClearIcon />
                         </IconButton>
                       )

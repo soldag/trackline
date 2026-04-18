@@ -139,6 +139,7 @@ export interface GameSettings {
 export interface Game {
   id: string;
   creationTime: string;
+  joinCode: string;
   settings: GameSettings;
   state: GameState;
   turns: Turn[];

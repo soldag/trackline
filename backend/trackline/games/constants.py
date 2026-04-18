@@ -1,3 +1,8 @@
+import string
+
+JOIN_CODE_LENGTH = 5
+JOIN_CODE_CHARACTERS = string.ascii_uppercase + string.digits
+
 MIN_PLAYER_COUNT = 2
 
 TOKEN_COST_BUY_TRACK = 3

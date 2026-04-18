@@ -1,63 +1,74 @@
-import { useMemo } from "react";
+import { FormattedMessage } from "react-intl";
 
-import PersonIcon from "@mui/icons-material/Person";
-import StarsIcon from "@mui/icons-material/Stars";
-import { List, ListItem, ListItemContent, ListItemDecorator } from "@mui/joy";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import {
+  Box,
+  Chip,
+  List,
+  ListDivider,
+  ListItem,
+  ListItemContent,
+  Typography,
+} from "@mui/joy";
 
+import StyledAvatar from "@/components/common/StyledAvatar";
 import { User } from "@/types/users";
-
-const getUsernameComparator =
-  (gameMasterId?: string, currentUserId?: string) => (u1: User, u2: User) => {
-    const specialUserIds = [gameMasterId, currentUserId];
-    if (specialUserIds.includes(u1.id)) {
-      return -1 * specialUserIds.indexOf(u1.id);
-    }
-    if (specialUserIds.includes(u2.id)) {
-      return specialUserIds.indexOf(u2.id);
-    }
-
-    return u1.username.localeCompare(u2.username);
-  };
 
 interface PlayersList {
   users?: User[];
   gameMasterId?: string;
-  currentUserId?: string;
 }
 
-const PlayersList = ({
-  users = [],
-  gameMasterId,
-  currentUserId,
-}: PlayersList) => {
-  const usernameComparator = useMemo(
-    () => getUsernameComparator(gameMasterId, currentUserId),
-    [gameMasterId, currentUserId],
-  );
-  const sortedUsers = useMemo(
-    () => users.slice().sort(usernameComparator),
-    [users, usernameComparator],
-  );
-
-  return (
-    <List>
-      {sortedUsers.map((user) => (
-        <ListItem
-          key={user.id}
-          variant={user.id === currentUserId ? "soft" : "plain"}
-          color={user.id === currentUserId ? "success" : undefined}
-        >
-          <ListItemDecorator>
-            <PersonIcon
-              color={user.id === currentUserId ? "success" : undefined}
+const PlayersList = ({ users = [], gameMasterId }: PlayersList) => (
+  <List variant="outlined" sx={{ p: 0, borderRadius: "sm" }}>
+    {users.map((user, i) => (
+      <Box key={user.id}>
+        {i > 0 && <ListDivider sx={{ m: 0 }} />}
+        <ListItem sx={{ borderRadius: "sm", py: 1.5 }}>
+          <ListItemContent
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              overflow: "hidden",
+            }}
+          >
+            <StyledAvatar
+              name={user.username}
+              variant="beam"
+              size={36}
+              style={{ flexShrink: 0 }}
             />
-          </ListItemDecorator>
-          <ListItemContent>{user.username}</ListItemContent>
-          {user.id == gameMasterId && <StarsIcon />}
+
+            <Typography
+              sx={{
+                flexShrink: 1,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {user.username}
+            </Typography>
+
+            {user.id === gameMasterId && (
+              <Chip
+                size="sm"
+                color="primary"
+                variant="solid"
+                startDecorator={<WorkspacePremiumIcon />}
+                sx={{ flexShrink: 0 }}
+              >
+                <FormattedMessage
+                  id="GameLobbyView.PlayersList.gameMaster"
+                  defaultMessage="Game master"
+                />
+              </Chip>
+            )}
+          </ListItemContent>
         </ListItem>
-      ))}
-    </List>
-  );
-};
+      </Box>
+    ))}
+  </List>
+);
 
 export default PlayersList;

@@ -6,7 +6,6 @@ import {
   CreditsGuess,
   Game,
   GameState,
-  Player,
   ReleaseYearGuess,
   TitleMatchMode,
   Track,
@@ -92,11 +91,15 @@ export const getUsers = async ({
   return users;
 };
 
-export const join = async ({ gameId }: { gameId: string }): Promise<Player> => {
+export const join = async ({
+  joinCode,
+}: {
+  joinCode: string;
+}): Promise<Game> => {
   const {
-    data: { data: player },
-  } = await instance.put<EntityResponse<Player>>(`games/${gameId}/players`);
-  return player;
+    data: { data: game },
+  } = await instance.post<EntityResponse<Game>>("games/join", { joinCode });
+  return game;
 };
 
 export const leave = async ({

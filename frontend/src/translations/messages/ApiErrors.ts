@@ -22,10 +22,6 @@ export default defineMessages<string, MessageDescriptor | undefined>({
 
   // Games
 
-  ALREADY_JOINED: {
-    id: "ApiErrors.alreadyJoined",
-    defaultMessage: "You have joined this game already.",
-  },
   GAME_MASTER_CANNOT_LEAVE: {
     id: "ApiErrors.gameMasterCannotLeave",
     defaultMessage: "The game master cannot leave the game.",
@@ -49,6 +45,10 @@ export default defineMessages<string, MessageDescriptor | undefined>({
   INVALID_POSITION: {
     id: "ApiErrors.invalidPosition",
     defaultMessage: "This position exceeds the boundaries of the timeline.",
+  },
+  INVALID_JOIN_CODE: {
+    id: "ApiErrors.invalidJoinCode",
+    defaultMessage: "This game either doesn't exist or has already started.",
   },
   NO_ACTIVE_PLAYER: {
     id: "ApiErrors.noActivePlayer",
