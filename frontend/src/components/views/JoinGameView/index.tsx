@@ -1,42 +1,53 @@
-import { useEffect } from "react";
+import { useCallback, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { useParams } from "react-router";
 
-import { Box, Stack, Typography } from "@mui/joy";
+import { Divider, Stack } from "@mui/joy";
 
 import AppNavigate from "@/components/common/AppNavigate";
 import View from "@/components/views/View";
+import { dismissError } from "@/store/errors";
 import { joinGame } from "@/store/games";
 import {
   useAppDispatch,
-  useAppNavigate,
   useAppSelector,
-  useErrorToast,
+  useBreakpoint,
+  useErrorSelector,
   useLoadingSelector,
 } from "@/utils/hooks";
 
-import JoinGameForm, { FormValues } from "./components/JoinGameForm";
-import QrCodeScanner from "./components/QrCodeScanner";
+import ManualInputSection from "./components/ManualInputSection";
+import ScanSection from "./components/ScanSection";
+
+enum JoinMode {
+  Code = "code",
+  QR = "qr",
+}
 
 const JoinGameView = () => {
-  const { joinCode } = useParams();
-  const navigate = useAppNavigate();
-
   const dispatch = useAppDispatch();
   const game = useAppSelector((state) => state.games.game);
+  const loading = useLoadingSelector(joinGame);
+  const { error } = useErrorSelector(joinGame);
 
-  const loadingJoinGame = useLoadingSelector(joinGame);
-  useErrorToast(joinGame);
+  const [joinCode, setJoinCode] = useState("");
+  const [joinMode, setJoinMode] = useState<JoinMode>();
 
-  const handleJoin = ({ joinCode }: FormValues) => {
-    navigate(`/games/join/${joinCode}`, { replace: true });
-  };
+  const isScreenXs = useBreakpoint((breakpoints) => breakpoints.only("xs"));
 
-  useEffect(() => {
-    if (joinCode) {
+  const handleJoin = useCallback(
+    (joinMode: JoinMode, joinCode: string) => {
+      setJoinCode(joinCode);
+      setJoinMode(joinMode);
       dispatch(joinGame({ joinCode }));
-    }
-  }, [dispatch, joinCode]);
+    },
+    [dispatch],
+  );
+
+  const handleDismissError = () => {
+    setJoinCode("");
+    setJoinMode(undefined);
+    dispatch(dismissError({ typePrefix: joinGame.typePrefix }));
+  };
 
   if (game && game.joinCode === joinCode) {
     return <AppNavigate replace to={`/games/${game.id}`} />;
@@ -57,35 +68,29 @@ const JoinGameView = () => {
     >
       <Stack
         direction={{ xs: "column", sm: "row" }}
-        alignItems="stretch"
-        spacing={2}
+        justifyContent="space-between"
+        spacing={4}
+        sx={{ flexGrow: { xs: 1, sm: 0 }, overflow: "hidden" }}
       >
-        <Stack direction="column" spacing={1} sx={{ flex: "1 1 0" }}>
-          <Typography level="title-md">
-            <FormattedMessage
-              id="JoinGameView.scanQrCode.header"
-              defaultMessage="Scan QR code"
-            />
-          </Typography>
-          <Box sx={{ flex: "1 1 0", overflow: "hidden" }}>
-            {!joinCode && (
-              <QrCodeScanner
-                sx={{ margin: { xs: "0 auto", sm: "0" } }}
-                onResult={handleJoin}
-              />
-            )}
-          </Box>
-        </Stack>
+        <ScanSection
+          loading={joinMode === JoinMode.QR && loading}
+          error={joinMode === JoinMode.QR ? error : undefined}
+          onResult={(joinCode) => handleJoin(JoinMode.QR, joinCode)}
+          onDismissError={handleDismissError}
+        />
 
-        <Stack direction="column" spacing={1}>
-          <Typography level="title-md">
-            <FormattedMessage
-              id="JoinGameView.enterGameId.header"
-              defaultMessage="Enter game ID manually"
-            />
-          </Typography>
-          <JoinGameForm loading={loadingJoinGame} onSubmit={handleJoin} />
-        </Stack>
+        <Divider
+          orientation={isScreenXs ? "horizontal" : "vertical"}
+          sx={{ textTransform: "uppercase" }}
+        >
+          <FormattedMessage id="JoinGameView.divider" defaultMessage="or" />
+        </Divider>
+
+        <ManualInputSection
+          loading={joinMode === JoinMode.Code && loading}
+          error={joinMode === JoinMode.Code ? error : undefined}
+          onSubmit={(joinCode) => handleJoin(JoinMode.Code, joinCode)}
+        />
       </Stack>
     </View>
   );

@@ -5,6 +5,7 @@ import ProtectedRoute from "@/components/common/ProtectedRoute";
 import GameContainer from "@/components/containers/GameContainer";
 import CreateGameView from "@/components/views/CreateGameView";
 import HomeView from "@/components/views/HomeView";
+import JoinGameLinkView from "@/components/views/JoinGameLinkView";
 import JoinGameView from "@/components/views/JoinGameView";
 import LoginView from "@/components/views/LoginView";
 import RegisterView from "@/components/views/RegisterView";
@@ -21,7 +22,8 @@ const RoutingContainer = () => (
 
       <Route path="games">
         <Route path="new" element={<CreateGameView />} />
-        <Route path="join/:joinCode?" element={<JoinGameView />} />
+        <Route path="join" element={<JoinGameView />} />
+        <Route path="join/:joinCode?" element={<JoinGameLinkView />} />
         <Route path=":gameId" element={<GameContainer />} />
       </Route>
 

@@ -5,8 +5,9 @@ import {
   FieldValues,
 } from "react-hook-form";
 
-import ReportIcon from "@mui/icons-material/Report";
 import { FormControl, FormHelperText, FormLabel } from "@mui/joy";
+
+import FormError from "@/components/common/FormError";
 
 interface FormControllerProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -31,8 +32,7 @@ const FormController = <
         {render({ field, fieldState, formState })}
         {fieldState.error && (
           <FormHelperText>
-            <ReportIcon sx={{ mr: 1 }} />
-            {fieldState.error.message}
+            <FormError>{fieldState.error.message}</FormError>
           </FormHelperText>
         )}
       </FormControl>
