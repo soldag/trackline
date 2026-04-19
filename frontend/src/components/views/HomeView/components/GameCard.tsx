@@ -31,7 +31,7 @@ const GameCard = ({ game }: GameCardProps) => {
     <ActionCard
       variant="soft"
       color="primary"
-      title={game.id}
+      title={game.joinCode}
       description={
         <Stack
           direction={{ xs: "column", sm: "row" }}
