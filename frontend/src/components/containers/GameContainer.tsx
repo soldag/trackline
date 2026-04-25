@@ -79,7 +79,7 @@ const GameContainer = () => {
   }
 
   if (!game || game.id !== gameId) {
-    return <LoadingView />;
+    return <LoadingView appBar />;
   }
 
   const View = GAME_STATE_VIEWS[game.state];

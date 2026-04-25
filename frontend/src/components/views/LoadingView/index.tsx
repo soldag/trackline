@@ -1,5 +1,11 @@
 import View from "@/components/views/View";
 
-const LoadingView = () => <View appBar={{ showTitle: true }} loading />;
+interface LoadingViewProps {
+  appBar?: boolean;
+}
+
+const LoadingView = ({ appBar }: LoadingViewProps) => (
+  <View loading appBar={appBar ? { showTitle: true } : undefined} />
+);
 
 export default LoadingView;
