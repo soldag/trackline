@@ -70,7 +70,7 @@ const JoinGameView = () => {
         direction={{ xs: "column", sm: "row" }}
         justifyContent="space-between"
         spacing={4}
-        sx={{ flexGrow: { xs: 1, sm: 0 }, overflow: "hidden" }}
+        sx={{ flexGrow: { xs: 1, sm: 0 }, flexShrink: 0, overflow: "hidden" }}
       >
         <ScanSection
           loading={joinMode === JoinMode.QR && loading}

@@ -67,7 +67,11 @@ const GameLobbyView = () => {
         spacing={4}
         sx={{ overflow: "hidden" }}
       >
-        <Stack direction="column" spacing={2} sx={{ flex: { sm: "1 1 0" } }}>
+        <Stack
+          direction="column"
+          spacing={2}
+          sx={{ flex: { sm: "1 1 0" }, overflowY: "auto" }}
+        >
           <Stack spacing={1}>
             <Typography
               level="title-md"
