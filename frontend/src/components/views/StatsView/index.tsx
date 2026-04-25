@@ -25,7 +25,7 @@ import OverviewCard from "./components/OverviewCard";
 
 const getWinRate = (stats: UserStats) => {
   const { wonGames, totalGames } = stats;
-  return totalGames > 0 ? wonGames / totalGames : 0;
+  return totalGames > 0 ? wonGames / totalGames : null;
 };
 
 const getTimeToGuess = (stats: UserStats) => {
@@ -36,6 +36,10 @@ const getTimeToGuess = (stats: UserStats) => {
     .filter((x) => x != null)
     .map((x) => Duration.fromISO(x))
     .filter((x) => x.isValid);
+
+  if (parsedValues.length === 0) {
+    return null;
+  }
 
   const totalMillis = parsedValues.reduce(
     (acc, curr) => acc + curr.toMillis(),
@@ -51,6 +55,10 @@ const getAccuracy = (stats: UserStats) => {
     stats.guessStats.credits.meanAccuracy,
     stats.guessStats.releaseYear.positionMeanAccuracy,
   ].filter((x) => x != null);
+
+  if (values.length === 0) {
+    return null;
+  }
 
   const total = values.reduce((acc, curr) => acc + curr, 0);
   return total / values.length;

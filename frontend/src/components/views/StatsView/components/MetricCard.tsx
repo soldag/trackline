@@ -23,7 +23,7 @@ const MetricCard = ({ icon, label, value }: MetricCardProps) => (
           {label}
         </Typography>
         <Typography fontSize="xl" fontWeight="lg">
-          {value}
+          {value ?? "–"}
         </Typography>
       </CardContent>
     </CardContent>
