@@ -51,11 +51,28 @@ const JoinCodeInput = ({
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) =>
     e.target.select();
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.ctrlKey || e.metaKey || e.key === "Tab") {
+  const handleChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const inputValue = e.target.value.toUpperCase();
+
+    const fullRegex = new RegExp(
+      `^${JOIN_CODE_CHAR_REGEX.source}{${inputValue.length}}$`,
+    );
+    if (!fullRegex.test(inputValue)) {
       return;
     }
 
+    const newValue = values
+      .map((char, i) => (i < index ? char : (inputValue[i - index] ?? char)))
+      .join("");
+    onChange?.(newValue);
+
+    focusInput(Math.min(JOIN_CODE_LENGTH - 1, index + inputValue.length));
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
     if (e.key === "Backspace" || e.key === "Delete") {
       if (values[index]) {
         setCharAt(index, "");
@@ -75,37 +92,11 @@ const JoinCodeInput = ({
       if (value?.length === JOIN_CODE_LENGTH) {
         onSubmit?.();
       }
-    } else if (e.key.length === 1) {
-      const char = e.key.toUpperCase();
-      if (JOIN_CODE_CHAR_REGEX.test(char)) {
-        setCharAt(index, char);
-      }
-    }
-
-    e.preventDefault();
-  };
-
-  const handlePaste = (index: number, e: React.ClipboardEvent) => {
-    e.preventDefault();
-
-    const data = e.clipboardData
-      .getData("text/plain")
-      .slice(0, JOIN_CODE_LENGTH - index)
-      .toUpperCase();
-
-    const fullRegex = new RegExp(
-      `^${JOIN_CODE_CHAR_REGEX.source}{${data.length}$`,
-    );
-    if (!fullRegex.test(data)) {
+    } else {
       return;
     }
 
-    const newValue = values
-      .map((char, i) => (i < index ? char : (data[i - index] ?? char)))
-      .join("");
-    onChange?.(newValue);
-
-    focusInput(Math.min(JOIN_CODE_LENGTH - 1, index + data.length));
+    e.preventDefault();
   };
 
   return (
@@ -117,8 +108,8 @@ const JoinCodeInput = ({
           error={error}
           value={value?.[i] ?? ""}
           onFocus={handleFocus}
+          onChange={(e) => handleChange(i, e)}
           onKeyDown={(e) => handleKeyDown(i, e)}
-          onPaste={(e) => handlePaste(i, e)}
           slotProps={{
             input: {
               ref: (el) => {
