@@ -8,6 +8,7 @@ import AppNavigate from "@/components/common/AppNavigate";
 import View from "@/components/views/View";
 import { LOBBY_TRACK_ID, MIN_PLAYER_COUNT } from "@/constants";
 import { abortGame, leaveGame, startGame } from "@/store/games";
+import { getCurrentPlayers } from "@/utils/games";
 import {
   useAppDispatch,
   useAppSelector,
@@ -32,12 +33,12 @@ const GameLobbyView = () => {
 
   const gameId = game?.id;
   const userId = user?.id;
+  const currentPlayers = game ? getCurrentPlayers(game) : [];
   const gameMasterId = game?.players.find((p) => p.isGameMaster)?.userId;
   const isGameMaster = user?.id === gameMasterId;
-  const sortedUsers =
-    game?.players
-      .map((p) => users.find((u) => u.id === p.userId))
-      .filter((u) => !!u) ?? [];
+  const sortedUsers = currentPlayers
+    .map((p) => users.find((u) => u.id === p.userId))
+    .filter((u) => !!u);
 
   useSpotifyPlayback({
     isEnabled: isGameMaster,
@@ -114,7 +115,7 @@ const GameLobbyView = () => {
               />
             </Typography>
             <Typography level="body-sm">
-              {game.players.length < MIN_PLAYER_COUNT ? (
+              {currentPlayers.length < MIN_PLAYER_COUNT ? (
                 <FormattedMessage
                   id="GameLobbyView.joinedPlayers.waitingForPlayers"
                   defaultMessage="You need at least two players to start."
@@ -137,7 +138,7 @@ const GameLobbyView = () => {
               <Button
                 loading={loadingStartGame}
                 disabled={
-                  loadingStartGame || game.players.length < MIN_PLAYER_COUNT
+                  loadingStartGame || currentPlayers.length < MIN_PLAYER_COUNT
                 }
                 onClick={() => dispatch(startGame({ gameId }))}
               >

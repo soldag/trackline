@@ -57,7 +57,7 @@ class Handler(TrackProvidingBaseHandler[ExchangeTrack, TrackExchangeOut]):
             token_delta[guess_user_id] += release_year_guess.token_cost
         for guess_user_id, credits_guess in turn.guesses.credits.items():
             token_delta[guess_user_id] += credits_guess.token_cost
-        for player in game.players:
+        for player in game.current_players:
             player.tokens += token_delta.get(player.user_id, 0)
 
         new_track = await self._get_new_track(game)

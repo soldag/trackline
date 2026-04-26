@@ -71,8 +71,8 @@ class Handler(BaseHandler[VoteCorrection, CorrectionProposalVoteResultOut]):
         proposal.votes[user_id] = vote
 
         all_votes = proposal.votes.values()
-        accepted_share = sum(v.agree for v in all_votes) / len(game.players)
-        rejected_share = sum(not v.agree for v in all_votes) / len(game.players)
+        accepted_share = sum(v.agree for v in all_votes) / len(game.current_players)
+        rejected_share = sum(not v.agree for v in all_votes) / len(game.current_players)
         if accepted_share > MIN_VOTES:
             proposal.state = CorrectionProposalState.ACCEPTED
         elif rejected_share >= 1 - MIN_VOTES:

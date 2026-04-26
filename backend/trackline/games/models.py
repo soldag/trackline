@@ -51,6 +51,7 @@ class TimelineTrack(Track):
 class Player(BaseModel):
     user_id: ResourceId
     is_game_master: bool = False
+    has_left: bool = False
     tokens: int = 0
     timeline: list[TimelineTrack] = Field(default_factory=list[TimelineTrack])
 
@@ -180,7 +181,7 @@ class Game(BaseDocument):
 
     @property
     def is_round_complete(self) -> bool:
-        current_user_ids = {p.user_id for p in self.players}
+        current_user_ids = {p.user_id for p in self.current_players}
         played_user_ids = {
             t.active_user_id for t in self.turns if t.round_number == self.round_number
         }
@@ -188,16 +189,20 @@ class Game(BaseDocument):
 
     @property
     def end_condition_met(self) -> bool:
-        if not self.players:
+        if not self.current_players:
             return False
 
-        timeline_lengths = [len(p.timeline) for p in self.players]
+        timeline_lengths = [len(p.timeline) for p in self.current_players]
         has_single_winner = (
             max(timeline_lengths) >= self.settings.timeline_length
             and timeline_lengths.count(max(timeline_lengths)) == 1
         )
 
         return self.is_round_complete and has_single_winner
+
+    @property
+    def current_players(self) -> list[Player]:
+        return [p for p in self.players if not p.has_left]
 
     def get_player(self, user_id: ResourceId) -> Player:
         try:
@@ -213,13 +218,14 @@ class Game(BaseDocument):
         return self.get_player(active_user_id)
 
     def get_next_player(self) -> Player:
-        if not self.players:
-            raise ValueError("This game has no players")
-
         active_player = self.get_active_player()
-        active_user_index = self.players.index(active_player) if active_player else -1
+        start_index = self.players.index(active_player) if active_player else -1
+        for offset in range(1, len(self.players) + 1):
+            candidate = self.players[(start_index + offset) % len(self.players)]
+            if not candidate.has_left:
+                return candidate
 
-        return self.players[(active_user_index + 1) % len(self.players)]
+        raise ValueError("This game has no players")
 
     def complete(self, state: GameState) -> None:
         self.state = state

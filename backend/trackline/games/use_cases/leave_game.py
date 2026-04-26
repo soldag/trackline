@@ -42,13 +42,17 @@ class Handler(TrackProvidingBaseHandler[LeaveGame]):
 
         if (
             game.state != GameState.WAITING_FOR_PLAYERS
-            and len(game.players) <= MIN_PLAYER_COUNT
+            and len(game.current_players) <= MIN_PLAYER_COUNT
         ):
             game.complete(GameState.ABORTED)
             await self._notifier.notify(user_id, game, GameAborted())
             return
 
-        game.players = [p for p in game.players if p.user_id != user_id]
+        if game.state == GameState.WAITING_FOR_PLAYERS:
+            game.players = [p for p in game.players if p.user_id != user_id]
+        else:
+            player = game.get_player(user_id)
+            player.has_left = True
 
         # If the user leaving is active user in an incomplete turn, it
         # will be replaced with a new one with next playing being active

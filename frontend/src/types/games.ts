@@ -41,6 +41,7 @@ export interface Track {
 export interface Player {
   userId: string;
   isGameMaster: boolean;
+  hasLeft: boolean;
   tokens: number;
   timeline: Track[];
 }

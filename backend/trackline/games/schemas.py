@@ -52,6 +52,7 @@ class TrackOut(BaseModel):
 class PlayerOut(BaseModel):
     user_id: ResourceId
     is_game_master: bool
+    has_left: bool
     tokens: int
     timeline: list[TrackOut]
 
@@ -60,6 +61,7 @@ class PlayerOut(BaseModel):
         return PlayerOut(
             user_id=model.user_id,
             is_game_master=model.is_game_master,
+            has_left=model.has_left,
             tokens=model.tokens,
             timeline=[TrackOut.from_model(t) for t in model.timeline],
         )

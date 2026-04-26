@@ -183,10 +183,17 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(playerLeft, (state, { payload: { userId, newTurn } }) => {
       invariant(state.game);
 
-      state.game.players = state.game.players.filter(
-        (p) => p.userId !== userId,
-      );
-      state.users = state.users.filter((u) => u.id !== userId);
+      if (state.game.state === GameState.WaitingForPlayers) {
+        state.game.players = state.game.players.filter(
+          (p) => p.userId !== userId,
+        );
+        state.users = state.users.filter((u) => u.id !== userId);
+      } else {
+        const player = state.game.players.find((p) => p.userId === userId);
+        if (player) {
+          player.hasLeft = true;
+        }
+      }
 
       if (newTurn) {
         state.game.turns.splice(-1, 1, newTurn);

@@ -32,7 +32,7 @@ class Handler(TrackProvidingBaseHandler[StartGame, GameOut]):
         self._assert_is_game_master(game, user_id)
         self._assert_has_state(game, GameState.WAITING_FOR_PLAYERS)
 
-        if len(game.players) < MIN_PLAYER_COUNT:
+        if len(game.current_players) < MIN_PLAYER_COUNT:
             raise UseCaseError(
                 "INSUFFICIENT_PLAYER_COUNT",
                 f"At least {MIN_PLAYER_COUNT} players are needed to start the game",
@@ -40,17 +40,17 @@ class Handler(TrackProvidingBaseHandler[StartGame, GameOut]):
 
         tracks = await self._track_provider.get_random_tracks(
             game.settings.playlists,
-            count=len(game.players),
+            count=len(game.current_players),
             market=game.settings.spotify_market,
         )
-        for player, track in zip(game.players, tracks, strict=False):
+        for player, track in zip(game.current_players, tracks, strict=False):
             player.add_to_timeline(track)
 
         game.state = GameState.STARTED
 
         player_tracks_out = {
             player.user_id: TrackOut.from_model(player.timeline[0])
-            for player in game.players
+            for player in game.current_players
         }
         await self._notifier.notify(
             user_id,

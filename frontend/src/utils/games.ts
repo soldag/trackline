@@ -10,6 +10,9 @@ import {
 export const getRoundNumber = (game: Game) =>
   game.turns.at(-1)?.roundNumber ?? 1;
 
+export const getCurrentPlayers = (game: Game) =>
+  game.players.filter((p) => !p.hasLeft);
+
 export const getTrackPosition = (timeline: Track[], track: Track) => {
   const position = timeline.findIndex((t) => t.releaseYear > track.releaseYear);
   return position < 0 ? timeline.length : position;
@@ -71,13 +74,14 @@ export const checkEndCondition = (
     return { isGameEnding: false };
   }
 
+  const currentPlayers = getCurrentPlayers(game);
   const activeUserId = game.turns[game.turns.length - 1].activeUserId;
   const roundComplete =
-    game.players[game.players.length - 1].userId === activeUserId;
+    currentPlayers[currentPlayers.length - 1].userId === activeUserId;
 
-  const timelineLengths = game.players.map((p) => p.timeline.length);
+  const timelineLengths = currentPlayers.map((p) => p.timeline.length);
   const maxTimelineLength = Math.max(...timelineLengths);
-  const leadingPlayers = game.players.filter(
+  const leadingPlayers = currentPlayers.filter(
     (p) => p.timeline.length === maxTimelineLength,
   );
   const isGameEnding =
@@ -93,7 +97,7 @@ export const checkEndCondition = (
 
 export const checkCatchUp = (game: Game, player: Player): boolean => {
   const maxTimelineLength = Math.max(
-    ...game.players.map((p) => p.timeline.length),
+    ...getCurrentPlayers(game).map((p) => p.timeline.length),
   );
   if (player.timeline.length === maxTimelineLength) {
     return false;

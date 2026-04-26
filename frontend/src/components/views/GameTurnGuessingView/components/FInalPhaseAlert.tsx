@@ -4,13 +4,14 @@ import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import { Box, Typography } from "@mui/joy";
 
 import { Game } from "@/types/games";
+import { getCurrentPlayers } from "@/utils/games";
 
 interface FinalPhaseAlertProps {
   game: Game;
 }
 
 const FinalPhaseAlert = ({ game }: FinalPhaseAlertProps) => {
-  const isFinalPhase = game.players.some(
+  const isFinalPhase = getCurrentPlayers(game).some(
     (p) => p.timeline.length >= game.settings.timelineLength,
   );
 

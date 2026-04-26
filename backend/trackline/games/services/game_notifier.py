@@ -38,7 +38,9 @@ class GameNotifier:
         if not game.id:
             raise ValueError("The game must have an id")
 
-        recipient_ids = [p.user_id for p in game.players if p.user_id != user_id]
+        recipient_ids = [
+            p.user_id for p in game.current_players if p.user_id != user_id
+        ]
         if not recipient_ids:
             return
 

@@ -41,7 +41,7 @@ class CompleteTurnHandler(BaseHandler[CompleteTurn, TurnCompletionOut]):
                 status_code=400,
             )
 
-        user_ids = {p.user_id for p in game.players}
+        user_ids = {p.user_id for p in game.current_players}
         completed_by = {*turn.completed_by, user_id}
         turn_completed = user_ids == completed_by
 

@@ -22,6 +22,7 @@ import {
   Game,
 } from "@/types/games";
 import { User } from "@/types/users";
+import { getCurrentPlayers } from "@/utils/games";
 import { getPossessiveForm } from "@/utils/i18n";
 
 interface CorrectionProposalVotingModalProps {
@@ -52,7 +53,7 @@ const CorrectionProposalVotingModal = ({
   const votes = proposal?.votes ?? [];
   const hasVoted = votes.some((v) => v.userId === userId);
 
-  const numberOfPlayers = game?.players?.length ?? 0;
+  const numberOfPlayers = game ? getCurrentPlayers(game).length : 0;
   const numberOfAgreeVotes = votes.filter((v) => v.agree).length;
   const numberOfDisagreeVotes = votes.filter((v) => !v.agree).length;
 

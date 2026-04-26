@@ -23,7 +23,7 @@ class BaseHandler(AuthenticatedUseCaseHandler[TUseCase, TResult]):
         self._repository = repository
 
     def _assert_is_player(self, game: Game, user_id: ResourceId) -> None:
-        player_ids = [p.user_id for p in game.players]
+        player_ids = [p.user_id for p in game.current_players]
         if not user_id or user_id not in player_ids:
             raise UseCaseError(
                 code="GAME_NOT_FOUND",

@@ -73,7 +73,7 @@ class Handler(TrackProvidingBaseHandler[BuyTrack, TrackPurchaseReceiptOut]):
 
     def _handle_equalizer(self, game: Game) -> None:
         turn = game.turns[-1]
-        max_timeline_length = max(len(p.timeline) for p in game.players)
+        max_timeline_length = max(len(p.timeline) for p in game.current_players)
 
         affected_user_ids: set[ResourceId] = set()
         for user_id in turn.completed_by:

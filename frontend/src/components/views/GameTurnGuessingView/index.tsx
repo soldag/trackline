@@ -16,7 +16,7 @@ import {
   scoreTurn,
 } from "@/store/games";
 import { Game, Turn } from "@/types/games.ts";
-import { getTrackPositionFromGuess } from "@/utils/games.ts";
+import { getCurrentPlayers, getTrackPositionFromGuess } from "@/utils/games.ts";
 import {
   useAppDispatch,
   useAppSelector,
@@ -211,7 +211,7 @@ const GameTurnGuessingView = () => {
   useEffect(() => {
     if (!isActivePlayer || scoringTriggered) return;
 
-    const haveAllPlayersPassed = game.players.every(({ userId }) =>
+    const haveAllPlayersPassed = getCurrentPlayers(game).every(({ userId }) =>
       passes.some((p) => p.userId === userId),
     );
     if (haveAllPlayersPassed) {
