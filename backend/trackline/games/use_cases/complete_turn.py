@@ -4,7 +4,6 @@ from trackline.core.db.repository import Repository
 from trackline.core.exceptions import UseCaseError
 from trackline.core.fields import ResourceId
 from trackline.core.use_cases import AuthenticatedUseCase
-from trackline.games.models import Game
 from trackline.games.schemas import GameState, TurnCompleted, TurnCompletionOut
 from trackline.games.services.game_notifier import GameNotifier
 from trackline.games.use_cases.base import BaseHandler
@@ -46,7 +45,7 @@ class CompleteTurnHandler(BaseHandler[CompleteTurn, TurnCompletionOut]):
         completed_by = {*turn.completed_by, user_id}
         turn_completed = user_ids == completed_by
 
-        game_completed = turn_completed and self._check_end_condition(game)
+        game_completed = turn_completed and game.end_condition_met
         if game_completed:
             game.complete(GameState.COMPLETED)
 
@@ -61,18 +60,3 @@ class CompleteTurnHandler(BaseHandler[CompleteTurn, TurnCompletionOut]):
         )
 
         return completion_out
-
-    def _check_end_condition(self, game: Game) -> bool:
-        if not game.turns:
-            return False
-
-        active_user_id = game.turns[-1].active_user_id
-        round_complete = game.players[-1].user_id == active_user_id
-
-        timeline_lengths = [len(p.timeline) for p in game.players]
-        has_single_winner = (
-            max(timeline_lengths) >= game.settings.timeline_length
-            and timeline_lengths.count(max(timeline_lengths)) == 1
-        )
-
-        return round_complete and has_single_winner

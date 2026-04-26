@@ -110,6 +110,7 @@ export interface TurnScoring {
 export interface Turn {
   revisionId: string;
   creationTime: string;
+  roundNumber: number;
   activeUserId: string;
   track: Track;
   catchUpTokenGain: { [userId: string]: number };

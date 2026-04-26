@@ -37,15 +37,19 @@ class Handler(TrackProvidingBaseHandler[CreateTurn, TurnOut]):
         self._assert_is_player(game, user_id)
         self._assert_has_state(game, (GameState.STARTED, GameState.SCORING))
 
+        round_number = game.round_number
+        if game.is_round_complete:
+            round_number += 1
+
         # Apply catch up mechanism at the beginning of a new round, if enabled
         catch_up_token_gain: dict[ResourceId, int] = {}
-        is_new_round = len(game.turns) % len(game.players) == 0
-        if is_new_round and game.settings.enable_catchup:
+        if game.is_round_complete and game.settings.enable_catchup:
             catch_up_token_gain = self._handle_catch_up(game)
 
         track = await self._get_new_track(game)
         next_player = game.get_next_player()
         turn = Turn(
+            round_number=round_number,
             active_user_id=next_player.user_id,
             track=track,
             catch_up_token_gain=catch_up_token_gain,
@@ -60,11 +64,11 @@ class Handler(TrackProvidingBaseHandler[CreateTurn, TurnOut]):
         return turn_out
 
     def _handle_catch_up(self, game: Game) -> dict[ResourceId, int]:
-        player_scores = [self._get_catch_up_score(p) for p in game.players]
+        player_scores = [self._get_catch_up_score(p) for p in game.current_players]
         max_score = max(player_scores)
 
         token_gain: dict[ResourceId, int] = {}
-        for player, score in zip(game.players, player_scores, strict=True):
+        for player, score in zip(game.current_players, player_scores, strict=True):
             max_bonus = min(
                 game.settings.max_tokens - player.tokens,
                 CATCH_UP_MAX_TOKENS,

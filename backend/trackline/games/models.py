@@ -134,6 +134,7 @@ class CorrectionProposal(BaseModel):
 class Turn(BaseModel):
     revision_id: str = Field(default_factory=lambda: str(uuid4()))
     creation_time: datetime = Field(default_factory=utcnow)
+    round_number: int
     active_user_id: ResourceId
     track: Track
     catch_up_token_gain: dict[ResourceId, int] = {}
@@ -174,25 +175,21 @@ class Game(BaseDocument):
     discarded_track_ids: list[str] = Field(default_factory=list[str])
 
     @property
-    def round_num(self) -> int:
-        if not self.players:
-            return 0
-
-        return int(len(self.turns) / len(self.players)) + 1
+    def round_number(self) -> int:
+        return self.turns[-1].round_number if self.turns else 1
 
     @property
-    def turn_num(self) -> int:
-        if not self.players:
-            return 0
-
-        return (len(self.turns) - 1) % len(self.players) + 1
+    def is_round_complete(self) -> bool:
+        current_user_ids = {p.user_id for p in self.players}
+        played_user_ids = {
+            t.active_user_id for t in self.turns if t.round_number == self.round_number
+        }
+        return played_user_ids == current_user_ids
 
     @property
     def end_condition_met(self) -> bool:
-        if not self.players or not self.turns:
+        if not self.players:
             return False
-
-        round_complete = self.turn_num == len(self.players)
 
         timeline_lengths = [len(p.timeline) for p in self.players]
         has_single_winner = (
@@ -200,7 +197,7 @@ class Game(BaseDocument):
             and timeline_lengths.count(max(timeline_lengths)) == 1
         )
 
-        return round_complete and has_single_winner
+        return self.is_round_complete and has_single_winner
 
     def get_player(self, user_id: ResourceId) -> Player:
         try:

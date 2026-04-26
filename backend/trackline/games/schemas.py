@@ -260,6 +260,7 @@ class CorrectionProposalOut(BaseModel):
 class TurnOut(BaseModel):
     revision_id: str
     creation_time: datetime
+    round_number: int
     active_user_id: ResourceId
     track: TrackOut
     catch_up_token_gain: Mapping[ResourceId, int]
@@ -274,6 +275,7 @@ class TurnOut(BaseModel):
         return TurnOut(
             revision_id=model.revision_id,
             creation_time=model.creation_time,
+            round_number=model.round_number,
             active_user_id=model.active_user_id,
             track=TrackOut.from_model(model.track),
             catch_up_token_gain=model.catch_up_token_gain,

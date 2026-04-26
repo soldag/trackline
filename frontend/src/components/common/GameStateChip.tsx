@@ -8,6 +8,7 @@ import { ChipProps } from "@mui/joy";
 
 import { ResponsiveChip } from "@/components/common/ResponsiveChip";
 import { Game, GameState } from "@/types/games";
+import { getRoundNumber } from "@/utils/games";
 
 interface GameStateChipProps extends Omit<
   ChipProps,
@@ -30,7 +31,7 @@ const getIcon = (game: Game): React.ReactNode => {
 };
 
 const getLabel = (game: Game): React.ReactNode => {
-  const roundNumber = (game.turns.length % game.players.length) + 1;
+  const roundNumber = getRoundNumber(game);
 
   switch (game.state) {
     case GameState.WaitingForPlayers:

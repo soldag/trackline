@@ -58,6 +58,7 @@ class Handler(TrackProvidingBaseHandler[LeaveGame]):
             track = await self._get_new_track(game)
             next_player = game.get_next_player()
             new_turn = Turn(
+                round_number=game.round_number,
                 active_user_id=next_player.user_id,
                 track=track,
             )

@@ -8,7 +8,7 @@ import {
 } from "@/types/games";
 
 export const getRoundNumber = (game: Game) =>
-  Math.floor(Math.max(0, game.turns.length - 1) / game.players.length) + 1;
+  game.turns.at(-1)?.roundNumber ?? 1;
 
 export const getTrackPosition = (timeline: Track[], track: Track) => {
   const position = timeline.findIndex((t) => t.releaseYear > track.releaseYear);
