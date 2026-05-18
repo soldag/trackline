@@ -88,8 +88,8 @@ export interface TokenGain {
   rewardEffective: number;
 }
 
-interface Scoring {
-  winner: string;
+export interface Scoring {
+  winner: string | null;
   correctGuesses: string[];
   tokenGains: { [userId: string]: TokenGain };
 }

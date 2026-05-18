@@ -1,5 +1,7 @@
-import { Typography } from "@mui/joy";
+import { Chip } from "@mui/joy";
 import type { ColorPaletteProp, SxProps } from "@mui/joy/styles/types";
+
+import { mergeSx } from "@/utils/style";
 
 const getColor = (value: number): ColorPaletteProp => {
   if (value < 0) {
@@ -20,15 +22,16 @@ interface NumericDeltaProps {
 
 const NumericDelta = ({ color, value, icon, sx }: NumericDeltaProps) => {
   return (
-    <Typography
+    <Chip
+      size="sm"
       variant="soft"
       color={color ?? getColor(value)}
-      sx={{ display: "inline-flex", ...sx }}
       endDecorator={icon}
+      sx={mergeSx({ px: 0.75, py: 0.25 }, sx)}
     >
       {value >= 0 && "+"}
       {value}
-    </Typography>
+    </Chip>
   );
 };
 

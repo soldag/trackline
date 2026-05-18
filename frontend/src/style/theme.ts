@@ -5,6 +5,19 @@ import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
 
+declare module "@mui/joy/styles" {
+  interface ShadowOverrides {
+    "lg-top": true;
+  }
+}
+
+declare module "@mui/joy/Button" {
+  interface ButtonPropsSizeOverrides {
+    xs: true;
+    xl: true;
+  }
+}
+
 export default extendTheme({
   fontWeight: {
     sm: "200",
@@ -110,6 +123,45 @@ export default extendTheme({
           solidDisabledBg: `var(--joy-palette-warning-900)`,
         },
       },
+    },
+  },
+  components: {
+    JoyButton: {
+      styleOverrides: {
+        root: ({ ownerState, theme }) => ({
+          ...(ownerState.size === "xs" && {
+            "--Icon-fontSize": "1rem",
+            "--Button-gap": "0.25rem",
+            "minHeight": "var(--Button-minHeight, 1.75rem)",
+            "fontSize": theme.vars.fontSize.xs,
+            "paddingBlock": "2px",
+            "paddingInline": "0.5rem",
+          }),
+          ...(ownerState.size === "xl" && {
+            "--Icon-fontSize": "2rem",
+            "--Button-gap": "1rem",
+            "minHeight": "var(--Button-minHeight, 4rem)",
+            "fontSize": theme.vars.fontSize.xl,
+            "paddingBlock": "0.5rem",
+            "paddingInline": "2rem",
+          }),
+        }),
+      },
+    },
+  },
+  shadow: {
+    "lg-top":
+      "var(--joy-shadowRing, 0 0 #000), rgba(var(--joy-shadowChannel, 21 21 21) / var(--joy-shadowOpacity, 0.08)) 0px -4px 16px -2px, rgba(var(--joy-shadowChannel, 21 21 21) / var(--joy-shadowOpacity, 0.08)) 0px -8px 24px -4px",
+  },
+  unstable_sxConfig: {
+    lineClamp: {
+      style: ({ lineClamp }) => ({
+        "display": "-webkit-box",
+        "-webkit-box-orient": "vertical",
+        "-webkit-line-clamp": `${lineClamp}`,
+        "lineClamp": `${lineClamp}`,
+        "overflow": "hidden",
+      }),
     },
   },
 });

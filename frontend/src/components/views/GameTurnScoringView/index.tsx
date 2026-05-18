@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import OutlinedFlagIcon from "@mui/icons-material/OutlinedFlag";
 import { Button, Stack } from "@mui/joy";
 
-import TrackCard from "@/components/common/TrackCard";
-import BuyTrackReminderModal from "@/components/views/GameTurnScoringView/components/BuyTrackReminderModal";
-import GameEndWarningSnackbar from "@/components/views/GameTurnScoringView/components/GameEndWarningSnackbar";
+import GameProgressBar from "@/components/common/GameProgressBar";
+import GameScoringTable from "@/components/common/GameScoringTable";
 import View from "@/components/views/View";
 import { TOKEN_COST_BUY_TRACK } from "@/constants";
 import {
@@ -29,11 +29,15 @@ import {
 } from "@/utils/hooks";
 
 import BuyTrackModal from "./components/BuyTrackModal";
+import BuyTrackReminderModal from "./components/BuyTrackReminderModal";
 import CorrectionProposalModal from "./components/CorrectionProposalModal";
 import CorrectionProposalVotingModal from "./components/CorrectionProposalVotingModal";
+import GameEndWarningSnackbar from "./components/GameEndWarningSnackbar";
 import MaxTokenWarningSnackbar from "./components/MaxTokenWarningSnackbar";
-import ScoringTabs from "./components/ScoringTabs";
+import ScoringAccordionGroup from "./components/ScoringAccordionGroup";
+import ScoringSection from "./components/ScoringSection";
 import TrackBoughtPopup from "./components/TrackBoughtPopup";
+import TrackResultCard from "./components/TrackResultCard";
 
 const GameTurnScoringView = () => {
   const [buyTrackModalOpen, setBuyTrackModelOpen] = useState(false);
@@ -45,7 +49,6 @@ const GameTurnScoringView = () => {
     useState(false);
   const [showGameEndSnackbar, setShowGameEndSnackbar] = useState(false);
   const [showMaxTokenSnackbar, setShowMaxTokenSnackbar] = useState(false);
-
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user)!;
   const game = useAppSelector((state) => state.games.game)!;
@@ -143,6 +146,29 @@ const GameTurnScoringView = () => {
         showPlaybackControls: isGameMaster,
         showExitGame: true,
       }}
+      footer={
+        <Button
+          variant="solid"
+          color="primary"
+          fullWidth
+          endDecorator={<ArrowForwardIcon />}
+          loading={loadingCompleteTurn}
+          disabled={loadingCompleteTurn || hasCompletedTurn}
+          onClick={handleCompleteTurn}
+        >
+          {hasCompletedTurn ? (
+            <FormattedMessage
+              id="GameTurnScoringView.waitingForPlayers"
+              defaultMessage="Waiting for players..."
+            />
+          ) : (
+            <FormattedMessage
+              id="GameTurnScoringView.nextRound"
+              defaultMessage="Nächste Runde"
+            />
+          )}
+        </Button>
+      }
     >
       <BuyTrackModal
         open={buyTrackModalOpen}
@@ -201,67 +227,94 @@ const GameTurnScoringView = () => {
         onClose={() => dispatch(clearBoughtTrack())}
       />
 
-      <Stack
-        direction={{
-          xs: "column",
-          sm: "row",
-        }}
-        spacing={2}
-        sx={{
-          height: "100%",
-          width: "100%",
-        }}
-      >
-        <Stack spacing={2} justifyContent="space-between">
-          <TrackCard sx={{ alignSelf: "center" }} track={turn.track} />
+      <Stack spacing={2}>
+        <GameProgressBar game={game} users={users} sx={{ mb: 2 }} />
 
-          <Stack direction="row" spacing={1}>
-            <Button
-              variant="soft"
-              color="neutral"
-              loading={loadingBuyTrack}
-              disabled={loadingBuyTrack || !canBuyTrack}
-              onClick={() => setBuyTrackModelOpen(true)}
-            >
-              <AddShoppingCartIcon />
-            </Button>
-
-            <Button
-              variant="soft"
-              sx={{ flexGrow: 1 }}
-              loading={loadingCompleteTurn}
-              disabled={loadingCompleteTurn || hasCompletedTurn}
-              onClick={handleCompleteTurn}
-            >
-              {hasCompletedTurn ? (
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          alignItems={{ xs: "stretch", md: "flex-start" }}
+          spacing={2}
+        >
+          <Stack spacing={2} sx={{ flex: 1 }}>
+            <ScoringSection
+              header={
                 <FormattedMessage
-                  id="GameTurnScoringView.waitingForPlayers"
-                  defaultMessage="Waiting for players..."
+                  id="GameTurnScoringView.trackResult.header"
+                  defaultMessage="Reveal"
                 />
-              ) : (
-                <FormattedMessage
-                  id="GameTurnScoringView.continue"
-                  defaultMessage="Continue"
-                />
-              )}
-            </Button>
-
-            <Button
-              variant="soft"
-              color="neutral"
-              disabled={
-                loadingProposeCorrection ||
-                !canProposeCorrection ||
-                hasCompletedTurn
               }
-              onClick={() => setCorrectionProposalModalOpen(true)}
+              action={
+                <Button
+                  color="neutral"
+                  size="xs"
+                  variant="soft"
+                  startDecorator={<OutlinedFlagIcon />}
+                  disabled={
+                    loadingProposeCorrection ||
+                    !canProposeCorrection ||
+                    hasCompletedTurn
+                  }
+                  onClick={() => setCorrectionProposalModalOpen(true)}
+                >
+                  <FormattedMessage
+                    id="GameTurnScoringView.trackResult.proposeCorrection"
+                    defaultMessage="Wrong year?"
+                  />
+                </Button>
+              }
             >
-              <PublishedWithChangesIcon />
-            </Button>
-          </Stack>
-        </Stack>
+              <TrackResultCard track={turn.track} />
+            </ScoringSection>
 
-        <ScoringTabs turn={turn} players={game.players} users={users} />
+            <ScoringSection
+              header={
+                <FormattedMessage
+                  id="GameTurnScoringView.winners.header"
+                  defaultMessage="Winners"
+                />
+              }
+            >
+              <ScoringAccordionGroup
+                turn={turn}
+                players={game.players}
+                users={users}
+              />
+            </ScoringSection>
+          </Stack>
+
+          <ScoringSection
+            header={
+              <FormattedMessage
+                id="GameTurnScoringView.scoreboard.header"
+                defaultMessage="Scoreboard"
+              />
+            }
+            action={
+              <Button
+                color="primary"
+                size="xs"
+                variant="soft"
+                startDecorator={<AddShoppingCartIcon />}
+                loading={loadingBuyTrack}
+                disabled={loadingBuyTrack || !canBuyTrack}
+                onClick={() => setBuyTrackModelOpen(true)}
+                sx={{ "--IconButton-size": "28px" }}
+              >
+                <FormattedMessage
+                  id="GameTurnScoringView.scoreboard.buyTrack"
+                  defaultMessage="Buy a track"
+                />
+              </Button>
+            }
+            sx={{ flex: 1 }}
+          >
+            <GameScoringTable
+              players={game.players}
+              users={users}
+              turn={turn}
+            />
+          </ScoringSection>
+        </Stack>
       </Stack>
     </View>
   );

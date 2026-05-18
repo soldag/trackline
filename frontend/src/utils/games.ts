@@ -13,6 +13,16 @@ export const getRoundNumber = (game: Game) =>
 export const getCurrentPlayers = (game: Game) =>
   game.players.filter((p) => !p.hasLeft);
 
+export const getYearRangeOfGuess = (
+  timeline: Track[],
+  guess: ReleaseYearGuess,
+) => {
+  const prev = timeline.find((t) => t.spotifyId === guess.prevTrackId);
+  const next = timeline.find((t) => t.spotifyId === guess.nextTrackId);
+
+  return { min: prev?.releaseYear, max: next?.releaseYear };
+};
+
 export const getTrackPosition = (timeline: Track[], track: Track) => {
   const position = timeline.findIndex((t) => t.releaseYear > track.releaseYear);
   return position < 0 ? timeline.length : position;

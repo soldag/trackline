@@ -1,25 +1,26 @@
-import { PropsWithChildren } from "react";
-
 import TokenIcon from "@mui/icons-material/Token";
 import WebStoriesIcon from "@mui/icons-material/WebStories";
-import { Typography } from "@mui/joy";
+import { Stack, Typography } from "@mui/joy";
 
 import MaxTokenHint from "@/components/common/MaxTokenHint";
 import NumericDelta from "@/components/common/NumericDelta";
 import { TokenGain } from "@/types/games";
 
 interface ScoringResultProps {
+  tracks?: number;
+  tokens?: number;
   tracksDelta?: number;
   tokenCost?: number;
   tokenGain?: TokenGain;
 }
 
 const ScoringResult = ({
+  tracks,
+  tokens,
   tracksDelta = 0,
   tokenCost = 0,
   tokenGain,
-  children,
-}: PropsWithChildren<ScoringResultProps>) => {
+}: ScoringResultProps) => {
   const refund = tokenGain?.refund ?? 0;
   const effectiveTokenReward = tokenGain?.rewardEffective ?? 0;
   const theoreticalTokenReward = tokenGain?.rewardTheoretical ?? 0;
@@ -27,24 +28,36 @@ const ScoringResult = ({
   const tokenLimitExceeded = effectiveTokenReward < theoreticalTokenReward;
 
   return (
-    <Typography
-      fontSize="inherit"
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={1}
+      flexWrap="wrap"
       sx={{
-        display: "flex",
-        alignItems: "center",
-        columnGap: 1,
-        flexWrap: "wrap",
+        "& > :empty": {
+          display: "none",
+        },
       }}
     >
-      {children}
-      <Typography
-        fontSize="inherit"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          columnGap: 1,
-        }}
-      >
+      {tracks != null && (
+        <Typography
+          level="body-sm"
+          endDecorator={<WebStoriesIcon sx={{ fontSize: "1em" }} />}
+        >
+          {tracks}
+        </Typography>
+      )}
+
+      {tokens != null && (
+        <Typography
+          level="body-sm"
+          endDecorator={<TokenIcon sx={{ fontSize: "1em" }} />}
+        >
+          {tokens}
+        </Typography>
+      )}
+
+      <Stack direction="row" alignItems="center" spacing={1}>
         {tracksDelta !== 0 && (
           <NumericDelta value={tracksDelta} icon={<WebStoriesIcon />} />
         )}
@@ -57,8 +70,8 @@ const ScoringResult = ({
           />
         )}
         {tokenLimitExceeded && <MaxTokenHint />}
-      </Typography>
-    </Typography>
+      </Stack>
+    </Stack>
   );
 };
 

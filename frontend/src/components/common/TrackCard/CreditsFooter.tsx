@@ -28,11 +28,7 @@ const ReleaseYearHeader = ({
           textColor="var(--TrackCard-color-primary)"
           sx={{
             lineHeight: 1.25,
-            overflow: "hidden",
-            display: "-webkit-box",
-            lineClamp: "2",
-            WebkitLineClamp: "2",
-            WebkitBoxOrient: "vertical",
+            lineClamp: 2,
             textOverflow: "ellipsis",
           }}
         >
@@ -41,14 +37,7 @@ const ReleaseYearHeader = ({
         <Typography
           level="title-md"
           textColor="var(--TrackCard-color-secondary)"
-          sx={{
-            overflow: "hidden",
-            display: "-webkit-box",
-            lineClamp: "2",
-            WebkitLineClamp: "2",
-            WebkitBoxOrient: "vertical",
-            textOverflow: "ellipsis",
-          }}
+          sx={{ lineClamp: 2, textOverflow: "ellipsis" }}
         >
           {artists?.join(", ")}
         </Typography>
