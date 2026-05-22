@@ -5,7 +5,7 @@ import { Box, Sheet, Typography } from "@mui/joy";
 import { SxProps } from "@mui/joy/styles/types";
 
 import ScoringResult from "@/components/common/ScoringResult";
-import StyledAvatar from "@/components/common/StyledAvatar";
+import UserAvatar from "@/components/common/UserAvatar";
 import { Player, TokenGain, Turn } from "@/types/games";
 import { User } from "@/types/users";
 import { aggregateTokenGains } from "@/utils/games";
@@ -118,9 +118,8 @@ const GameScoringTable = ({
           }}
         >
           <TableCell sx={{ gap: 1.5 }}>
-            <StyledAvatar
-              name={player.username}
-              variant="beam"
+            <UserAvatar
+              username={player.username ?? ""}
               size={28}
               style={{ flexShrink: 0 }}
             />

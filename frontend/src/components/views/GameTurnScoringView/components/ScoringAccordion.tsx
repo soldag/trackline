@@ -13,7 +13,7 @@ import {
 } from "@mui/joy";
 
 import ScoringResult from "@/components/common/ScoringResult";
-import StyledAvatar from "@/components/common/StyledAvatar";
+import UserAvatar from "@/components/common/UserAvatar";
 import { Guess, Scoring } from "@/types/games";
 import { User } from "@/types/users";
 
@@ -136,11 +136,7 @@ const ScoringAccordion = <TGuess extends Guess>({
               spacing={1.5}
             >
               <Box sx={{ display: "flex", px: 0.5, flexShrink: 0 }}>
-                <StyledAvatar
-                  name={usernames[guess.userId]}
-                  variant="beam"
-                  size={28}
-                />
+                <UserAvatar username={usernames[guess.userId]} size={28} />
               </Box>
 
               <Stack spacing={0.25} sx={{ flexGrow: 1 }}>

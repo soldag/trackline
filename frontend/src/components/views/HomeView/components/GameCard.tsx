@@ -5,9 +5,9 @@ import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import { Stack } from "@mui/joy";
 
 import ActionCard from "@/components/common/ActionCard";
+import GameAvatar from "@/components/common/GameAvatar";
 import GameStateChip from "@/components/common/GameStateChip";
 import { ResponsiveChip } from "@/components/common/ResponsiveChip";
-import StyledAvatar from "@/components/common/StyledAvatar";
 import { Game } from "@/types/games";
 import { useInterval } from "@/utils/hooks";
 import { formatRelativeTime } from "@/utils/i18n";
@@ -56,9 +56,7 @@ const GameCard = ({ game }: GameCardProps) => {
           </ResponsiveChip>
         </Stack>
       }
-      startDecorator={
-        <StyledAvatar size={50} variant="marble" name={game.id} />
-      }
+      startDecorator={<GameAvatar gameId={game.id} size={50} />}
       linkTo={`/games/${game.id}`}
     />
   );

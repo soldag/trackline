@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/joy";
 
-import StyledAvatar from "@/components/common/StyledAvatar";
+import UserAvatar from "@/components/common/UserAvatar";
 import { User } from "@/types/users";
 
 interface PlayersList {
@@ -33,9 +33,8 @@ const PlayersList = ({ users = [], gameMasterId }: PlayersList) => (
               overflow: "hidden",
             }}
           >
-            <StyledAvatar
-              name={user.username}
-              variant="beam"
+            <UserAvatar
+              username={user.username}
               size={36}
               style={{ flexShrink: 0 }}
             />
