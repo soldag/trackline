@@ -297,7 +297,6 @@ const GameTurnScoringView = () => {
                 loading={loadingBuyTrack}
                 disabled={loadingBuyTrack || !canBuyTrack}
                 onClick={() => setBuyTrackModelOpen(true)}
-                sx={{ "--IconButton-size": "28px" }}
               >
                 <FormattedMessage
                   id="GameTurnScoringView.scoreboard.buyTrack"
