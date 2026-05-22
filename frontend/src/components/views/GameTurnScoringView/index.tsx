@@ -33,8 +33,8 @@ import BuyTrackModal from "./components/BuyTrackModal";
 import BuyTrackReminderModal from "./components/BuyTrackReminderModal";
 import CorrectionProposalModal from "./components/CorrectionProposalModal";
 import CorrectionProposalVotingModal from "./components/CorrectionProposalVotingModal";
-import GameEndWarningSnackbar from "./components/GameEndWarningSnackbar";
-import MaxTokenWarningSnackbar from "./components/MaxTokenWarningSnackbar";
+import GameEndAlert from "./components/GameEndAlert";
+import MaxTokenAlert from "./components/MaxTokenAlert";
 import ScoringAccordionGroup from "./components/ScoringAccordionGroup";
 import ScoringSection from "./components/ScoringSection";
 import TrackBoughtPopup from "./components/TrackBoughtPopup";
@@ -48,8 +48,6 @@ const GameTurnScoringView = () => {
     useState(false);
   const [correctionVotingModalOpen, setCorrectionVotingModalOpen] =
     useState(false);
-  const [showGameEndSnackbar, setShowGameEndSnackbar] = useState(false);
-  const [showMaxTokenSnackbar, setShowMaxTokenSnackbar] = useState(false);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user)!;
   const game = useAppSelector((state) => state.games.game)!;
@@ -69,6 +67,7 @@ const GameTurnScoringView = () => {
   const turnId = game.turns.length - 1;
   const turn = game.turns[turnId];
   const currentPlayer = game.players.find((p) => p.userId === userId);
+  const awaitedUsers = users.filter((u) => !turn.completedBy.includes(u.id));
   const { isGameMaster = false } = currentPlayer || {};
   const { correctionProposal } = turn;
   const hasCompletedTurn = turn.completedBy.includes(userId);
@@ -82,13 +81,8 @@ const GameTurnScoringView = () => {
     !hasCompletedTurn &&
     correctionProposal?.state !== CorrectionProposalState.Voting &&
     correctionProposal?.state !== CorrectionProposalState.Accepted;
-  const awaitedUsers = users.filter((u) => !turn.completedBy.includes(u.id));
-
   const hasMaxTokens =
     currentPlayer != null && currentPlayer?.tokens >= game.settings.maxTokens;
-  useEffect(() => {
-    setShowMaxTokenSnackbar(hasMaxTokens);
-  }, [hasMaxTokens]);
 
   const showStars = turn?.scoring?.releaseYear?.position?.winner === userId;
   const { start: startStars } = useStars();
@@ -113,14 +107,6 @@ const GameTurnScoringView = () => {
       setCorrectionVotingModalOpen(true);
     }
   }, [correctionProposal?.state]);
-
-  useEffect(() => {
-    if (isGameEnding && winner !== currentPlayer) {
-      setShowGameEndSnackbar(true);
-    } else {
-      setShowGameEndSnackbar(false);
-    }
-  }, [isGameEnding, winner, currentPlayer]);
 
   const handleCompleteTurn = () => {
     const shouldShowBuyTrackReminder =
@@ -205,19 +191,6 @@ const GameTurnScoringView = () => {
           dispatch(voteCorrection({ gameId, turnId, agree: false }))
         }
         onClose={() => setCorrectionVotingModalOpen(false)}
-      />
-
-      <GameEndWarningSnackbar
-        canCatchUp={canCatchUp}
-        winner={users.find((u) => u.id === winner?.userId)}
-        open={showGameEndSnackbar}
-        onClose={() => setShowGameEndSnackbar(false)}
-      />
-
-      <MaxTokenWarningSnackbar
-        limit={game.settings.maxTokens}
-        open={showMaxTokenSnackbar && !showGameEndSnackbar}
-        onClose={() => setShowMaxTokenSnackbar(false)}
       />
 
       <TrackBoughtPopup
@@ -306,11 +279,22 @@ const GameTurnScoringView = () => {
             }
             sx={{ flex: 1 }}
           >
-            <GameScoringTable
-              players={game.players}
-              users={users}
-              turn={turn}
-            />
+            <Stack direction="column" spacing={1}>
+              <GameEndAlert
+                open={isGameEnding && winner !== currentPlayer}
+                canCatchUp={canCatchUp}
+                winner={users.find((u) => u.id === winner?.userId)}
+              />
+              <MaxTokenAlert
+                open={hasMaxTokens && !isGameEnding}
+                limit={game.settings.maxTokens}
+              />
+              <GameScoringTable
+                players={game.players}
+                users={users}
+                turn={turn}
+              />
+            </Stack>
           </ScoringSection>
         </Stack>
       </Stack>
