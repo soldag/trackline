@@ -160,7 +160,7 @@
   "GameTurnScoringView.ScoringAccordionGroup.year.summary.winner": "{username} got the exact year.",
   "GameTurnScoringView.TrackBoughtPopup.description": "This track is now part of your timeline.",
   "GameTurnScoringView.TrackBoughtPopup.title": "You got a new track!",
-  "GameTurnScoringView.nextRound": "Nächste Runde",
+  "GameTurnScoringView.nextTurn": "Next turn",
   "GameTurnScoringView.scoreboard.buyTrack": "Buy a track",
   "GameTurnScoringView.scoreboard.header": "Scoreboard",
   "GameTurnScoringView.trackResult.header": "Reveal",

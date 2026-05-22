@@ -160,7 +160,7 @@
   "GameTurnScoringView.ScoringAccordionGroup.year.summary.winner": "{username} hat das Jahr erraten.",
   "GameTurnScoringView.TrackBoughtPopup.description": "Dieser Song ist jetzt Teil deines Zeitstrahls.",
   "GameTurnScoringView.TrackBoughtPopup.title": "Du hast einen neuen Song!",
-  "GameTurnScoringView.nextRound": "Nächste Runde",
+  "GameTurnScoringView.nextTurn": "Nächster Zug",
   "GameTurnScoringView.scoreboard.buyTrack": "Song kaufen",
   "GameTurnScoringView.scoreboard.header": "Spielstand",
   "GameTurnScoringView.trackResult.header": "Auflösung",

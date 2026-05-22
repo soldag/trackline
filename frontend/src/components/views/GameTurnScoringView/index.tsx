@@ -162,8 +162,8 @@ const GameTurnScoringView = () => {
             onClick={handleCompleteTurn}
           >
             <FormattedMessage
-              id="GameTurnScoringView.nextRound"
-              defaultMessage="Nächste Runde"
+              id="GameTurnScoringView.nextTurn"
+              defaultMessage="Next turn"
             />
           </Button>
         )
