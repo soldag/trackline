@@ -8,6 +8,7 @@ import { Button, Stack } from "@mui/joy";
 
 import GameProgressBar from "@/components/common/GameProgressBar";
 import GameScoringTable from "@/components/common/GameScoringTable";
+import AwaitedPlayersCard from "@/components/views/GameTurnScoringView/components/AwaitedPlayersCard";
 import View from "@/components/views/View";
 import { TOKEN_COST_BUY_TRACK } from "@/constants";
 import {
@@ -81,6 +82,7 @@ const GameTurnScoringView = () => {
     !hasCompletedTurn &&
     correctionProposal?.state !== CorrectionProposalState.Voting &&
     correctionProposal?.state !== CorrectionProposalState.Accepted;
+  const awaitedUsers = users.filter((u) => !turn.completedBy.includes(u.id));
 
   const hasMaxTokens =
     currentPlayer != null && currentPlayer?.tokens >= game.settings.maxTokens;
@@ -147,27 +149,24 @@ const GameTurnScoringView = () => {
         showExitGame: true,
       }}
       footer={
-        <Button
-          variant="solid"
-          color="primary"
-          fullWidth
-          endDecorator={<ArrowForwardIcon />}
-          loading={loadingCompleteTurn}
-          disabled={loadingCompleteTurn || hasCompletedTurn}
-          onClick={handleCompleteTurn}
-        >
-          {hasCompletedTurn ? (
-            <FormattedMessage
-              id="GameTurnScoringView.waitingForPlayers"
-              defaultMessage="Waiting for players..."
-            />
-          ) : (
+        hasCompletedTurn ? (
+          <AwaitedPlayersCard users={awaitedUsers} />
+        ) : (
+          <Button
+            variant="solid"
+            color="primary"
+            fullWidth
+            endDecorator={<ArrowForwardIcon />}
+            loading={loadingCompleteTurn}
+            disabled={loadingCompleteTurn || hasCompletedTurn}
+            onClick={handleCompleteTurn}
+          >
             <FormattedMessage
               id="GameTurnScoringView.nextRound"
               defaultMessage="Nächste Runde"
             />
-          )}
-        </Button>
+          </Button>
+        )
       }
     >
       <BuyTrackModal

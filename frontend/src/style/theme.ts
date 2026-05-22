@@ -18,6 +18,18 @@ declare module "@mui/joy/Button" {
   }
 }
 
+declare module "@mui/joy/CircularProgress" {
+  interface CircularProgressPropsSizeOverrides {
+    xs: true;
+  }
+}
+
+declare module "@mui/joy/Avatar" {
+  interface AvatarPropsSizeOverrides {
+    xs: true;
+  }
+}
+
 export default extendTheme({
   fontWeight: {
     sm: "200",
@@ -126,6 +138,30 @@ export default extendTheme({
     },
   },
   components: {
+    JoyAvatar: {
+      styleOverrides: {
+        root: ({ ownerState }) => ({
+          ...(ownerState.size === "xs" && {
+            width: "var(--Avatar-size, 1.5rem)",
+            height: "var(--Avatar-size, 1.5rem)",
+            fontSize: "calc(var(--Avatar-size, 1.5rem) * 0.4375)",
+          }),
+        }),
+      },
+    },
+    JoyCircularProgress: {
+      styleOverrides: {
+        root: ({ ownerState }) => ({
+          ...(ownerState.size === "xs" && {
+            "--_root-size": "var(--CircularProgress-size, 20px)",
+            "--_track-thickness":
+              "var(--CircularProgress-trackThickness, var(--CircularProgress-thickness, 2px))",
+            "--_progress-thickness":
+              "var(--CircularProgress-progressThickness, var(--CircularProgress-thickness, 2px))",
+          }),
+        }),
+      },
+    },
     JoyButton: {
       styleOverrides: {
         root: ({ ownerState, theme }) => ({
