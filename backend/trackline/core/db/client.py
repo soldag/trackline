@@ -1,4 +1,4 @@
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from typing import Any
@@ -40,7 +40,7 @@ class DatabaseClient:
         )
 
     @asynccontextmanager
-    async def start_session(self) -> AsyncIterator[AsyncClientSession]:
+    async def start_session(self) -> AsyncGenerator[AsyncClientSession]:
         async with (
             self._client.start_session() as session,
             await session.start_transaction(),

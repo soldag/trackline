@@ -11,6 +11,7 @@ from trackline.core.use_cases import AuthenticatedUseCase, AuthenticatedUseCaseH
 from trackline.games.models import Game, Guess, Track, Turn
 from trackline.games.schemas import GameState
 from trackline.games.services.game_notifier import GameNotifier
+from trackline.games.services.track_fetcher import PlaylistsExhaustedError
 from trackline.games.services.track_provider import TrackProvider
 
 TResult = TypeVar("TResult", default=None)
@@ -140,26 +141,13 @@ class TrackProvidingBaseHandler(BaseHandler[TUseCase, TResult]):
         self._track_provider = track_provider
 
     async def _get_new_track(self, game: Game) -> Track:
-        timeline_track_ids = {t.spotify_id for p in game.players for t in p.timeline}
-        played_track_ids = {t.track.spotify_id for t in game.turns}
-        exclude_track_ids = {
-            *timeline_track_ids,
-            *played_track_ids,
-            *game.discarded_track_ids,
-        }
-
-        track = await self._track_provider.get_random_track(
-            game.settings.playlists,
-            exclude=exclude_track_ids,
-            market=game.settings.spotify_market,
-        )
-        if not track:
+        try:
+            return await self._track_provider.get_track(game)
+        except PlaylistsExhaustedError as e:
             raise UseCaseError(
                 "PLAYLISTS_EXHAUSTED",
                 "There are no unplayed tracks left in the selected playlists.",
-            )
-
-        return track
+            ) from e
 
 
 class CreateGuessBaseHandler(BaseHandler[TUseCase, TResult]):

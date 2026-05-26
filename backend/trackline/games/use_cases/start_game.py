@@ -38,10 +38,9 @@ class Handler(TrackProvidingBaseHandler[StartGame, GameOut]):
                 f"At least {MIN_PLAYER_COUNT} players are needed to start the game",
             )
 
-        tracks = await self._track_provider.get_random_tracks(
-            game.settings.playlists,
+        tracks = await self._track_provider.get_tracks(
+            game,
             count=len(game.current_players),
-            market=game.settings.spotify_market,
         )
         for player, track in zip(game.current_players, tracks, strict=False):
             player.add_to_timeline(track)

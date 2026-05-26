@@ -1,113 +1,81 @@
-from collections.abc import Collection, Iterable
+import logging
+from collections.abc import Iterable
 
 from injector import inject
 
-from trackline.core.db.repository import Repository
-from trackline.core.utils import shuffle
-from trackline.games.models import Playlist, Track, TrackCorrection
-from trackline.games.services.music_brainz_lookup import MusicBrainzLookup
-from trackline.games.services.track_metadata_parser import (
-    TrackMetadata,
-    TrackMetadataParser,
-)
-from trackline.spotify.models import SpotifyTrack
-from trackline.spotify.services.spotify_client import SpotifyClient
+from trackline.core.background_tasks import BackgroundTaskManager
+from trackline.games.models import Game, Track
+from trackline.games.services.track_cache import TrackCache
+from trackline.games.services.track_fetcher import PlaylistsExhaustedError, TrackFetcher
+from trackline.games.use_cases.replenish_track_cache import ReplenishTrackCache
+
+log = logging.getLogger(__name__)
 
 
 class TrackProvider:
     @inject
     def __init__(
         self,
-        repository: Repository,
-        spotify_client: SpotifyClient,
-        music_brainz_lookup: MusicBrainzLookup,
-        track_metadata_parser: TrackMetadataParser,
+        track_cache: TrackCache,
+        track_fetcher: TrackFetcher,
+        background_task_manager: BackgroundTaskManager,
     ) -> None:
-        self._repository = repository
-        self._spotify_client = spotify_client
-        self._music_brainz_lookup = music_brainz_lookup
-        self._track_metadata_parser = track_metadata_parser
+        self._track_cache = track_cache
+        self._track_fetcher = track_fetcher
+        self._background_task_manager = background_task_manager
 
-    async def get_random_tracks(
-        self,
-        playlists: Iterable[Playlist],
-        count: int,
-        market: str | None = None,
-        exclude: Collection[str] | None = None,
-    ) -> list[Track]:
-        tracks: list[Track] = []
-        exclude = list(exclude or [])
-        while len(tracks) < count:
-            track = await self.get_random_track(playlists, market, exclude)
-            if not track:
-                break
+    async def get_track(self, game: Game) -> Track:
+        if tracks := await self.get_tracks(game, 1):
+            return tracks[0]
 
-            tracks.append(track)
-            exclude.append(track.spotify_id)
+        raise PlaylistsExhaustedError
 
-        return tracks
+    async def get_tracks(self, game: Game, count: int) -> list[Track]:
+        if not game.id:
+            raise ValueError("The game must have an id")
 
-    async def get_random_track(
-        self,
-        playlists: Iterable[Playlist],
-        market: str | None = None,
-        exclude: Collection[str] | None = None,
-    ) -> Track | None:
-        exclude = exclude or []
-
-        # Build a flat list of (playlist_id, track_index) pairs so that each track,
-        # regardless of which playlist it belongs to, has an equal chance of selection
-        track_indices = [
-            (playlist.spotify_id, index)
-            for playlist in playlists
-            for index in range(playlist.track_count)
+        exclude_ids = self._get_exclude_ids(game)
+        result = [
+            t
+            for t in self._track_cache.pop_many(game.id, count)
+            if t.spotify_id not in exclude_ids
         ]
 
-        for playlist_id, track_index in shuffle(track_indices):
-            track = await self._spotify_client.get_playlist_track(
-                playlist_id,
-                track_index,
-                market=market,
+        if tracks_to_fetch := count - len(result):
+            log.warning(
+                "Track cache miss for game %s: fetching %s/%s tracks from spotify.",
+                game.id,
+                tracks_to_fetch,
+                count,
             )
-            if (
-                not track
-                or not track.is_playable
-                or not track.release_year
-                or track.id in exclude
-            ):
-                continue
-
-            metadata = self._track_metadata_parser.parse(track.artists, track.title)
-            release_year = await self._validate_release_year(track, metadata)
-
-            return Track(
-                spotify_id=track.id,
-                title=metadata.clean_title,
-                artists=track.artists,
-                release_year=release_year,
-                image_url=track.image_url,
+            result += await self._track_fetcher.fetch_tracks(
+                game.settings.playlists,
+                tracks_to_fetch,
+                exclude={*exclude_ids, *(t.spotify_id for t in result)},
+                market=game.settings.spotify_market,
             )
 
-        return None
-
-    async def _validate_release_year(
-        self,
-        track: SpotifyTrack,
-        metadata: TrackMetadata,
-    ) -> int:
-        if not track.release_year:
-            raise ValueError("Track has no release year")
-
-        # If the release year has been corrected before, use the corrected value
-        correction = await self._repository.get_one(
-            TrackCorrection, {"track_spotify_id": track.id}
+        self.replenish_cache(
+            game,
+            exclude={t.spotify_id for t in result},
         )
-        if correction:
-            return correction.release_year
 
-        # Lookup release year on MusicBrainz and use the lower of the two values
-        mb_release_year = await self._music_brainz_lookup.get_release_year(metadata)
-        if mb_release_year is not None:
-            return min(track.release_year, mb_release_year)
+        return result
 
-        return track.release_year
+    def replenish_cache(self, game: Game, exclude: Iterable[str] | None = None) -> None:
+        if not game.id:
+            raise ValueError("The game must have an id")
+
+        self._background_task_manager.schedule(
+            ReplenishTrackCache(
+                game=game,
+                exclude=frozenset({*(exclude or ()), *self._get_exclude_ids(game)}),
+            )
+        )
+
+    def _get_exclude_ids(self, game: Game) -> set[str]:
+        return {
+            *(t.spotify_id for p in game.players for t in p.timeline),
+            *(t.track.spotify_id for t in game.turns),
+            *game.discarded_track_ids,
+        }

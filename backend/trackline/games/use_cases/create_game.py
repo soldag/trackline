@@ -19,6 +19,7 @@ from trackline.games.models import (
     TitleMatchMode,
 )
 from trackline.games.schemas import GameOut
+from trackline.games.services.track_provider import TrackProvider
 from trackline.games.use_cases.base import BaseHandler
 from trackline.spotify.services.spotify_client import (
     PlaylistNotFoundError,
@@ -46,9 +47,11 @@ class Handler(BaseHandler[CreateGame, GameOut]):
     def __init__(
         self,
         repository: Repository,
+        track_provider: TrackProvider,
         spotify_client: SpotifyClient,
     ) -> None:
         super().__init__(repository)
+        self._track_provider = track_provider
         self._spotify_client = spotify_client
 
     async def execute(self, user_id: ResourceId, use_case: CreateGame) -> GameOut:
@@ -82,6 +85,8 @@ class Handler(BaseHandler[CreateGame, GameOut]):
             ],
         )
         await self._repository.create(game)
+
+        self._track_provider.replenish_cache(game)
 
         return GameOut.from_model(game)
 

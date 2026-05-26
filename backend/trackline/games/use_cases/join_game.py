@@ -12,6 +12,7 @@ from trackline.games.constants import JOIN_CODE_LENGTH
 from trackline.games.models import Game, GameState, Player
 from trackline.games.schemas import GameOut, PlayerJoined, PlayerOut
 from trackline.games.services.game_notifier import GameNotifier
+from trackline.games.services.track_provider import TrackProvider
 from trackline.games.use_cases.base import BaseHandler
 from trackline.users.models import User
 from trackline.users.schemas import UserOut
@@ -35,10 +36,12 @@ class Handler(BaseHandler[JoinGame, GameOut]):
     def __init__(
         self,
         repository: Repository,
+        track_provider: TrackProvider,
         notifier: GameNotifier,
     ) -> None:
         super().__init__(repository)
         self._notifier = notifier
+        self._track_provider = track_provider
 
     async def execute(self, user_id: ResourceId, use_case: JoinGame) -> GameOut:
         game = await self._repository.get_one(
@@ -70,6 +73,8 @@ class Handler(BaseHandler[JoinGame, GameOut]):
         # game master from always being the start player
         position = random.randint(0, len(game.players))  # noqa: S311
         game.players.insert(position, player)
+
+        self._track_provider.replenish_cache(game)
 
         user = await User.get(user_id)
         if not user:

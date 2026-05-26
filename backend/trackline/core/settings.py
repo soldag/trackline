@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     spotify_retries_min_interval: PositiveInt = 100
     spotify_throttle_time: PositiveInt = 200
 
+    track_cache_max_size: PositiveInt = 100
+
     sentry_dsn: str | None = None
 
 

@@ -1,5 +1,5 @@
 import logging
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI
@@ -9,6 +9,7 @@ from fastapi_injector import InjectorMiddleware, attach_injector
 from starlette.requests import HTTPConnection
 
 from trackline.auth.router import router as auth_router
+from trackline.core.background_tasks import BackgroundTaskManager
 from trackline.core.db.client import DatabaseClient
 from trackline.core.deps import websocket_logger
 from trackline.core.logging import initialize_sentry
@@ -30,7 +31,7 @@ log = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     log.info("Waiting for application startup.")
 
     initialize_sentry(injector.get(Settings))
@@ -40,7 +41,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     log.info("Application startup complete.")
 
-    yield
+    async with injector.get(BackgroundTaskManager):
+        yield
 
     log.info("Waiting for application shutdown.")
 
