@@ -2,7 +2,7 @@
 name = "trackline"
 version = "0.1.0"
 description = ""
-authors = [{ name = "Sören Oldag", email = "soeren_oldag@freenet.de" }]
+authors = [{ name = "Sören Oldag", email = "soeren.oldag@proton.me" }]
 license = "MIT"
 readme = "README.md"
 requires-python = '>=3.14,<3.15'
