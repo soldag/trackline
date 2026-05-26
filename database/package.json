@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "migrate-mongo": "^14.0.7",
-    "uuid": "^13.0.0"
+    "uuid": "^14.0.0"
   },
   "scripts": {
     "migrate": "migrate-mongo"
