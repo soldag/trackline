@@ -1,6 +1,6 @@
 import { FormattedMessage } from "react-intl";
 
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
 import { Tooltip } from "@mui/joy";
 
 const MaxTokenHint = () => (
@@ -25,7 +25,7 @@ const MaxTokenHint = () => (
       },
     ]}
   >
-    <ErrorOutlineIcon color="warning" sx={{ cursor: "pointer" }} />
+    <ErrorOutlinedIcon color="warning" sx={{ cursor: "pointer" }} />
   </Tooltip>
 );
 

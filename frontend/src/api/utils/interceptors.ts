@@ -20,9 +20,11 @@ export const decamelizeRequest = (
 };
 
 export const camelizeResponse = (response: AxiosResponse): AxiosResponse => {
+  const contentType = response.headers["content-type"];
   if (
     response.data &&
-    response.headers["content-type"]?.startsWith("application/json")
+    typeof contentType === "string" &&
+    contentType.startsWith("application/json")
   ) {
     response.data = camelizeKeys(response.data);
   }
