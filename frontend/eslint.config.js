@@ -1,6 +1,7 @@
 import eslint from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
-import importPlugin from "eslint-plugin-import";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import importPlugin from "eslint-plugin-import-x";
 import prettierPlugin from "eslint-plugin-prettier/recommended";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
@@ -50,7 +51,7 @@ export default tseslint.config(
       "comma-dangle": ["error", "always-multiline"],
       "no-empty": ["error", { allowEmptyCatch: true }],
       "no-duplicate-imports": ["error", { includeExports: true }],
-      "import/no-relative-packages": "error",
+      "import-x/no-relative-packages": "error",
 
       "@typescript-eslint/no-restricted-imports": [
         "warn",
@@ -103,10 +104,7 @@ export default tseslint.config(
       "react": {
         version: "detect",
       },
-      "import/resolver": {
-        typescript: true,
-      },
-      "import/ignore": ["qr-scanner"],
+      "import-x/resolver-next": [createTypeScriptImportResolver()],
     },
   },
   {
