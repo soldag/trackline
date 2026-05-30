@@ -102,6 +102,7 @@ const GameScoringTable = ({
         display: "grid",
         gridTemplateColumns: "1fr auto auto",
         borderRadius: "sm",
+        width: "100%",
       }}
     >
       {sortedPlayers.map((player, i) => (
