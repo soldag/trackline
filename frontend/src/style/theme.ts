@@ -1,3 +1,4 @@
+import { circularProgressClasses } from "@mui/joy/CircularProgress";
 import { extendTheme } from "@mui/joy/styles";
 
 import "@fontsource/inter/200.css";
@@ -172,6 +173,11 @@ export default extendTheme({
             "fontSize": theme.vars.fontSize.xs,
             "paddingBlock": "2px",
             "paddingInline": "0.5rem",
+            [`& .${circularProgressClasses.root}`]: {
+              "--_root-size": "16px",
+              "--_track-thickness": "2px",
+              "--_progress-thickness": "2px",
+            },
           }),
           ...(ownerState.size === "xl" && {
             "--Icon-fontSize": "2rem",
@@ -180,6 +186,11 @@ export default extendTheme({
             "fontSize": theme.vars.fontSize.xl,
             "paddingBlock": "0.5rem",
             "paddingInline": "2rem",
+            [`& .${circularProgressClasses.root}`]: {
+              "--_root-size": "32px",
+              "--_track-thickness": "4px",
+              "--_progress-thickness": "4px",
+            },
           }),
         }),
       },
