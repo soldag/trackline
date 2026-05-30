@@ -83,6 +83,7 @@ class TrackMetadataParser:
         ],
         TrackVersionType.MISC: [
             r"Anniversary\s+Edition",
+            r"Bonus\s+Track",
             r"Intro",
             r"Mono",
             r"^(Re-?)?Recorded",
