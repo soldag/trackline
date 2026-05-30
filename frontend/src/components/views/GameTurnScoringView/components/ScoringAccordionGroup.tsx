@@ -153,6 +153,7 @@ const ScoringAccordionGroup = ({
       />
 
       <ScoringAccordion
+        hideTokenCost
         open={openAccordion === ScoringCategory.Year}
         onToggle={() => handleToggle(ScoringCategory.Year)}
         icon={<EventAvailableIcon />}

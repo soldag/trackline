@@ -29,6 +29,7 @@ interface ScoringAccordionProps<TGuess extends Guess> {
   scoring: Scoring;
   renderGuessContent: (guess: TGuess) => React.ReactNode;
   tracksDeltas?: { [userId: string]: number };
+  hideTokenCost?: boolean;
 }
 
 const ScoringAccordion = <TGuess extends Guess>({
@@ -43,8 +44,10 @@ const ScoringAccordion = <TGuess extends Guess>({
   scoring,
   renderGuessContent,
   tracksDeltas,
+  hideTokenCost,
 }: ScoringAccordionProps<TGuess>) => {
   const color = scoring.winner === null ? "neutral" : "success";
+  const winnerGuess = guesses.find((g) => g.userId === scoring.winner);
 
   const usernames = useMemo(
     () => Object.fromEntries(users.map((u) => [u.id, u.username])),
@@ -108,9 +111,7 @@ const ScoringAccordion = <TGuess extends Guess>({
         {scoring.winner && (
           <ScoringResult
             tracksDelta={tracksDeltas?.[scoring.winner]}
-            tokenCost={
-              guesses.find((g) => g.userId === scoring.winner)?.tokenCost
-            }
+            tokenCost={hideTokenCost ? 0 : winnerGuess?.tokenCost}
             tokenGain={scoring.tokenGains[scoring.winner]}
           />
         )}
@@ -157,7 +158,7 @@ const ScoringAccordion = <TGuess extends Guess>({
 
               <ScoringResult
                 tracksDelta={tracksDeltas?.[guess.userId]}
-                tokenCost={guess.tokenCost}
+                tokenCost={hideTokenCost ? 0 : guess.tokenCost}
                 tokenGain={scoring.tokenGains[guess.userId]}
               />
             </Stack>
