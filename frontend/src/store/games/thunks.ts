@@ -148,7 +148,8 @@ interface GuessTrackReleaseYearPayload {
   gameId: string;
   turnId: number;
   turnRevisionId: string;
-  position: number;
+  prevTrackId: string | null;
+  nextTrackId: string | null;
   year: number;
 }
 export const guessTrackReleaseYear = createSafeAsyncThunk(
@@ -158,14 +159,16 @@ export const guessTrackReleaseYear = createSafeAsyncThunk(
     gameId,
     turnId,
     turnRevisionId,
-    position,
+    prevTrackId,
+    nextTrackId,
     year,
   }: GuessTrackReleaseYearPayload) => {
     const guess = await tracklineApi.games.createReleaseYearGuess({
       gameId,
       turnId,
       turnRevisionId,
-      position,
+      prevTrackId,
+      nextTrackId,
       year,
     });
 

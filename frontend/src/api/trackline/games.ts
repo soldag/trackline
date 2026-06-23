@@ -140,13 +140,15 @@ export const createReleaseYearGuess = async ({
   gameId,
   turnId,
   turnRevisionId,
-  position,
+  prevTrackId,
+  nextTrackId,
   year,
 }: {
   gameId: string;
   turnId: number;
   turnRevisionId: string;
-  position: number;
+  prevTrackId: string | null;
+  nextTrackId: string | null;
   year: number;
 }): Promise<ReleaseYearGuess> => {
   const {
@@ -155,7 +157,8 @@ export const createReleaseYearGuess = async ({
     `games/${gameId}/turns/${turnId}/guesses/release-year`,
     {
       turnRevisionId,
-      position,
+      prevTrackId,
+      nextTrackId,
       year,
     },
   );

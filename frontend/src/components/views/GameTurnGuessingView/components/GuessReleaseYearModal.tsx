@@ -17,7 +17,11 @@ interface GuessReleaseYearModalProps {
   tracks?: Track[];
   activeTrackId?: string;
   tokenCost?: number;
-  onConfirm?: (args: { position: number; year: number }) => void;
+  onConfirm?: (args: {
+    prevTrackId: string | null;
+    nextTrackId: string | null;
+    year: number;
+  }) => void;
   onClose?: () => void;
 }
 
@@ -31,13 +35,19 @@ const GuessReleaseYearModal = ({
   onClose,
 }: GuessReleaseYearModalProps) => {
   const position = tracks.findIndex((t) => t.spotifyId === activeTrackId);
-  const minYear = tracks[position - 1]?.releaseYear;
-  const maxYear = tracks[position + 1]?.releaseYear;
+  const prevTrack = tracks[position - 1];
+  const nextTrack = tracks[position + 1];
+  const minYear = prevTrack?.releaseYear;
+  const maxYear = nextTrack?.releaseYear;
 
   const [year, setYear] = useState(getInitialYear(minYear, maxYear));
 
   const handleConfirm = () => {
-    onConfirm?.({ position, year });
+    onConfirm?.({
+      prevTrackId: prevTrack?.spotifyId ?? null,
+      nextTrackId: nextTrack?.spotifyId ?? null,
+      year,
+    });
   };
 
   useEffect(() => {

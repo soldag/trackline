@@ -235,10 +235,12 @@ const GameTurnGuessingView = () => {
   });
 
   const handleGuessReleaseYear = ({
-    position,
+    prevTrackId,
+    nextTrackId,
     year,
   }: {
-    position: number;
+    prevTrackId: string | null;
+    nextTrackId: string | null;
     year: number;
   }) => {
     dispatch(
@@ -246,7 +248,8 @@ const GameTurnGuessingView = () => {
         gameId,
         turnId,
         turnRevisionId,
-        position,
+        prevTrackId,
+        nextTrackId,
         year,
       }),
     );

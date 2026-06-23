@@ -13,7 +13,8 @@ class CreateReleaseYearGuess(AuthenticatedUseCase[ReleaseYearGuessOut]):
     game_id: ResourceId
     turn_id: int
     turn_revision_id: str
-    position: int
+    prev_track_id: str | None = None
+    next_track_id: str | None = None
     year: int
 
 
@@ -43,22 +44,36 @@ class Handler(CreateGuessBaseHandler[CreateReleaseYearGuess, ReleaseYearGuessOut
                 status_code=400,
             )
 
-        if use_case.position > len(active_player.timeline):
-            raise UseCaseError(
-                code="INVALID_POSITION",
-                message="This position exceeds the boundaries of the timeline.",
-                status_code=400,
-            )
+        tracks_by_id = {track.spotify_id: track for track in active_player.timeline}
 
-        if use_case.position == 0:
-            prev_track = None
-        else:
-            prev_track = active_player.timeline[use_case.position - 1]
+        prev_track = None
+        if use_case.prev_track_id is not None:
+            prev_track = tracks_by_id.get(use_case.prev_track_id)
+            if not prev_track:
+                raise UseCaseError(
+                    code="INVALID_POSITION",
+                    message="The previous track is not part of the timeline.",
+                    status_code=400,
+                )
 
-        if use_case.position == len(active_player.timeline):
-            next_track = None
-        else:
-            next_track = active_player.timeline[use_case.position]
+        next_track = None
+        if use_case.next_track_id is not None:
+            next_track = tracks_by_id.get(use_case.next_track_id)
+            if not next_track:
+                raise UseCaseError(
+                    code="INVALID_POSITION",
+                    message="The next track is not part of the timeline.",
+                    status_code=400,
+                )
+
+        if prev_track and next_track:
+            timeline = active_player.timeline
+            if timeline.index(next_track) - timeline.index(prev_track) != 1:
+                raise UseCaseError(
+                    code="INVALID_POSITION",
+                    message="The previous and next track are not subsequent.",
+                    status_code=400,
+                )
 
         if (prev_track and prev_track.release_year > use_case.year) or (
             next_track and next_track.release_year < use_case.year
@@ -74,8 +89,8 @@ class Handler(CreateGuessBaseHandler[CreateReleaseYearGuess, ReleaseYearGuessOut
 
         guess = ReleaseYearGuess(
             token_cost=token_cost,
-            prev_track_id=prev_track.spotify_id if prev_track else None,
-            next_track_id=next_track.spotify_id if next_track else None,
+            prev_track_id=use_case.prev_track_id,
+            next_track_id=use_case.next_track_id,
             year=use_case.year,
         )
         game.turns[use_case.turn_id].guesses.release_year[user_id] = guess

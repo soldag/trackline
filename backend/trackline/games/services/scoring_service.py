@@ -121,7 +121,13 @@ class ScoringService:
             is_duplicate = position in seen_positions
             if is_correct and not winner:
                 winner = user_id
-                player.add_to_timeline(turn.track)
+                if user_id == turn.active_user_id:
+                    # The active player guesses the position within their own
+                    # timeline, so honor the exact slot they chose.
+                    index = self._get_guess_position(player.timeline, guess)
+                    player.add_to_timeline(turn.track, index)
+                else:
+                    player.add_to_timeline(turn.track)
             elif is_correct or is_duplicate:
                 # Duplicate guesses are ignored and these players get
                 # their spent token back. There might be multiple correct
@@ -135,6 +141,29 @@ class ScoringService:
             correct_guesses=correct_guesses,
             token_gains=token_gains,
         )
+
+    def _get_guess_position(
+        self,
+        timeline: list[TimelineTrack],
+        guess: ReleaseYearGuess,
+    ) -> int:
+        if guess.prev_track_id is None:
+            return 0
+        if guess.next_track_id is None:
+            return len(timeline)
+
+        prev_index = next(
+            (
+                i
+                for i, track in enumerate(timeline)
+                if track.spotify_id == guess.prev_track_id
+            ),
+            None,
+        )
+        if prev_index is None:
+            raise ValueError("Previous track not found in timeline")
+
+        return prev_index + 1
 
     def _check_position(
         self,

@@ -55,15 +55,17 @@ class Player(BaseModel):
     tokens: int = 0
     timeline: list[TimelineTrack] = Field(default_factory=list[TimelineTrack])
 
-    def add_to_timeline(self, track: Track) -> None:
-        index = next(
-            (
-                i
-                for i, timeline_track in enumerate(self.timeline)
-                if timeline_track.release_year > track.release_year
-            ),
-            len(self.timeline),
-        )
+    def add_to_timeline(self, track: Track, index: int | None = None) -> None:
+        if index is None:
+            index = next(
+                (
+                    i
+                    for i, timeline_track in enumerate(self.timeline)
+                    if timeline_track.release_year > track.release_year
+                ),
+                len(self.timeline),
+            )
+
         timeline_track = TimelineTrack(**track.model_dump())
         self.timeline.insert(index, timeline_track)
 

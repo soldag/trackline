@@ -167,7 +167,10 @@ async def create_release_year_guess(
     auth_user_id: AuthUserId,
     use_case: Annotated[
         CreateReleaseYearGuess,
-        Bind(CreateReleaseYearGuess, body=["turn_revision_id", "position", "year"]),
+        Bind(
+            CreateReleaseYearGuess,
+            body=["turn_revision_id", "prev_track_id", "next_track_id", "year"],
+        ),
     ],
     use_case_executor: Annotated[UseCaseExecutor, Injected(UseCaseExecutor)],
 ) -> EntityResponse[ReleaseYearGuessOut]:

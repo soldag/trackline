@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from dataclasses import asdict, field, make_dataclass
+from dataclasses import MISSING, asdict, field, make_dataclass
 from typing import Annotated, Any
 
 from fastapi import Body, Depends, Path, Query, Request
@@ -50,6 +50,11 @@ def Bind[TModel: BaseModel](  # noqa: N802
                 field(**field_kwargs),  # type: ignore[reportUnknownArgumentType]
             ),
         )
+
+    # Dataclasses require fields without a default to precede those with one
+    fields.sort(
+        key=lambda f: f[2].default is not MISSING or f[2].default_factory is not MISSING
+    )
 
     ModelWrapper = make_dataclass(  # noqa: N806
         cls_name=model_type.__name__,
