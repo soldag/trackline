@@ -164,6 +164,7 @@ class GameSettings(BaseModel):
     title_match_mode: TitleMatchMode
     credits_similarity_threshold: float
     credits_filter_stop_words: bool
+    credits_convert_numbers: bool
     enable_catchup: bool
 
 

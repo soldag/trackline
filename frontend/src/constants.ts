@@ -61,24 +61,28 @@ export const CREDITS_STRICTNESS_VALUES = {
     titleMatchMode: TitleMatchMode.Full,
     creditsSimilarityThreshold: 1.0,
     creditsFilterStopWords: false,
+    creditsConvertNumbers: false,
   },
   [CreditsStrictness.Strict]: {
     artistsMatchMode: ArtistMatchMode.All,
     titleMatchMode: TitleMatchMode.Full,
     creditsSimilarityThreshold: 0.9,
     creditsFilterStopWords: true,
+    creditsConvertNumbers: false,
   },
   [CreditsStrictness.Moderate]: {
     artistsMatchMode: ArtistMatchMode.One,
     titleMatchMode: TitleMatchMode.Main,
     creditsSimilarityThreshold: 0.9,
     creditsFilterStopWords: true,
+    creditsConvertNumbers: true,
   },
   [CreditsStrictness.Relaxed]: {
     artistsMatchMode: ArtistMatchMode.One,
     titleMatchMode: TitleMatchMode.Main,
     creditsSimilarityThreshold: 0.8,
     creditsFilterStopWords: true,
+    creditsConvertNumbers: true,
   },
 };
 

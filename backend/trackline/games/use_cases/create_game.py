@@ -38,6 +38,7 @@ class CreateGame(AuthenticatedUseCase[GameOut]):
     title_match_mode: TitleMatchMode = TitleMatchMode.MAIN
     credits_similarity_threshold: Fraction = 0.9
     credits_filter_stop_words: bool = True
+    credits_convert_numbers: bool = True
     enable_catch_up: bool = True
 
 
@@ -74,6 +75,7 @@ class Handler(BaseHandler[CreateGame, GameOut]):
                 title_match_mode=use_case.title_match_mode,
                 credits_similarity_threshold=use_case.credits_similarity_threshold,
                 credits_filter_stop_words=use_case.credits_filter_stop_words,
+                credits_convert_numbers=use_case.credits_convert_numbers,
                 enable_catchup=use_case.enable_catch_up,
             ),
             players=[

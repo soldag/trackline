@@ -338,6 +338,7 @@ class ScoringService:
                         reference_artist.primary_name,
                         *reference_artist.secondary_names,
                     ],
+                    convert_numbers=settings.credits_convert_numbers,
                     filter_stop_words=settings.credits_filter_stop_words,
                 )
                 for candidate in candidate_metadata.artists
@@ -371,7 +372,10 @@ class ScoringService:
             references += reference_metadata.secondary_titles
 
         return self._get_max_similarity(
-            candidates, references, filter_stop_words=settings.credits_filter_stop_words
+            candidates,
+            references,
+            convert_numbers=settings.credits_convert_numbers,
+            filter_stop_words=settings.credits_filter_stop_words,
         )
 
     def _get_max_similarity(
@@ -379,12 +383,18 @@ class ScoringService:
         candidates: Iterable[str],
         references: Iterable[str],
         *,
+        convert_numbers: bool = False,
         filter_stop_words: bool = False,
     ) -> float:
         stop_words = CREDITS_STOP_WORDS if filter_stop_words else None
 
         return max(
-            compare_strings(candidate, reference, stop_words=stop_words)
+            compare_strings(
+                candidate,
+                reference,
+                convert_numbers=convert_numbers,
+                stop_words=stop_words,
+            )
             for candidate in candidates
             for reference in references
         )

@@ -129,6 +129,7 @@ export interface GameSettings {
   artistsMatchMode: ArtistMatchMode;
   creditsSimilarityThreshold: number;
   creditsFilterStopWords: boolean;
+  creditsConvertNumbers: boolean;
   guessTimeout: number;
   initialTokens: number;
   maxTokens: number;
