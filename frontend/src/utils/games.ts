@@ -2,6 +2,7 @@ import { TOKEN_COST_BUY_TRACK } from "@/constants";
 import {
   Game,
   Player,
+  RankedPlayer,
   ReleaseYearGuess,
   Track,
   TurnScoring,
@@ -12,6 +13,17 @@ export const getRoundNumber = (game: Game) =>
 
 export const getCurrentPlayers = (game: Game) =>
   game.players.filter((p) => !p.hasLeft);
+
+export const getPlayerScore = (player: Player): number =>
+  player.timeline.length + player.tokens / TOKEN_COST_BUY_TRACK;
+
+export const getPlayerRank = (player: Player, players: Player[]) =>
+  players.filter((p) => getPlayerScore(p) > getPlayerScore(player)).length + 1;
+
+export const sortPlayersByRank = (players: Player[]): RankedPlayer[] =>
+  players
+    .map((player) => ({ ...player, rank: getPlayerRank(player, players) }))
+    .toSorted((a, b) => a.rank - b.rank);
 
 export const getYearRangeOfGuess = (
   timeline: Track[],

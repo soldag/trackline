@@ -1,4 +1,3 @@
-import * as _ from "lodash-es";
 import { PropsWithChildren } from "react";
 
 import { Box, Sheet, Typography } from "@mui/joy";
@@ -8,7 +7,7 @@ import ScoringResult from "@/components/common/ScoringResult";
 import UserAvatar from "@/components/common/UserAvatar";
 import { Player, TokenGain, Turn } from "@/types/games";
 import { User } from "@/types/users";
-import { aggregateTokenGains } from "@/utils/games";
+import { aggregateTokenGains, sortPlayersByRank } from "@/utils/games";
 import { mergeSx } from "@/utils/style";
 
 const getTracksDelta = (userId: string, turn?: Turn): number => {
@@ -38,13 +37,6 @@ const getTokenGain = (userId: string, turn?: Turn): TokenGain | undefined => {
 
   return aggregateTokenGains(userId, turn.scoring);
 };
-
-const getPosition = (player: Player, players: Player[]) =>
-  players.filter(
-    (p) =>
-      p.timeline.length > player.timeline.length ||
-      (p.timeline.length == player.timeline.length && p.tokens > player.tokens),
-  ).length + 1;
 
 interface TableCellProps extends PropsWithChildren {
   sx?: SxProps;
@@ -78,29 +70,29 @@ interface GameScoringTableProps {
   players?: Player[];
   users?: User[];
   turn?: Turn;
+  showRank?: boolean;
 }
 
 const GameScoringTable = ({
   players = [],
   users = [],
   turn,
+  showRank = false,
 }: GameScoringTableProps) => {
-  const mergedPlayers = players.map((p) => ({
+  const sortedPlayers = sortPlayersByRank(players).map((p) => ({
     ...p,
     username: users.find((u) => u.id === p.userId)?.username,
-    position: getPosition(p, players),
     tracksDelta: getTracksDelta(p.userId, turn),
     tokenCost: getTokenCost(p.userId, turn),
     tokenGain: getTokenGain(p.userId, turn),
   }));
-  const sortedPlayers = _.sortBy(mergedPlayers, ["position"]);
 
   return (
     <Sheet
       variant="outlined"
       sx={{
         display: "grid",
-        gridTemplateColumns: "1fr auto auto",
+        gridTemplateColumns: showRank ? "auto 1fr auto auto" : "1fr auto auto",
         borderRadius: "sm",
         width: "100%",
       }}
@@ -118,6 +110,8 @@ const GameScoringTable = ({
             },
           }}
         >
+          {showRank && <TableCell>{player.rank}</TableCell>}
+
           <TableCell sx={{ gap: 1.5 }}>
             <UserAvatar
               username={player.username ?? ""}

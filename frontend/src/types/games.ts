@@ -46,6 +46,10 @@ export interface Player {
   timeline: Track[];
 }
 
+export interface RankedPlayer extends Player {
+  rank: number;
+}
+
 export interface Guess {
   creationTime: string;
   userId: string;
