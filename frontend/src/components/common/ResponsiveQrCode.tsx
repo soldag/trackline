@@ -1,4 +1,4 @@
-import QRCode from "react-qr-code";
+import { QRCode } from "react-qr-code";
 
 import { Box, useTheme } from "@mui/joy";
 import type { SxProps } from "@mui/joy/styles/types";
