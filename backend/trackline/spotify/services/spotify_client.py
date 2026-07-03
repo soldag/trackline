@@ -62,7 +62,7 @@ class SpotifyClientBase(abc.ABC):
 
         try:
             release_year = int(release_date[:4])
-        except TypeError, IndexError, ValueError:
+        except (TypeError, IndexError, ValueError):
             release_year = None
 
         images = sorted(
@@ -141,7 +141,7 @@ class SpotifyClientBase(abc.ABC):
 
                 try:
                     release_year = int(release_date[:4])
-                except TypeError, IndexError, ValueError:
+                except (TypeError, IndexError, ValueError):
                     release_year = None
 
                 images = sorted(

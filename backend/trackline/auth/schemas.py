@@ -14,7 +14,7 @@ class SessionOut(BaseModel):
     expiration_time: datetime
 
     @staticmethod
-    def from_model(model: Session) -> SessionOut:
+    def from_model(model: Session) -> "SessionOut":
         if not model.id:
             raise ValueError("ID is required")
 

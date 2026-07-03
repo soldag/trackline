@@ -9,7 +9,7 @@ class UserOut(BaseModel):
     username: str
 
     @staticmethod
-    def from_model(model: User) -> UserOut:
+    def from_model(model: User) -> "UserOut":
         if not model.id:
             raise ValueError("ID is required")
 

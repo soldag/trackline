@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 class AnonymousUseCase[TResult = None](BaseModel):
     handler_cls: ClassVar[
-        type[AnonymousUseCaseHandler[Self, TResult]] | None  # type: ignore[reportGeneralTypeIssues]
+        type["AnonymousUseCaseHandler[Self, TResult]"] | None  # type: ignore[reportGeneralTypeIssues]
     ] = None
 
     @classmethod
@@ -29,7 +29,7 @@ class AnonymousUseCase[TResult = None](BaseModel):
 
 class AuthenticatedUseCase[TResult = None](BaseModel):
     handler_cls: ClassVar[
-        type[AuthenticatedUseCaseHandler[Self, TResult]] | None  # type: ignore[reportGeneralTypeIssues]
+        type["AuthenticatedUseCaseHandler[Self, TResult]"] | None  # type: ignore[reportGeneralTypeIssues]
     ] = None
 
     @classmethod
