@@ -99,9 +99,9 @@ const GuessCreditsModal = ({
                     placeholder={label as string}
                     renderTags={(tags, getTagProps) =>
                       tags.map((item, index) => (
+                        // eslint-disable-next-line @eslint-react/no-missing-key
                         <Chip
                           {...getTagProps({ index })}
-                          key={index}
                           size="sm"
                           variant="solid"
                           color="primary"

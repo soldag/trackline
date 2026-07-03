@@ -14,7 +14,7 @@ const SpotifyContainer = ({ children }: PropsWithChildren) => {
   const needsAuth = isRequired && isLoggedIn === false;
 
   return (
-    <SpotifyContext.Provider
+    <SpotifyContext
       value={{
         isRequired,
         setIsRequired,
@@ -43,7 +43,7 @@ const SpotifyContainer = ({ children }: PropsWithChildren) => {
         />
       </ConfirmModal>
       {children}
-    </SpotifyContext.Provider>
+    </SpotifyContext>
   );
 };
 

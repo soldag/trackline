@@ -40,7 +40,7 @@ const GuessReleaseYearModal = ({
   const minYear = prevTrack?.releaseYear;
   const maxYear = nextTrack?.releaseYear;
 
-  const [year, setYear] = useState(getInitialYear(minYear, maxYear));
+  const [year, setYear] = useState(() => getInitialYear(minYear, maxYear));
 
   const handleConfirm = () => {
     onConfirm?.({

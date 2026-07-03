@@ -216,14 +216,13 @@ const Heatmap = <T,>({
   valueFormatter,
   sx,
 }: HeatmapProps<T>) => {
-  const currentYear = new Date().getFullYear();
-
   const years = useMemo(() => {
+    const currentYear = new Date().getFullYear();
     const minYear = Math.min(...Object.keys(data).map(Number));
     const start = minYear - (minYear % 10);
     const end = Math.ceil(currentYear / 10) * 10;
     return Array.from({ length: end - start }, (_, i) => start + i);
-  }, [data, currentYear]);
+  }, [data]);
 
   return (
     <Stack gap={2} sx={sx}>

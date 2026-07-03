@@ -1,6 +1,6 @@
 import {
+  use,
   useCallback,
-  useContext,
   useEffect,
   useReducer,
   useRef,
@@ -60,7 +60,7 @@ export const useAppNavigateBack = (fallback: string = "/") => {
 };
 
 export const useMountEffect = (effect: React.EffectCallback) => {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line @eslint-react/exhaustive-deps
   return useEffect(effect, []);
 };
 
@@ -123,17 +123,17 @@ export const useInterval = (
   delay: number,
   { autoStart = true }: { autoStart?: boolean } = {},
 ) => {
-  const savedCallback = useRef(callback);
+  const savedCallbackRef = useRef(callback);
   const [isActive, setIsActive] = useState(autoStart);
 
   useEffect(() => {
-    savedCallback.current = callback;
+    savedCallbackRef.current = callback;
   }, [callback]);
 
   useEffect(() => {
     if (!isActive || delay == null) return;
 
-    const id = setInterval(() => savedCallback.current(), delay);
+    const id = setInterval(() => savedCallbackRef.current(), delay);
     return () => clearInterval(id);
   }, [delay, isActive]);
 
@@ -172,6 +172,7 @@ export const useCountdown = ({
   let progress = 0;
   if (start != null && end != null) {
     const total = end - start;
+    // eslint-disable-next-line @eslint-react/purity
     remaining = Math.max(0, end - Date.now());
     progress = total === 0 ? 1 : (total - remaining) / total;
   }
@@ -231,7 +232,7 @@ export const useSpotify = ({
 }: {
   requireAuth?: boolean;
 }) => {
-  const { setIsRequired } = useContext(SpotifyContext);
+  const { setIsRequired } = use(SpotifyContext);
 
   useMountEffect(() => () => setIsRequired(false));
   useEffect(() => setIsRequired(requireAuth), [requireAuth, setIsRequired]);

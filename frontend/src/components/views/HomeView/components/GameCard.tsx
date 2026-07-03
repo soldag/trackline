@@ -19,7 +19,7 @@ interface GameCardProps {
 const GameCard = ({ game }: GameCardProps) => {
   const { locale } = useIntl();
 
-  const [relativeTime, setRelativeTime] = useState(
+  const [relativeTime, setRelativeTime] = useState(() =>
     formatRelativeTime(game.creationTime, locale),
   );
 

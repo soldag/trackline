@@ -1,10 +1,9 @@
+import eslintReact from "@eslint-react/eslint-plugin";
 import eslint from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import importPlugin from "eslint-plugin-import-x";
 import prettierPlugin from "eslint-plugin-prettier/recommended";
-import react from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -12,8 +11,7 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   eslint.configs.recommended,
   tseslint.configs.recommended,
-  react.configs.flat.recommended,
-  react.configs.flat["jsx-runtime"],
+  eslintReact.configs["recommended-typescript"],
   importPlugin.flatConfigs.recommended,
   importPlugin.flatConfigs.react,
   eslintConfigPrettier,
@@ -36,22 +34,15 @@ export default tseslint.config(
       },
     },
     plugins: {
-      react,
-      "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
     },
     rules: {
-      "react/react-in-jsx-scope": "off",
-      "react/jsx-curly-brace-presence": [
-        "error",
-        { props: "never", children: "never" },
-      ],
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
       "comma-dangle": ["error", "always-multiline"],
       "no-empty": ["error", { allowEmptyCatch: true }],
       "no-duplicate-imports": ["error", { includeExports: true }],
       "import-x/no-relative-packages": "error",
+
+      "@eslint-react/set-state-in-effect": "off",
 
       "@typescript-eslint/no-restricted-imports": [
         "warn",
@@ -101,9 +92,6 @@ export default tseslint.config(
       ],
     },
     settings: {
-      "react": {
-        version: "detect",
-      },
       "import-x/resolver-next": [createTypeScriptImportResolver()],
     },
   },

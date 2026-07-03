@@ -154,7 +154,7 @@ const GameTurnGuessingView = () => {
     if (hasTimeout && !isActivePlayer && !hasPassed) {
       window.navigator.vibrate?.([100, 100]);
     }
-  }, [hasTimeout, isActivePlayer]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hasTimeout, isActivePlayer]); // eslint-disable-line @eslint-react/exhaustive-deps
 
   useEffect(() => {
     if (activePlayer && releaseYearGuess) {

@@ -29,7 +29,7 @@ const QrCodeScanner = ({
 }: QrCodeScannerProps) => {
   const scannerRef = useRef<QrScanner>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const lastResult = useRef<string>(null);
+  const lastResultRef = useRef<string>(null);
   const onResultRef = useRef<OnResultCallback>(null);
 
   const [hasScannerError, setHasScannerError] = useState(false);
@@ -46,15 +46,15 @@ const QrCodeScanner = ({
     const scanner = new QrScanner(
       videoRef.current,
       ({ data }) => {
-        if (data !== lastResult.current) {
+        if (data !== lastResultRef.current) {
           window.navigator.vibrate?.(40);
           onResultRef.current?.(data);
-          lastResult.current = data;
+          lastResultRef.current = data;
         }
       },
       {
         onDecodeError: () => {
-          lastResult.current = null;
+          lastResultRef.current = null;
         },
         returnDetailedScanResult: true,
       },
@@ -70,7 +70,7 @@ const QrCodeScanner = ({
   }, []);
 
   const handleRetry = useCallback(() => {
-    lastResult.current = null;
+    lastResultRef.current = null;
 
     if (hasScannerError) {
       startScanner();

@@ -46,7 +46,7 @@ export const useConfetti = (): { start: () => void } => {
 };
 
 export const useStars = (): { start: () => void; stop: () => void } => {
-  const timeoutRefs = useRef<number[]>([]);
+  const timeoutsRef = useRef<number[]>([]);
 
   const start = useCallback(() => {
     const defaults = {
@@ -75,7 +75,7 @@ export const useStars = (): { start: () => void; stop: () => void } => {
       });
     };
 
-    timeoutRefs.current = [
+    timeoutsRef.current = [
       setTimeout(shoot, 0),
       setTimeout(shoot, 100),
       setTimeout(shoot, 200),
@@ -83,7 +83,7 @@ export const useStars = (): { start: () => void; stop: () => void } => {
   }, []);
 
   const stop = useCallback(
-    () => timeoutRefs.current.forEach((x) => clearTimeout(x)),
+    () => timeoutsRef.current.forEach((x) => clearTimeout(x)),
     [],
   );
 

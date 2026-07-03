@@ -21,7 +21,7 @@ const JoinCodeInput = ({
   onChange,
   onSubmit,
 }: JoinCodeInputProps) => {
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const inputElementsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   const values = useMemo(
     () => Array.from({ length: JOIN_CODE_LENGTH }, (_, i) => value?.[i] ?? ""),
@@ -34,7 +34,8 @@ const JoinCodeInput = ({
     }
   });
 
-  const focusInput = (index: number) => inputRefs.current[index]?.focus();
+  const focusInput = (index: number) =>
+    inputElementsRef.current[index]?.focus();
 
   const setCharAt = (index: number, char: string) => {
     const newValue = Array.from(
@@ -113,7 +114,7 @@ const JoinCodeInput = ({
           slotProps={{
             input: {
               ref: (el) => {
-                inputRefs.current[i] = el;
+                inputElementsRef.current[i] = el;
               },
               sx: { textAlign: "center" },
             },

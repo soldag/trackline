@@ -23,6 +23,7 @@ interface YearPickerProps {
 const YearPicker = ({
   value = 0,
   min = 0,
+  // eslint-disable-next-line @eslint-react/purity
   max = new Date().getFullYear(),
   disabled = false,
   onChange,

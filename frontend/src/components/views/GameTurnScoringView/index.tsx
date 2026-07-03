@@ -41,7 +41,7 @@ import TrackBoughtPopup from "./components/TrackBoughtPopup";
 import TrackResultCard from "./components/TrackResultCard";
 
 const GameTurnScoringView = () => {
-  const [buyTrackModalOpen, setBuyTrackModelOpen] = useState(false);
+  const [buyTrackModalOpen, setBuyTrackModalOpen] = useState(false);
   const [buyTrackReminderModalOpen, setBuyTrackReminderModalOpen] =
     useState(false);
   const [correctionProposalModalOpen, setCorrectionProposalModalOpen] =
@@ -158,7 +158,7 @@ const GameTurnScoringView = () => {
       <BuyTrackModal
         open={buyTrackModalOpen}
         onConfirm={() => dispatch(buyTrack({ gameId, userId }))}
-        onClose={() => setBuyTrackModelOpen(false)}
+        onClose={() => setBuyTrackModalOpen(false)}
       />
 
       <BuyTrackReminderModal
@@ -269,7 +269,7 @@ const GameTurnScoringView = () => {
                 startDecorator={<AddShoppingCartIcon />}
                 loading={loadingBuyTrack}
                 disabled={loadingBuyTrack || !canBuyTrack}
-                onClick={() => setBuyTrackModelOpen(true)}
+                onClick={() => setBuyTrackModalOpen(true)}
               >
                 <FormattedMessage
                   id="GameTurnScoringView.scoreboard.buyTrack"
