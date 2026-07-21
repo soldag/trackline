@@ -56,7 +56,6 @@ const RecommendationsList = ({
 interface SearchResultsListProps {
   items?: SpotifyPlaylist[];
   error?: AppError;
-  loading?: boolean;
   queryLength?: number;
   minQueryLength?: number;
   selectedItems?: SpotifyPlaylist[];
@@ -65,7 +64,6 @@ interface SearchResultsListProps {
 
 const SearchResultsList = ({
   items = [],
-  loading = false,
   error,
   queryLength = 0,
   minQueryLength = 0,
@@ -85,8 +83,7 @@ const SearchResultsList = ({
       items={items}
       selectedItems={selectedItems}
       emptyText={
-        !loading &&
-        (queryLength < minQueryLength ? (
+        queryLength < minQueryLength ? (
           <FormattedMessage
             id="CreateGameView.PlaylistSelector.SearchModal.searchResults.shortQuery"
             defaultMessage="Please enter at least {minQueryLength} characters."
@@ -97,7 +94,7 @@ const SearchResultsList = ({
             id="CreateGameView.PlaylistSelector.SearchModal.searchResults.noResults"
             defaultMessage="No playlists found."
           />
-        ))
+        )
       }
       onSelectedItemsChange={onSelectedItemsChange}
     />
@@ -156,9 +153,10 @@ const SearchModal = ({
     onClose();
   };
 
-  const showLoader =
-    (recommendations.length === 0 && recommendationsLoading) ||
-    (searchResults.length === 0 && searchLoading);
+  const isSearch = query.length > 0;
+  const loading = isSearch ? searchLoading : recommendationsLoading;
+  const items = isSearch ? searchResults : recommendations;
+  const showLoader = loading && items.length === 0;
 
   return (
     <Modal open={open} onClose={handleCancel}>
@@ -232,24 +230,24 @@ const SearchModal = ({
             flexGrow: 1,
           }}
         >
-          {query.length === 0 ? (
-            <RecommendationsList
-              items={recommendations}
-              error={recommendationsError}
-              selectedItems={newSelection}
-              onSelectedItemsChange={setNewSelection}
-            />
-          ) : (
-            <SearchResultsList
-              items={searchResults}
-              error={searchError}
-              loading={showLoader}
-              queryLength={query.length}
-              minQueryLength={minQueryLength}
-              selectedItems={newSelection}
-              onSelectedItemsChange={setNewSelection}
-            />
-          )}
+          {!showLoader &&
+            (isSearch ? (
+              <SearchResultsList
+                items={searchResults}
+                error={searchError}
+                queryLength={query.length}
+                minQueryLength={minQueryLength}
+                selectedItems={newSelection}
+                onSelectedItemsChange={setNewSelection}
+              />
+            ) : (
+              <RecommendationsList
+                items={recommendations}
+                error={recommendationsError}
+                selectedItems={newSelection}
+                onSelectedItemsChange={setNewSelection}
+              />
+            ))}
 
           {showLoader && (
             <Box

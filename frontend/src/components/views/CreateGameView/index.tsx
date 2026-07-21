@@ -25,6 +25,7 @@ import {
   DEFAULT_MAX_TOKENS,
   DEFAULT_TIMELINE_LENGTH,
 } from "@/constants";
+import { dismissError } from "@/store/errors";
 import { createGame } from "@/store/games";
 import {
   clearPlaylistSearchResults,
@@ -98,10 +99,10 @@ const CreateGameView = () => {
     [dispatch],
   );
 
-  const handleClearPlaylistSearchResults = useCallback(
-    () => dispatch(clearPlaylistSearchResults()),
-    [dispatch],
-  );
+  const handleClearPlaylistSearchResults = useCallback(() => {
+    dispatch(clearPlaylistSearchResults());
+    dispatch(dismissError({ typePrefix: searchPlaylists.typePrefix }));
+  }, [dispatch]);
 
   const handleCreate = useCallback(() => {
     if (!spotifyUser) return;
