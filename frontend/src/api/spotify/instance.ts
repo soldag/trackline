@@ -3,7 +3,7 @@ import rateLimit from "axios-rate-limit";
 
 import { SpotifyApiError } from "@/api/spotify/errors";
 import tracklineApi from "@/api/trackline";
-import { ApiError, NetworkError } from "@/api/utils/errors";
+import { ApiError, NetworkError, TimeoutError } from "@/api/utils/errors";
 import { camelizeResponse, decamelizeRequest } from "@/api/utils/interceptors";
 import { withRetry } from "@/api/utils/retry";
 import { SpotifyAccessToken } from "@/types/spotify";
@@ -33,7 +33,12 @@ const refreshAccessToken = async (refreshToken: string): Promise<boolean> => {
       });
       setAccessToken(accessToken);
       return true;
-    } catch {
+    } catch (error) {
+      if (error instanceof NetworkError || error instanceof TimeoutError) {
+        throw error;
+      }
+
+      setAccessToken(null);
       return false;
     }
   });
@@ -87,7 +92,9 @@ instance.interceptors.response.use(null, async (error: AxiosError) => {
       if (refreshToken && !config?.retry) {
         // Refresh might have been triggered by a previous request already
         if (!(await refreshLock.wait())) {
-          await refreshAccessToken(refreshToken);
+          if (!(await refreshAccessToken(refreshToken))) {
+            throw new SpotifyApiError(message, status);
+          }
         }
 
         return await instance.request({
