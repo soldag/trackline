@@ -5,7 +5,7 @@ import { SpotifyApiError } from "@/api/spotify/errors";
 import tracklineApi from "@/api/trackline";
 import { ApiError, NetworkError } from "@/api/utils/errors";
 import { camelizeResponse, decamelizeRequest } from "@/api/utils/interceptors";
-import { setupRetry } from "@/api/utils/retry";
+import { withRetry } from "@/api/utils/retry";
 import { SpotifyAccessToken } from "@/types/spotify";
 import { Lock, sleep } from "@/utils/concurrency";
 
@@ -39,7 +39,7 @@ const refreshAccessToken = async (refreshToken: string): Promise<boolean> => {
   });
 };
 
-const instance = setupRetry(
+const instance = withRetry(
   rateLimit(
     axios.create({
       baseURL: "https://api.spotify.com/v1",

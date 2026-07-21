@@ -6,7 +6,7 @@ import { TracklineApiError } from "@/api/trackline/errors";
 import { ErrorResponse } from "@/api/trackline/types";
 import { ApiError, NetworkError, TimeoutError } from "@/api/utils/errors";
 import { camelizeResponse, decamelizeRequest } from "@/api/utils/interceptors";
-import { setupRetry } from "@/api/utils/retry";
+import { withRetry } from "@/api/utils/retry";
 import { BACKEND_URL } from "@/configuration";
 import { HTTP_REQUEST_TIMEOUT } from "@/constants";
 
@@ -28,7 +28,7 @@ export const setup = (config: TracklineApiConfig) => {
   ({ getSessionToken, setSessionToken, setTimeDeviation } = config);
 };
 
-const instance = setupRetry(
+const instance = withRetry(
   rateLimit(
     axios.create({
       baseURL: BACKEND_URL,
