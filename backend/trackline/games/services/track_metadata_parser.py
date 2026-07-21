@@ -266,17 +266,32 @@ class TrackMetadataParser:
         return artists
 
     def _deduplicate_artists(self, artists: Iterable[Artist]) -> list[Artist]:
-        seen: set[str] = set()
         result: list[Artist] = []
 
         for artist in sorted(
             artists, key=lambda a: self.ARTIST_TYPE_PRIORITIES[a.artist_type]
         ):
-            if artist.full_name not in seen:
+            for index, other in enumerate(result):
+                if not self._get_artist_names(artist) & self._get_artist_names(other):
+                    continue
+
+                # Artists are sorted by priority, so the already accepted artist
+                # keeps its type, but we prefer the more specific name
+                other_secondary_names = {
+                    name.casefold() for name in other.secondary_names
+                }
+                if artist.primary_name.casefold in other_secondary_names:
+                    result[index] = replace(artist, artist_type=other.artist_type)
+
+                break
+            else:
                 result.append(artist)
-                seen.add(artist.full_name)
 
         return result
+
+    def _get_artist_names(self, artist: Artist) -> set[str]:
+        names = (artist.primary_name, *artist.secondary_names)
+        return {name.casefold() for name in names}
 
     def _search(self, pattern: str, text: str) -> re.Match[str] | None:
         return re.search(pattern, text, re.IGNORECASE)
