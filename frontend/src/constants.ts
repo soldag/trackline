@@ -6,6 +6,9 @@ import {
 } from "@/types/games";
 
 export const HTTP_REQUEST_TIMEOUT = 10000;
+export const HTTP_RETRY_MAX_ATTEMPTS = 3;
+export const HTTP_RETRY_MIN_INTERVAL = 500;
+export const HTTP_RETRY_MAX_INTERVAL = 5000;
 
 export const WS_RECONNECT_MIN_INTERVAL = 200;
 export const WS_RECONNECT_MAX_INTERVAL = 10000;

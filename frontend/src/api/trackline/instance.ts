@@ -4,8 +4,9 @@ import qs from "qs";
 
 import { TracklineApiError } from "@/api/trackline/errors";
 import { ErrorResponse } from "@/api/trackline/types";
-import { NetworkError, TimeoutError } from "@/api/utils/errors";
+import { ApiError, NetworkError, TimeoutError } from "@/api/utils/errors";
 import { camelizeResponse, decamelizeRequest } from "@/api/utils/interceptors";
+import { setupRetry } from "@/api/utils/retry";
 import { BACKEND_URL } from "@/configuration";
 import { HTTP_REQUEST_TIMEOUT } from "@/constants";
 
@@ -27,18 +28,20 @@ export const setup = (config: TracklineApiConfig) => {
   ({ getSessionToken, setSessionToken, setTimeDeviation } = config);
 };
 
-const instance = rateLimit(
-  axios.create({
-    baseURL: BACKEND_URL,
-    headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-    },
-    paramsSerializer: (params) =>
-      qs.stringify(params, { arrayFormat: "repeat" }),
-    timeout: HTTP_REQUEST_TIMEOUT,
-  }),
-  { maxRPS: 15 },
+const instance = setupRetry(
+  rateLimit(
+    axios.create({
+      baseURL: BACKEND_URL,
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      paramsSerializer: (params) =>
+        qs.stringify(params, { arrayFormat: "repeat" }),
+      timeout: HTTP_REQUEST_TIMEOUT,
+    }),
+    { maxRPS: 15 },
+  ),
 );
 
 instance.interceptors.request.use(decamelizeRequest);
@@ -52,6 +55,7 @@ instance.interceptors.request.use((config) => {
 
   return config;
 });
+
 instance.interceptors.response.use(
   (response) => {
     const serverTime = response.headers["x-server-time"];
@@ -63,6 +67,11 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
+    // A retried request may already have been transformed
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
     const { code, message, response } = error;
     if (code === "ERR_NETWORK") {
       throw new NetworkError(message);

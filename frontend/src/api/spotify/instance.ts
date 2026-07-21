@@ -3,8 +3,9 @@ import rateLimit from "axios-rate-limit";
 
 import { SpotifyApiError } from "@/api/spotify/errors";
 import tracklineApi from "@/api/trackline";
-import { NetworkError } from "@/api/utils/errors";
+import { ApiError, NetworkError } from "@/api/utils/errors";
 import { camelizeResponse, decamelizeRequest } from "@/api/utils/interceptors";
+import { setupRetry } from "@/api/utils/retry";
 import { SpotifyAccessToken } from "@/types/spotify";
 import { Lock, sleep } from "@/utils/concurrency";
 
@@ -38,15 +39,17 @@ const refreshAccessToken = async (refreshToken: string): Promise<boolean> => {
   });
 };
 
-const instance = rateLimit(
-  axios.create({
-    baseURL: "https://api.spotify.com/v1",
-    headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-    },
-  }),
-  { maxRPS: 100 },
+const instance = setupRetry(
+  rateLimit(
+    axios.create({
+      baseURL: "https://api.spotify.com/v1",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+    }),
+    { maxRPS: 100 },
+  ),
 );
 
 instance.interceptors.request.use(decamelizeRequest);
@@ -66,6 +69,11 @@ instance.interceptors.request.use(async (config) => {
 });
 
 instance.interceptors.response.use(null, async (error: AxiosError) => {
+  // A retried request may already have been transformed
+  if (error instanceof ApiError) {
+    throw error;
+  }
+
   const { code, config, message, response } = error;
   if (code === "ERR_NETWORK") {
     throw new NetworkError(message);
