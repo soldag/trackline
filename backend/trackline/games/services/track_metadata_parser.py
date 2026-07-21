@@ -113,14 +113,13 @@ class TrackMetadataParser:
                 artists.append(artist)
 
         for segment in self._split_in_segments(raw_title):
-            text = segment.text
+            featuring_artists, text = self._extract_featuring(segment.text, artists)
+            artists += featuring_artists
+            if not text:
+                continue
 
             if not primary_title and not segment.is_annotation:
                 primary_title = text
-                continue
-
-            if featuring_artists := self._extract_featuring(text, artists):
-                artists += featuring_artists
                 continue
 
             if version := self._extract_version(text, artists):
@@ -173,10 +172,11 @@ class TrackMetadataParser:
 
     def _extract_featuring(
         self, segment: str, known_artists: Iterable[Artist]
-    ) -> list[Artist]:
+    ) -> tuple[list[Artist], str]:
         artists: list[Artist] = []
+        remainder = segment
         for pattern in self.FEATURING_PATTERNS:
-            if match := self._search(pattern.value, segment):
+            if match := self._search(pattern.value, remainder):
                 # Some patterns (e.g with <artist>) are not reliable, so we
                 # double check if any of the extracted artists is already
                 # known as an artist of the track
@@ -190,8 +190,9 @@ class TrackMetadataParser:
                 )
                 if pattern.is_trusted or has_known_artist:
                     artists += match_artists
+                    remainder = remainder[: match.start()]
 
-        return artists
+        return artists, remainder
 
     def _extract_version(
         self, segment: str, known_artists: Iterable[Artist]
