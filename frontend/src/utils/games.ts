@@ -23,7 +23,9 @@ export const getPlayerRank = (player: Player, players: Player[]) =>
 export const sortPlayersByRank = (players: Player[]): RankedPlayer[] =>
   players
     .map((player) => ({ ...player, rank: getPlayerRank(player, players) }))
-    .toSorted((a, b) => a.rank - b.rank);
+    .toSorted(
+      (a, b) => a.rank - b.rank || a.timeline.length - b.timeline.length,
+    );
 
 export const getYearRangeOfGuess = (
   timeline: Track[],
