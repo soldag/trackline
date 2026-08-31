@@ -98,7 +98,7 @@ class MusicBrainzClient:
             return []
 
         if not response.is_success:
-            log.exception(
+            log.error(
                 "MusicBrainz request failed with status code %s",
                 response.status_code,
             )
