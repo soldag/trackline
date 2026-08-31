@@ -9,12 +9,12 @@
     },
     "packageManager": {
       "name": "npm",
-      "version": "^11"
+      "version": "^12"
     }
   },
   "dependencies": {
     "migrate-mongo": "^14.0.7",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.2"
   },
   "scripts": {
     "migrate": "migrate-mongo"
