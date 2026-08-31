@@ -8,7 +8,7 @@ const isMainBranch = process.env.GITHUB_REF_NAME === "main";
 export default {
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
   build: {

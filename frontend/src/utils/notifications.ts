@@ -1,7 +1,7 @@
 import { Action, ActionCreator } from "@reduxjs/toolkit";
 import { camelizeKeys } from "humps";
 import { useCallback, useMemo, useState } from "react";
-import useWebSocket from "react-use-websocket";
+import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 
 import tracklineApi from "@/api/trackline";
 import {
