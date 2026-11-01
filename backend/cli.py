@@ -1,6 +1,7 @@
 import asyncio
 import csv
 import os
+import sys
 import time
 from collections import defaultdict
 from collections.abc import Collection, Iterable, Mapping
@@ -10,6 +11,7 @@ from typing import Annotated, Any
 
 import anyio
 import typer
+from httpx import URL
 from injector import ClassAssistedBuilder, inject
 from rich import print  # noqa: A004
 from rich.console import Console
@@ -164,6 +166,44 @@ class TrackMetadataParserCli:
         )
 
 
+class SpotifyAccessTokenCli:
+    SCOPES = (
+        "playlist-read-private",
+        "playlist-modify-private",
+        "playlist-modify-public",
+    )
+
+    @inject
+    def __init__(self, auth_provider: SpotifyAuthProvider) -> None:
+        self._auth_provider = auth_provider
+
+    async def run(self) -> None:
+        url = await self._auth_provider.get_user_authorization_url(self.SCOPES)
+        typer.echo(
+            "Make sure the frontend dev server is stopped, as it would consume the "
+            "authorization code. Then open this URL and approve access:\n",
+            err=True,
+        )
+        typer.echo(f"{url}\n", err=True)
+        typer.echo("Paste the URL you were redirected to: ", nl=False, err=True)
+        redirect_url = sys.stdin.readline().strip()
+
+        code = URL(redirect_url).params.get("code")
+        if not code:
+            typer.echo("The URL does not contain an authorization code.", err=True)
+            raise typer.Exit(1)
+
+        try:
+            token = await self._auth_provider.get_user_access_token(code)
+        except InvalidTokenError as e:
+            typer.echo(f"{e}. Codes are single-use, please try again.", err=True)
+            raise typer.Exit(1) from e
+        finally:
+            await self._auth_provider.close()
+
+        typer.echo(token.access_token)
+
+
 class PlaylistTrackDeduplicatorCli:
     # Spotify user access tokens are valid for one hour
     ACCESS_TOKEN_LIFETIME = 3600
@@ -269,6 +309,13 @@ def track_metadata(track_id: str) -> None:
     """Parse metadata of a Spotify track."""
     cli = injector.get(TrackMetadataParserCli)
     asyncio.run(cli.run(track_id))
+
+
+@app.command()
+def spotify_token() -> None:
+    """Get a Spotify user access token for modifying playlists."""
+    cli = injector.get(SpotifyAccessTokenCli)
+    asyncio.run(cli.run())
 
 
 @app.command()
