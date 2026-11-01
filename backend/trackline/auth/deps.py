@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated
 
-from fastapi import Depends, Query, Request
+from fastapi import Depends, Query
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_injector import Injected
 
@@ -13,22 +13,11 @@ from trackline.core.use_cases import UseCaseExecutor
 log = logging.getLogger(__name__)
 
 
-class OptionalHTTPBearer(HTTPBearer):
-    async def __call__(
-        self,
-        request: Request = None,  # type: ignore[assignment]
-    ) -> HTTPAuthorizationCredentials | None:
-        if not request:
-            return None
-
-        return await super().__call__(request)
-
-
-_auth = OptionalHTTPBearer(auto_error=False)
-
-
 def get_auth_token(
-    auth: Annotated[HTTPAuthorizationCredentials | None, Depends(_auth)],
+    auth: Annotated[
+        HTTPAuthorizationCredentials | None,
+        Depends(HTTPBearer(auto_error=False)),
+    ],
     session_token: str | None = Query(default=None, include_in_schema=False),  # type: ignore[reportCallInDefaultInitializer]
 ) -> str:
     if auth:
