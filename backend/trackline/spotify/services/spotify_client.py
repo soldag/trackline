@@ -265,8 +265,8 @@ class SpotifyUserClient(SpotifyClientBase):
             response = await self._client.request(
                 "DELETE",
                 f"playlists/{playlist_id}/items",
-                data={
-                    "tracks": [
+                json={
+                    "items": [
                         {"uri": f"spotify:track:{track_id}"}
                         for track_id in track_ids_chunk
                     ]

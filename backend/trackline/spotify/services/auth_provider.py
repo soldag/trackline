@@ -1,4 +1,5 @@
 import time
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Literal, overload
 
@@ -55,11 +56,12 @@ class SpotifyAuthProvider:
 
         return self._parse_token_response(response)
 
-    async def get_user_authorization_url(self) -> str:
+    async def get_user_authorization_url(self, scopes: Iterable[str] = ()) -> str:
         params = {
             "client_id": self._settings.spotify_client_id,
             "response_type": "code",
             "redirect_uri": self._settings.spotify_redirect_url,
+            "scope": " ".join(scopes),
         }
         url = URL(self.AUTHORIZATION_URL, params=params)
         return str(url)

@@ -1,6 +1,7 @@
 import asyncio
 import csv
 import os
+import time
 from collections import defaultdict
 from collections.abc import Collection, Iterable, Mapping
 from dataclasses import asdict
@@ -22,6 +23,11 @@ from trackline.games.services.track_metadata_parser import (
     TrackMetadataParser,
 )
 from trackline.spotify.models import SpotifyTrack
+from trackline.spotify.services.auth_provider import (
+    InvalidTokenError,
+    RefreshableAccessToken,
+    SpotifyAuthProvider,
+)
 from trackline.spotify.services.spotify_client import SpotifyClient, SpotifyUserClient
 
 app = typer.Typer()
@@ -159,6 +165,9 @@ class TrackMetadataParserCli:
 
 
 class PlaylistTrackDeduplicatorCli:
+    # Spotify user access tokens are valid for one hour
+    ACCESS_TOKEN_LIFETIME = 3600
+
     @inject
     def __init__(
         self,
@@ -170,8 +179,13 @@ class PlaylistTrackDeduplicatorCli:
 
     async def run(self, playlist_id: str, access_token: str, *, dry_run: bool) -> None:
         print(f"Fetching playlist {playlist_id} from Spotify...")
+        token = RefreshableAccessToken(
+            access_token=access_token,
+            expiration_time=int(time.time()) + self.ACCESS_TOKEN_LIFETIME,
+            refresh_token="",
+        )
         async with self._spotify_client_builder.build(
-            access_token=access_token
+            access_token=token
         ) as spotify_client:
             tracks = await spotify_client.get_playlist_tracks(playlist_id)
 
