@@ -1,4 +1,8 @@
-import { defineMessages } from "react-intl";
+import { MessageTag, defineMessages } from "react-intl";
+
+import { CreditsStrictness } from "@/types/games";
+
+type DescriptionValues = Record<CreditsStrictness, { bold: MessageTag }>;
 
 export default {
   labels: defineMessages({
@@ -19,7 +23,7 @@ export default {
       defaultMessage: "Relaxed",
     },
   }),
-  descriptions: defineMessages({
+  descriptions: defineMessages<DescriptionValues>({
     exact: {
       id: "CreditsStrictness.descriptions.exact",
       defaultMessage:

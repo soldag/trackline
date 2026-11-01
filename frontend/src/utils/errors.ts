@@ -19,7 +19,7 @@ export const getErrorMessage = (intl: IntlShape, error: AppError) => {
     }
   }
 
-  return intl.formatMessage(
-    messageDescriptor || GlobalErrorMessages.UNEXPECTED_ERROR,
-  );
+  messageDescriptor ||= GlobalErrorMessages.UNEXPECTED_ERROR;
+
+  return intl.formatMessage(messageDescriptor);
 };

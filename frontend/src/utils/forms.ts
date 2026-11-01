@@ -44,7 +44,9 @@ export const buildRules = <TFieldValue>(
         {
           value,
           message: intl.formatMessage(
-            FormValidationMessages[key as keyof typeof FormValidationMessages],
+            FormValidationMessages[
+              key as keyof typeof FormValidationMessages
+            ] as MessageDescriptor,
             typeof value === "string" || typeof value === "number"
               ? { value }
               : undefined,
