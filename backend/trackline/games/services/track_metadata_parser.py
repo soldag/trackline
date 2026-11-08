@@ -280,7 +280,7 @@ class TrackMetadataParser:
                 other_secondary_names = {
                     name.casefold() for name in other.secondary_names
                 }
-                if artist.primary_name.casefold in other_secondary_names:
+                if artist.primary_name.casefold() in other_secondary_names:
                     result[index] = replace(artist, artist_type=other.artist_type)
 
                 break
