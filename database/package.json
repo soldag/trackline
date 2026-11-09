@@ -9,7 +9,7 @@
     },
     "packageManager": {
       "name": "npm",
-      "version": "^12"
+      "version": "^11 || ^12"
     }
   },
   "dependencies": {
