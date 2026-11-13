@@ -53,8 +53,11 @@ const GuessCreditsModal = ({
     onConfirm?.(credits);
   };
 
+  // Reset when opening rather than closing: ConfirmModal closes the modal
+  // synchronously after triggering the (async) submit, and react-hook-form
+  // silently aborts a submission if reset() is called while it's validating.
   useEffect(() => {
-    if (!open) {
+    if (open) {
       reset();
     }
   }, [open, reset]);
