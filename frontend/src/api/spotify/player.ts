@@ -12,6 +12,12 @@ interface ActivePlaybackStateResponse {
 }
 type PlaybackStateResponse = ActivePlaybackStateResponse | "";
 
+interface TrackResponse {
+  album: {
+    uri: string;
+  };
+}
+
 export const getPlaybackState = async (): Promise<PlaybackState> => {
   const { data: playbackState } =
     await instance.get<PlaybackStateResponse>("me/player");
@@ -44,6 +50,11 @@ export const getPlaybackState = async (): Promise<PlaybackState> => {
   };
 };
 
+const getAlbumUri = async (trackId: string): Promise<string> => {
+  const { data } = await instance.get<TrackResponse>(`tracks/${trackId}`);
+  return data.album.uri;
+};
+
 export const play = async ({
   trackId,
   deviceId,
@@ -51,10 +62,23 @@ export const play = async ({
   trackId?: string;
   deviceId?: string;
 } = {}): Promise<void> => {
-  await instance.put("me/player/play", {
-    ...(deviceId && { deviceId }),
-    ...(trackId && { uris: [`spotify:track:${trackId}`] }),
-  });
+  const body: Record<string, unknown> = {};
+
+  if (deviceId) {
+    body.deviceId = deviceId;
+  }
+
+  if (trackId) {
+    // WORKAROUND: Starting a single track via `uris` can leave the Spotify
+    // client in a broken state: it acknowledges the request (204), but only
+    // adds the track to the queue and restarts the current track instead.
+    // Starting the track within its album context does not suffer from this
+    // issue. To revert, remove the album lookup and set `body.uris` instead.
+    body.contextUri = await getAlbumUri(trackId);
+    body.offset = { uri: `spotify:track:${trackId}` };
+  }
+
+  await instance.put("me/player/play", body);
 };
 
 export const pause = async (): Promise<void> => {
